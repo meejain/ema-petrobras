@@ -265,18 +265,24 @@ function buildMainNav(section, nav) {
   const topUl = section.querySelector(':scope > ul');
   const list = document.createElement('ul');
   list.className = 'nav-list';
-  [...topUl.children].forEach((li) => {
+  [...topUl.children].filter((li) => li.tagName === 'LI').forEach((li) => {
     const item = document.createElement('li');
     item.className = 'nav-item';
     const topA = li.querySelector(':scope > a');
     const subUls = [...li.querySelectorAll(':scope > ul')];
+    // label from the direct link, or the li's own text nodes when there's no link
+    const label = topA ? topA.textContent.trim() : [...li.childNodes]
+      .filter((n) => n.nodeType === Node.TEXT_NODE)
+      .map((n) => n.textContent.trim())
+      .filter(Boolean)
+      .join(' ');
 
     if (subUls.length > 0) {
       const trigger = document.createElement('button');
       trigger.type = 'button';
       trigger.className = 'nav-drop';
       trigger.setAttribute('aria-expanded', 'false');
-      trigger.innerHTML = `<span>${topA.textContent.trim()}</span>`;
+      trigger.innerHTML = `<span>${label}</span>`;
       const panel = buildMegamenuPanel(subUls);
       item.append(trigger, panel);
 
@@ -294,12 +300,17 @@ function buildMainNav(section, nav) {
       });
       const closeBtn = panel.querySelector('.nav-megamenu-close');
       if (closeBtn) closeBtn.addEventListener('click', () => closeAllMegamenus(nav));
-    } else {
+    } else if (topA) {
       const link = document.createElement('a');
-      link.href = topA.href;
+      link.href = topA.getAttribute('href');
       link.textContent = topA.textContent.trim();
       link.className = 'nav-link';
       item.append(link);
+    } else if (label) {
+      const span = document.createElement('span');
+      span.className = 'nav-link';
+      span.textContent = label;
+      item.append(span);
     }
     list.append(item);
   });
