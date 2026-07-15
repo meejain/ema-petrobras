@@ -174,7 +174,7 @@ function buildSubList(categoryLabel, nestedUl) {
   return view;
 }
 
-function buildMegamenuPanel(subLists) {
+function buildMegamenuPanel(subLists, title) {
   const panel = document.createElement('div');
   panel.className = 'nav-megamenu';
   panel.hidden = true;
@@ -187,9 +187,15 @@ function buildMegamenuPanel(subLists) {
   const categoryList = subLists.find((ul) => !ul.querySelector('img'));
   const highlightList = subLists.find((ul) => ul.querySelector('img'));
 
-  // Left: category links
+  // Left: panel title + category links
   const left = document.createElement('div');
   left.className = 'nav-megamenu-list';
+  if (title) {
+    const heading = document.createElement('p');
+    heading.className = 'nav-megamenu-title';
+    heading.textContent = title;
+    left.append(heading);
+  }
   const catUl = document.createElement('ul');
 
   // Right: swappable region (default = highlights; category with nested list swaps in its sublist)
@@ -288,7 +294,7 @@ function buildMainNav(section, nav) {
       trigger.className = 'nav-drop';
       trigger.setAttribute('aria-expanded', 'false');
       trigger.innerHTML = `<span>${label}</span>`;
-      const panel = buildMegamenuPanel(subUls);
+      const panel = buildMegamenuPanel(subUls, label);
       item.append(trigger, panel);
 
       trigger.addEventListener('click', () => {
