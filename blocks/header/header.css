@@ -391,6 +391,25 @@ header .nav-megamenu-list {
   flex: 0 0 30%;
 }
 
+/* panel title — large dark heading with a yellow accent bar (source) */
+header .nav-megamenu-title {
+  margin: 0 0 32px;
+  font-family: var(--heading-font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #373737;
+}
+
+header .nav-megamenu-title::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 16px;
+  background: var(--petro-yellow);
+}
+
 header .nav-megamenu-list ul {
   list-style: none;
   margin: 0;
@@ -447,10 +466,14 @@ header .nav-megamenu-cat.is-active .nav-megamenu-cat-toggle {
   text-decoration: underline;
 }
 
-/* right region wrapper (holds highlights + swappable sublists) */
+/* right region wrapper (holds highlights + swappable sublists) —
+   light-grey panel (source .submenus --color-neutral-300 #f8f8f8) */
 header .nav-megamenu-right {
   flex: 1;
   position: relative;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 32px;
 }
 
 /* nested sublist view (swapped in when an expandable category is clicked) */
@@ -497,15 +520,23 @@ header .nav-megamenu-highlights-head p {
 }
 
 header .nav-megamenu-close {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--petro-green);
   border-radius: 50%;
   background: none;
   cursor: pointer;
   position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+/* hover: fill green circle, white X (source) */
+header .nav-megamenu-close:hover {
+  background: var(--petro-green);
+  border-color: var(--petro-green);
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-megamenu-close::before,
 header .nav-megamenu-close::after {
   content: '';
@@ -515,10 +546,17 @@ header .nav-megamenu-close::after {
   width: 14px;
   height: 2px;
   background: var(--petro-green);
+  transition: background-color 0.2s ease;
 }
 
 header .nav-megamenu-close::before { transform: translate(-50%, -50%) rotate(45deg); }
 header .nav-megamenu-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+/* stylelint-disable-next-line no-descending-specificity */
+header .nav-megamenu-close:hover::before,
+header .nav-megamenu-close:hover::after {
+  background: #fff;
+}
 
 header .nav-megamenu-cards {
   display: grid;
@@ -529,16 +567,18 @@ header .nav-megamenu-cards {
 header .nav-megamenu-card {
   display: flex;
   flex-direction: column;
+  background: #fff;
   border: 1px solid #e6e6e6;
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
   color: #373737;
   transition: box-shadow 0.2s ease;
 }
 
+/* source .card:hover — box-shadow-default lift */
 header .nav-megamenu-card:hover {
-  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
 }
 
 header .nav-megamenu-card-img img {
@@ -586,6 +626,22 @@ header .nav-overlay.is-visible {
 /* header turns solid white when a megamenu is open */
 header .nav-wrapper.is-open .nav-main {
   background: #fff;
+}
+
+/* on white open-state, nav links/triggers turn dark so they stay visible */
+header .nav-wrapper.is-open .nav-link,
+header .nav-wrapper.is-open .nav-drop {
+  color: #373737;
+}
+
+/* the open megamenu's trigger gets a green label + blue focus box (source) */
+header .nav-wrapper.is-open .nav-drop[aria-expanded="true"] {
+  color: var(--petro-green);
+}
+
+/* white open-state search icon turns dark */
+header .nav-wrapper.is-open .nav-search-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23373737" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
 
 /* ---------- Sticky compact-on-scroll ---------- */
