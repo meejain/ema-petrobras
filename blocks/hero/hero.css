@@ -144,7 +144,7 @@ main > .section.hero-container {
 .hero .hero-card {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   min-height: 140px;
   padding: 24px;
   overflow: hidden;

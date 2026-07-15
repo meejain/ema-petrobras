@@ -12,13 +12,16 @@
   --nav-main-compact: 56px;
 }
 
-/* wrapper: fixed at top, transparent by default (overlaps hero) */
+/* wrapper: fixed at top, transparent by default (overlaps hero).
+   A soft top-down shade darkens the page top so white nav/utility text stays
+   legible — darkest at the very top edge, fading to transparent by the nav
+   baseline, matching the source (no mid-header dark band). */
 header .nav-wrapper {
   position: fixed;
   inset: 0 0 auto;
   z-index: 20;
   width: 100%;
-  background: transparent;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 18%) 0%, rgb(0 0 0 / 0%) 100%);
 }
 
 header nav {
