@@ -1,0 +1,38 @@
+{
+  "variantName": "featured-news",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-07-15T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://petrobras.com.br/",
+    "originPage": "Petrobras homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "news",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image + category tag + heading + link",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "latest news / press highlight sections",
+      "article listing grids",
+      "editorial content teasers with images"
+    ],
+    "notSuitableFor": [
+      "product showcases (use cards-product)",
+      "text-only card lists (use cards no-images)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-15T00:00:00.000Z"
+  }
+}

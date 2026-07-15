@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "url": "https://petrobras.com.br/",
+  "path": "index",
+  "timestamp": "2026-07-15T19:18:59.976Z",
+  "title": "O Brasil é a nossa Energia | Petrobras",
+  "template": "homepage",
+  "blocks": [
+    "hero",
+    "featured-news",
+    "slider-cards",
+    "banner-notice"
+  ]
+}

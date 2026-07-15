@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "projectType": "doc"
+  },
+  "templates": [
+    {
+      "name": "homepage",
+      "urls": [
+        "https://petrobras.com.br/"
+      ],
+      "representativeUrl": "https://petrobras.com.br/",
+      "coverageGaps": [],
+      "description": "Petrobras home page with hero carousel, featured news, sustainable products slider, and a banner notice text block",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-carrossel-hero-destaque.lfr-layout-structure-item-670001a6-a672-1dd3-b0b6-823f0762dc4e"
+          ]
+        },
+        {
+          "name": "featured-news",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-banner-destaque-agencia.lfr-layout-structure-item-52cb4c53-f8c8-8298-7cae-6b6c970cfc58"
+          ]
+        },
+        {
+          "name": "slider-cards",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-lista-de-cards-content.lfr-layout-structure-item-b84fa5e3-f603-2c6c-b4c6-42aad28dfe00"
+          ]
+        },
+        {
+          "name": "banner-notice",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-b9a44bf9-a2c7-47d2-4574-afafbc9830bb"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "rc2c5c1",
+          "name": "carrossel-hero-destaque",
+          "selector": "#main-content > div.lfr-layout-structure-item-carrossel-hero-destaque.lfr-layout-structure-item-670001a6-a672-1dd3-b0b6-823f0762dc4e",
+          "style": null,
+          "blocks": [
+            "hero"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc2c5c2",
+          "name": "banner-destaque-agencia",
+          "selector": "#main-content > div.lfr-layout-structure-item-banner-destaque-agencia.lfr-layout-structure-item-52cb4c53-f8c8-8298-7cae-6b6c970cfc58",
+          "style": "light",
+          "blocks": [
+            "featured-news"
+          ],
+          "defaultContent": [
+            ".agency-highlight-title"
+          ]
+        },
+        {
+          "id": "rc2c5c3",
+          "name": "lista-de-cards-content",
+          "selector": "#main-content > div.lfr-layout-structure-item-lista-de-cards-content.lfr-layout-structure-item-b84fa5e3-f603-2c6c-b4c6-42aad28dfe00",
+          "style": "light",
+          "blocks": [
+            "slider-cards"
+          ],
+          "defaultContent": [
+            ".title-wrapper"
+          ]
+        },
+        {
+          "id": "rc2c5c4",
+          "name": "grade",
+          "selector": "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-b9a44bf9-a2c7-47d2-4574-afafbc9830bb",
+          "style": null,
+          "blocks": [
+            "banner-notice"
+          ],
+          "defaultContent": []
+        }
+      ]
+    }
+  ]
+}

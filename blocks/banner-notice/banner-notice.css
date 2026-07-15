@@ -1,0 +1,47 @@
+/* banner-notice — bordered card with heading, yellow accent bar, and notice text.
+   Matches the Petrobras "Pausa em alguns de nossos conteúdos" section. */
+
+.banner-notice {
+  border: 1px solid rgb(215 215 215);
+  border-radius: 8px;
+  background: var(--background-color);
+}
+
+.banner-notice .banner-notice-inner {
+  padding: 40px 48px;
+}
+
+.banner-notice .banner-notice-inner h2,
+.banner-notice .banner-notice-inner h3 {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #373737;
+}
+
+/* yellow accent bar under the heading (source .yellow-bar.bar-h3) */
+.banner-notice .banner-notice-inner h2::after,
+.banner-notice .banner-notice-inner h3::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin-top: 18px;
+  background-color: rgb(253 200 47);
+}
+
+.banner-notice .banner-notice-inner p {
+  margin: 32px 0 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #373737;
+}
+
+@media (width < 900px) {
+  .banner-notice .banner-notice-inner {
+    padding: 28px 20px;
+  }
+}

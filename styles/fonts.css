@@ -1,5 +1,37 @@
 /* stylelint-disable max-line-length */
 @font-face {
+  font-family: "Petrobras Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/PetrobrasSans-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "Petrobras Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/PetrobrasSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "Petrobras Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/PetrobrasSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "Petrobras Sans";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/PetrobrasSans-XBold.ttf') format('truetype');
+}
+
+@font-face {
   font-family: roboto-condensed;
   font-style: normal;
   font-weight: 700;

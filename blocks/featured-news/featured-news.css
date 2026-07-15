@@ -1,0 +1,249 @@
+/* featured-news — editorial "latest news" layout
+ * Mobile-first: single column stack.
+ * Desktop (>=900px): large featured card (left) + stacked list of secondary cards (right).
+ * Values extracted from petrobras.com.br news section (fragment_2144685) computed styles.
+ */
+
+/* gap below the heading + yellow bar before the cards (matches source) */
+.featured-news-container .default-content-wrapper h2 {
+  margin-bottom: 32px;
+}
+
+/* yellow accent bar under the section heading (matches source .title-yellow-bar) */
+.featured-news-container .default-content-wrapper h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 24px;
+  background-color: rgb(253 200 47);
+}
+
+.featured-news > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---- Base card shell (applies to every li) ---- */
+.featured-news > ul > li {
+  position: relative;
+  background: var(--background-color);
+  border: 1px solid rgb(215 215 215);
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: hidden;
+  transition: box-shadow 300ms ease-in-out;
+}
+
+/* hover lift — every news card gains the neutral shadow (source .card:hover) */
+.featured-news > ul > li:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
+}
+
+.featured-news .featured-news-card-image {
+  line-height: 0;
+}
+
+.featured-news .featured-news-card-image img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.featured-news .featured-news-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* category tag (first paragraph in body) */
+.featured-news .featured-news-card-body > p:first-child {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(55 55 55);
+}
+
+/* headline link (last paragraph / anchor) */
+.featured-news .featured-news-card-body a {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.32;
+  color: rgb(55 55 55);
+  text-decoration: none;
+}
+
+.featured-news .featured-news-card-body a:hover {
+  text-decoration: underline;
+}
+
+/* =====================================================================
+   FEATURED CARD (first li) — image with a flat dark overlay + text
+   ===================================================================== */
+.featured-news > ul > li:first-child .featured-news-card-image {
+  position: absolute;
+  inset: 0;
+}
+
+.featured-news > ul > li:first-child .featured-news-card-image img {
+  height: 100%;
+}
+
+/* flat 35% dark overlay for legibility of overlaid text (source .overlay-filter) */
+.featured-news > ul > li:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 35%);
+  pointer-events: none;
+}
+
+.featured-news > ul > li:first-child .featured-news-card-body {
+  position: relative;
+  z-index: 1;
+  justify-content: flex-end;
+  min-height: 420px;
+  padding: 0 24px 22px;
+  gap: 16px;
+  color: #fff;
+}
+
+.featured-news > ul > li:first-child .featured-news-card-body > p:first-child {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.featured-news > ul > li:first-child .featured-news-card-body h2 {
+  margin: 0;
+  padding-bottom: 16px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
+/* yellow accent bar between headline and the "Ler notícia" pill (source .bar) */
+.featured-news > ul > li:first-child .featured-news-card-body h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 16px;
+  background-color: rgb(253 200 47);
+}
+
+/* "Ler notícia" frosted pill button (source .link-container + .link) */
+.featured-news > ul > li:first-child .featured-news-card-body a {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: 296px;
+  padding: 18px 32px;
+  border-radius: 100px;
+  background: rgb(255 255 255 / 48%);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
+  backdrop-filter: blur(8px);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.44;
+  color: #fff;
+}
+
+.featured-news > ul > li:first-child .featured-news-card-body a:hover {
+  text-decoration: none;
+}
+
+/* arrow icon (source SVG viewBox 0 0 46 28, 46x28) */
+.featured-news > ul > li:first-child .featured-news-card-body a::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 46px;
+  height: 28px;
+  background-color: currentcolor;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 28"><path d="M36.5303 14.5303C36.8232 14.2374 36.8232 13.7626 36.5303 13.4697L31.7574 8.6967C31.4645 8.40381 30.9896 8.40381 30.6967 8.6967C30.4038 8.9896 30.4038 9.46447 30.6967 9.75736L34.9393 14L30.6967 18.2426C30.4038 18.5355 30.4038 19.0104 30.6967 19.3033C30.9896 19.5962 31.4645 19.5962 31.7574 19.3033L36.5303 14.5303ZM0 14.75L36 14.75L36 13.25L0 13.25L0 14.75Z"/></svg>') no-repeat center / contain;
+}
+
+/* =====================================================================
+   SECONDARY CARDS (li 2..n) — horizontal: small image left, body right
+   ===================================================================== */
+.featured-news > ul > li:not(:first-child) {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  max-height: 136px;
+}
+
+.featured-news > ul > li:not(:first-child) .featured-news-card-image {
+  flex: 0 0 154px;
+  overflow: hidden;
+  border-radius: 8px 0 0 8px;
+}
+
+.featured-news > ul > li:not(:first-child) .featured-news-card-image img {
+  width: 154px;
+  height: 134px;
+  object-fit: cover;
+}
+
+.featured-news > ul > li:not(:first-child) .featured-news-card-body {
+  flex: 1;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 0 8px 8px 0;
+  background: var(--background-color);
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.featured-news > ul > li:not(:first-child) .featured-news-card-body a {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* =====================================================================
+   DESKTOP — two-column editorial layout
+   ===================================================================== */
+@media (width >= 900px) {
+  .featured-news > ul {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 452px;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  /* featured spans the full left column across all three rows */
+  .featured-news > ul > li:first-child {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    height: 100%;
+  }
+
+  .featured-news > ul > li:not(:first-child) {
+    grid-column: 2;
+    height: 100%;
+    max-height: none;
+  }
+
+  /* featured body fills the card; height driven by the 3 stacked cards */
+  .featured-news > ul > li:first-child .featured-news-card-body {
+    height: 100%;
+    padding: 0 48px 22px;
+  }
+
+  .featured-news > ul > li:first-child .featured-news-card-body h2 {
+    font-size: 38px;
+  }
+}

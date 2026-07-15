@@ -1,0 +1,187 @@
+/* slider-cards — "Produtos mais sustentáveis" product cards
+   Design extracted from petrobras.com.br (getComputedStyle). */
+
+/* gap below the heading + yellow bar before the cards (matches source) */
+.slider-cards-container .default-content-wrapper h2 {
+  margin-bottom: 40px;
+}
+
+/* yellow accent bar under the section heading (source .yellow-bar.bar-h2) */
+.slider-cards-container .default-content-wrapper h2::after {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 4px;
+  margin-top: 16px;
+  background-color: rgb(253 200 47);
+}
+
+/* slider viewport (horizontal scroll track) */
+.slider-cards .slider-cards-viewport {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.slider-cards .slider-cards-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.slider-cards > .slider-cards-viewport > ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: 32px;
+}
+
+/* arrow controls */
+.slider-cards .slider-cards-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.slider-cards .slider-cards-arrow {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.slider-cards .slider-cards-prev {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><path d="M15 4l-8 8 8 8"/></svg>');
+}
+
+.slider-cards .slider-cards-next {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><path d="M9 4l8 8-8 8"/></svg>');
+}
+
+.slider-cards .slider-cards-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Product card */
+.slider-cards ul > li {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  background-color: var(--background-color); /* #fff */
+  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: none;
+  transition: box-shadow 0.2s ease;
+}
+
+/* hover lift (source: box-shadow 0 4px 16px rgba(0,0,0,0.16)) */
+.slider-cards ul > li:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
+}
+
+/* Image */
+.slider-cards .slider-cards-card-image {
+  line-height: 0;
+}
+
+.slider-cards .slider-cards-card-image picture {
+  display: block;
+}
+
+.slider-cards ul > li img {
+  width: 100%;
+  aspect-ratio: 398 / 245;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Card body */
+.slider-cards .slider-cards-card-body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Heading */
+.slider-cards .slider-cards-card-body h3 {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.32;
+  color: #373737;
+}
+
+/* Yellow accent bar under the heading (source: div.yellow-bar #fdc82f 22x3) */
+.slider-cards .slider-cards-card-body h3::after {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 3px;
+  margin-top: 12px;
+  background-color: #fdc82f;
+}
+
+/* Description */
+.slider-cards .slider-cards-card-body p {
+  margin: 24px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text-color); /* #272833 */
+}
+
+/* CTA link — sits at the bottom of the card */
+.slider-cards .slider-cards-card-body p:last-child {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.slider-cards .slider-cards-card-body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--link-color); /* #0b5fff */
+  text-decoration: underline;
+}
+
+/* Chevron after the CTA label (source uses a ChevronRight icon) */
+.slider-cards .slider-cards-card-body a::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid currentcolor;
+  border-right: 2px solid currentcolor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.slider-cards .slider-cards-card-body a:hover {
+  color: var(--link-hover-color);
+}
+
+/* Tablet: fixed-width cards that overflow into a scrollable slider */
+@media (width >= 600px) {
+  .slider-cards > .slider-cards-viewport > ul {
+    grid-auto-columns: 340px;
+  }
+}
+
+/* Desktop: fixed 396px cards (matches source) — ~3 visible, rest scroll */
+@media (width >= 900px) {
+  .slider-cards > .slider-cards-viewport > ul {
+    grid-auto-columns: 396px;
+  }
+}
