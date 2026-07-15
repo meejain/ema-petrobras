@@ -9,6 +9,10 @@
   margin-bottom: 32px;
 }
 
+.featured-news {
+  width: 100%;
+}
+
 /* yellow accent bar under the section heading (matches source .title-yellow-bar) */
 .featured-news-container .default-content-wrapper h2::after {
   content: "";
@@ -221,7 +225,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 452px;
     grid-template-rows: repeat(3, 1fr);
-    gap: 32px;
+    gap: var(--space-lg);
   }
 
   /* featured spans the full left column across all three rows */

@@ -1,1 +1,7 @@
-/* add global styles that can be loaded post LCP here */
+/* Post-LCP global styles */
+
+/* VLibras widget — fixed on the right edge (position tuned in delayed.js) */
+[vw].enabled {
+  position: fixed;
+  z-index: 9999;
+}

@@ -3,11 +3,16 @@
    with yellow accent bar and green pill CTA, and 3 stacked highlight cards on
    the right that sit over the image. */
 
-/* full-bleed: escape the section 1200px max-width */
+/* full-bleed: hero spans the full viewport width */
 .hero-wrapper {
-  max-width: 100% !important;
+  max-width: none !important;
   padding: 0 !important;
   margin: 0 !important;
+}
+
+main > .section.hero-container {
+  width: 100%;
+  max-width: none;
 }
 
 .hero {
@@ -52,10 +57,12 @@
 .hero .hero-main-content {
   position: relative;
   z-index: 2;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px;
+  margin-left: var(--layout-gutter);
+  padding: 24px var(--layout-gutter) 24px 0;
   color: #fff;
 }
 
@@ -191,9 +198,9 @@
   }
 
   .hero .hero-main-content {
-    box-sizing: border-box;
     width: min(62%, 900px);
-    padding: 40px 72px;
+    margin-left: max(var(--space-big), calc((100vw - var(--content-max-width)) / 2));
+    padding: 40px var(--space-lg) 40px 0;
   }
 
   .hero .hero-main-content h1 {
@@ -221,5 +228,12 @@
 
   .hero .hero-card-content a:any-link {
     font-size: 16px;
+  }
+}
+
+@media (width <= 767px) {
+  .hero .hero-main-content {
+    margin-left: var(--layout-gutter);
+    padding: 24px var(--layout-gutter) 24px 0;
   }
 }

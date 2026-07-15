@@ -41,10 +41,12 @@ header .nav-utility-inner {
   justify-content: space-between;
   gap: 24px;
   height: 100%;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 72px;
   box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
 }
 
 header .nav-utility-label {
@@ -369,9 +371,12 @@ header .nav-megamenu {
 header .nav-megamenu-inner {
   display: flex;
   gap: 48px;
-  max-width: var(--content-max-width, 1248px);
-  margin: 0 auto;
-  padding: 40px 24px 48px;
+  box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 0 48px;
 }
 
 header .nav-megamenu-list {
@@ -797,5 +802,21 @@ header .nav-mobile-bar {
   /* prevent body scroll when mobile menu open */
   body.nav-mobile-open {
     overflow: hidden;
+  }
+}
+
+@media (width <= 1440px) {
+  header .nav-utility-inner,
+  header .nav-megamenu-inner {
+    margin-left: var(--space-big);
+    margin-right: var(--space-big);
+  }
+}
+
+@media (width <= 767px) {
+  header .nav-utility-inner,
+  header .nav-megamenu-inner {
+    margin-left: var(--layout-gutter);
+    margin-right: var(--layout-gutter);
   }
 }

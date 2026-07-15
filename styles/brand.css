@@ -7,11 +7,25 @@
   --link-color: #0b5fff;
   --link-hover-color: #004ad7;
   --section-light-color: #f6f8fa;
-  --content-max-width: 1248px;
+
+  /* Source .breakpoint layout (main.css) */
+  --content-max-width: 1440px;
+  --space-big: 72px;
+  --space-lg: 32px;
+  --space-md: 24px;
+  --layout-gutter: 32px;
+  --section-spacing: 48px;
+
   --heading-size-xxl: 38px;
   --heading-size-xl: 32px;
   --heading-size-l: 22px;
   --heading-size-m: 20px;
   --heading-size-s: 18px;
   --heading-size-xs: 16px;
+}
+
+@media (width >= 900px) {
+  :root {
+    --section-spacing: 64px;
+  }
 }

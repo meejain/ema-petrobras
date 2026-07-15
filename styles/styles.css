@@ -137,7 +137,7 @@ pre {
 }
 
 main > div {
-  margin: 40px 16px;
+  margin: 0;
 }
 
 input,
@@ -309,25 +309,73 @@ main img {
   width: 100%;
 }
 
-/* sections */
+/* sections — source .breakpoint container (1440px max, 72px side margins <=1440px) */
 main > .section {
-  margin: 40px 0;
+  margin: var(--section-spacing) 0;
 }
 
-main > .section > div {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 24px;
+main > .section > div:not(.hero-wrapper) {
+  box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+}
+
+@media (width <= 1440px) {
+  main > .section > div:not(.hero-wrapper) {
+    margin-left: var(--space-big);
+    margin-right: var(--space-big);
+  }
+}
+
+@media (width <= 767px) {
+  main > .section > div:not(.hero-wrapper) {
+    margin-left: var(--layout-gutter);
+    margin-right: var(--layout-gutter);
+  }
+}
+
+main > .section.hero-container > .hero-wrapper {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* shared page container for header/footer inner bands */
+.page-container {
+  box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (width <= 1440px) {
+  .page-container {
+    margin-left: var(--space-big);
+    margin-right: var(--space-big);
+  }
+}
+
+@media (width <= 767px) {
+  .page-container {
+    margin-left: var(--layout-gutter);
+    margin-right: var(--layout-gutter);
+  }
 }
 
 main > .section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
+main > .section .default-content-wrapper > :first-child {
+  margin-top: 0;
+}
+
+main > .section .block {
+  width: 100%;
 }
 
 /* section metadata */

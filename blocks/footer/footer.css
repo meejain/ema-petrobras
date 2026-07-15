@@ -24,10 +24,12 @@ footer .footer-top-inner {
   display: flex;
   align-items: flex-start;
   gap: 48px;
-  max-width: var(--content-max-width, 1248px);
-  margin: 0 auto;
-  padding: 32px 72px;
   box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 32px 0;
 }
 
 /* brand + social */
@@ -172,10 +174,12 @@ footer .footer-columns-inner {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
-  max-width: var(--content-max-width, 1248px);
-  margin: 0 auto;
-  padding: 40px 72px;
   box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 0;
 }
 
 footer .footer-column-title {
@@ -229,10 +233,12 @@ footer .footer-legal-inner {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  max-width: var(--content-max-width, 1248px);
-  margin: 0 auto;
-  padding: 24px 72px;
   box-sizing: border-box;
+  width: auto;
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 24px 0;
 }
 
 footer .footer-legal-links {
@@ -265,7 +271,7 @@ footer .footer-copyright {
     align-items: center;
     text-align: center;
     gap: 28px;
-    padding: 28px 20px;
+    padding: 28px 0;
   }
 
   footer .footer-search-col {
@@ -281,7 +287,7 @@ footer .footer-copyright {
   footer .footer-columns-inner {
     grid-template-columns: 1fr;
     gap: 0;
-    padding: 8px 20px;
+    padding: 8px 0;
   }
 
   /* link columns become tap-to-expand accordions */
@@ -328,6 +334,24 @@ footer .footer-copyright {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    padding: 20px;
+    padding: 20px 0;
+  }
+}
+
+@media (width <= 1440px) {
+  footer .footer-top-inner,
+  footer .footer-columns-inner,
+  footer .footer-legal-inner {
+    margin-left: var(--space-big);
+    margin-right: var(--space-big);
+  }
+}
+
+@media (width <= 767px) {
+  footer .footer-top-inner,
+  footer .footer-columns-inner,
+  footer .footer-legal-inner {
+    margin-left: var(--layout-gutter);
+    margin-right: var(--layout-gutter);
   }
 }

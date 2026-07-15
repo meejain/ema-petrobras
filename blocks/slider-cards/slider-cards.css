@@ -16,6 +16,10 @@
   background-color: rgb(253 200 47);
 }
 
+.slider-cards {
+  width: 100%;
+}
+
 /* slider viewport (horizontal scroll track) */
 .slider-cards .slider-cards-viewport {
   overflow-x: auto;
