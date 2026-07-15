@@ -1,0 +1,17 @@
+:root {
+  /* Petrobras brand design tokens (extracted from petrobras.com.br) */
+  --heading-font-family: "Petrobras Sans", "Petrobras Sans Fallback", sans-serif;
+  --body-font-family: "Petrobras Sans", "Petrobras Sans Fallback", sans-serif;
+  --background-color: #fff;
+  --text-color: #272833;
+  --link-color: #0b5fff;
+  --link-hover-color: #004ad7;
+  --section-light-color: #f6f8fa;
+  --content-max-width: 1248px;
+  --heading-size-xxl: 38px;
+  --heading-size-xl: 32px;
+  --heading-size-l: 22px;
+  --heading-size-m: 20px;
+  --heading-size-s: 18px;
+  --heading-size-xs: 16px;
+}

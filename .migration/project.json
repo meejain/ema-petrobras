@@ -1,0 +1,10 @@
+{
+  "type": "doc",
+  "sites": {
+    "ema-petrobras": {
+      "previewOrg": "meejain",
+      "previewSite": "ema-petrobras",
+      "libraryUrl": "https://main--sta-boilerplate--aemdemos.aem.page/tools/sidekick/library.json"
+    }
+  }
+}

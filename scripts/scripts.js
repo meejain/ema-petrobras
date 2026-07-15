@@ -147,10 +147,41 @@ function decorateButtons(main) {
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
+/**
+ * Applies section-metadata blocks: reads key/value rows (e.g. style),
+ * adds them as classes/dataset on the parent section, then removes the block.
+ * The imported content carries section styling via these blocks.
+ * @param {Element} main The container element
+ */
+export function decorateSectionMetadata(main) {
+  main.querySelectorAll(':scope > .section .section-metadata').forEach((meta) => {
+    const section = meta.closest('.section');
+    if (!section) return;
+    [...meta.children].forEach((row) => {
+      if (row.children.length >= 2) {
+        const key = row.children[0].textContent.trim().toLowerCase();
+        const value = row.children[1].textContent.trim();
+        if (key === 'style') {
+          value.split(',').forEach((s) => {
+            const cls = s.trim().toLowerCase().replace(/\s+/g, '-');
+            if (cls) section.classList.add(cls);
+          });
+        } else {
+          section.dataset[key] = value;
+        }
+      }
+    });
+    const wrapper = meta.parentElement;
+    meta.remove();
+    if (wrapper && wrapper !== section && wrapper.children.length === 0) wrapper.remove();
+  });
+}
+
 export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateSectionMetadata(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

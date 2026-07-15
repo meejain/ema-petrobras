@@ -1,0 +1,38 @@
+{
+  "variantName": "slider-cards",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-07-15T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://petrobras.com.br/",
+    "originPage": "Petrobras homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "product",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image + heading + description + CTA",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "product showcases",
+      "sustainable/feature product highlights",
+      "card grids or sliders with image + title + text + CTA"
+    ],
+    "notSuitableFor": [
+      "news/article teasers (use cards-news)",
+      "text-only card lists (use cards no-images)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-15T00:00:00.000Z"
+  }
+}
