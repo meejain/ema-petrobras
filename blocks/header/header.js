@@ -3,6 +3,11 @@
 
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
+// Nav fragment links may be direct children of <li> or wrapped in <p> (CMS markup).
+function getLiLink(li) {
+  return li.querySelector(':scope > a, :scope > p > a');
+}
+
 // Quadrilateral white shape (angled bottom-right cut). The wordmark image src
 // is read from the nav fragment (content-first), not hardcoded here.
 const LOGO_SHAPE = `
@@ -157,7 +162,7 @@ function buildSubList(categoryLabel, nestedUl) {
 
   const list = document.createElement('ul');
   list.className = 'nav-megamenu-sublist-links';
-  [...nestedUl.querySelectorAll(':scope > li > a')].forEach((a) => {
+  [...nestedUl.querySelectorAll(':scope > li > a, :scope > li > p > a')].forEach((a) => {
     const li = document.createElement('li');
     const link = document.createElement('a');
     link.href = a.getAttribute('href');
@@ -202,12 +207,12 @@ function buildMegamenuPanel(subLists) {
 
   if (categoryList) {
     [...categoryList.children].filter((li) => li.tagName === 'LI').forEach((li) => {
-      const a = li.querySelector(':scope > a');
+      const a = getLiLink(li);
       const nestedUl = li.querySelector(':scope > ul');
       const item = document.createElement('li');
       item.className = 'nav-megamenu-cat';
 
-      if (nestedUl) {
+      if (nestedUl && a) {
         // expandable category: click swaps the right panel to its sublist
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -231,7 +236,7 @@ function buildMegamenuPanel(subLists) {
         });
         const subClose = subView.querySelector('.nav-megamenu-close');
         if (subClose) subClose.addEventListener('click', showDefault);
-      } else {
+      } else if (a) {
         const link = document.createElement('a');
         link.href = a.getAttribute('href');
         link.textContent = a.textContent.trim();
@@ -268,7 +273,7 @@ function buildMainNav(section, nav) {
   [...topUl.children].filter((li) => li.tagName === 'LI').forEach((li) => {
     const item = document.createElement('li');
     item.className = 'nav-item';
-    const topA = li.querySelector(':scope > a');
+    const topA = getLiLink(li);
     const subUls = [...li.querySelectorAll(':scope > ul')];
     // label from the direct link, or the li's own text nodes when there's no link
     const label = topA ? topA.textContent.trim() : [...li.childNodes]
@@ -381,12 +386,12 @@ function buildMobileNav(section, wrapper) {
   list.append(homeLi);
 
   [...topUl.children].filter((li) => li.tagName === 'LI').forEach((li) => {
-    const topA = li.querySelector(':scope > a');
+    const topA = getLiLink(li);
     const nestedUls = [...li.querySelectorAll(':scope > ul')];
     const catUl = nestedUls.find((ul) => !ul.querySelector('img'));
     const item = document.createElement('li');
 
-    if (catUl) {
+    if (catUl && topA) {
       // expandable accordion section
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -396,7 +401,8 @@ function buildMobileNav(section, wrapper) {
       sub.className = 'nav-mobile-sub';
       sub.hidden = true;
       [...catUl.children].filter((c) => c.tagName === 'LI').forEach((c) => {
-        const ca = c.querySelector(':scope > a');
+        const ca = getLiLink(c);
+        if (!ca) return;
         const sli = document.createElement('li');
         const link = document.createElement('a');
         link.href = ca.getAttribute('href');
@@ -410,7 +416,7 @@ function buildMobileNav(section, wrapper) {
         btn.classList.toggle('is-open', !open);
       });
       item.append(btn, sub);
-    } else {
+    } else if (topA) {
       const link = document.createElement('a');
       link.href = topA.getAttribute('href');
       link.textContent = topA.textContent.trim();
