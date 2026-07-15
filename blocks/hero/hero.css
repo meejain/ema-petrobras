@@ -101,33 +101,39 @@ main > .section.hero-container {
   display: inline;
 }
 
+/* CTA green pill (source .button-in): 64px tall, padding 0 32px, 16px gap,
+   bold white label + a circular white arrow icon on the right. */
 .hero .hero-main-content a.hero-cta:any-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   width: fit-content;
+  height: 64px;
   margin: 0;
-  padding: 12px 24px;
-  border: 1px solid #fff;
+  padding: 0 32px;
+  border: none;
   border-radius: 500px;
   background-color: rgb(0 133 66);
   color: #fff;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.25;
   text-decoration: none;
   white-space: nowrap;
+  transition: background-color 0.2s ease;
 }
 
+/* circular arrow icon at the right (white ring + right-arrow) */
 .hero .hero-main-content a.hero-cta:any-link::after {
   content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border: 2px solid #fff;
-  border-left: 0;
-  border-bottom: 0;
-  transform: rotate(45deg);
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="%23ffffff" stroke-width="2"><line x1="4" y1="9" x2="13" y2="9"/><path d="M9 5l4 4-4 4"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .hero .hero-main-content a.hero-cta:hover {
