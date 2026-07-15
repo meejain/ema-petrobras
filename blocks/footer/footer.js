@@ -85,7 +85,8 @@ function buildColumns(section) {
   inner.className = 'footer-columns-inner';
 
   const topUl = section.querySelector(':scope > ul');
-  [...topUl.children].filter((li) => li.tagName === 'LI').forEach((li) => {
+  const columnItems = topUl ? [...topUl.children].filter((li) => li.tagName === 'LI') : [];
+  columnItems.forEach((li) => {
     const col = document.createElement('div');
     col.className = 'footer-column';
     const heading = document.createElement('button');
