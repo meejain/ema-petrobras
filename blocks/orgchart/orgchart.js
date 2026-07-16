@@ -247,8 +247,13 @@ export default function decorate(block) {
     nodeRows.forEach(({ cells }) => chart.append(buildCard(cells)));
   }
 
+  // Legend sits to the left of the chart (as on the source site).
+  const body = document.createElement('div');
+  body.className = 'orgchart-body';
+  if (legendEl) body.append(legendEl);
+  body.append(chart);
+
   block.textContent = '';
   if (intro.childNodes.length) block.append(intro);
-  if (legendEl) block.append(legendEl);
-  block.append(chart);
+  block.append(body);
 }

@@ -57,6 +57,32 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"><path d="M12.75 7.75V13.25a.5.5 0 0 1-.5.5H2.75a.5.5 0 0 1-.5-.5V3.75a.5.5 0 0 1 .5-.5H8.5M10.24 2.36h3.71V6.07M13.95 2.36 7.25 9" stroke="black" stroke-linecap="round" stroke-linejoin="round"/></svg>') center / contain no-repeat;
 }
 
+/* Body — legend on the left, chart on the right (matches source site) */
+.orgchart .orgchart-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+@media (width >= 900px) {
+  .orgchart .orgchart-body {
+    flex-direction: row;
+    gap: 40px;
+  }
+
+  .orgchart .orgchart-body .orgchart-legend {
+    position: sticky;
+    top: 24px;
+    flex: 0 0 auto;
+  }
+
+  .orgchart .orgchart-body .orgchart-chart {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
 /* Legend — bordered rounded box */
 .orgchart .orgchart-legend {
   display: flex;
@@ -64,7 +90,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   gap: 24px;
   width: max-content;
   max-width: 100%;
-  margin: 0 0 32px;
+  margin: 0;
   padding: 24px;
   border: 1px solid var(--orgchart-legend-border);
   border-radius: 16px;
@@ -276,6 +302,16 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   width: 16px;
   height: 16px;
   display: block;
+}
+
+/* When a card is flipped open, the icon button disappears (as on the source)
+   and the freed space on the right is reclaimed for the revealed text. */
+.orgchart .orgchart-card.is-flipped .orgchart-card-button {
+  display: none;
+}
+
+.orgchart .orgchart-card.is-flipped {
+  padding-right: 24px;
 }
 
 /* Tablet+: the single-column fallback chart wraps into a responsive grid.
