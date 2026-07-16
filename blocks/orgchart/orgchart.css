@@ -1,0 +1,297 @@
+/* Orgchart (Organograma) block */
+
+.orgchart {
+  /* Role category colors (exact source values). */
+  --orgchart-dark-blue: #006298;
+  --orgchart-orange: #ed8b00;
+  --orgchart-cyan: #00b2a9;
+  --orgchart-grey: #63666a;
+  --orgchart-green: #008542;
+  --orgchart-card-bg: #fff;
+  --orgchart-card-border: #959595;
+  --orgchart-legend-border: #d7d7d7;
+  --orgchart-connector: #d7d7d7;
+  --orgchart-label: #373737;
+
+  display: block;
+  color: var(--orgchart-label);
+}
+
+/* Intro: heading, paragraph, document button */
+.orgchart .orgchart-intro {
+  margin-bottom: 24px;
+}
+
+.orgchart .orgchart-intro p {
+  max-width: 70ch;
+}
+
+main .orgchart a.orgchart-doc-button:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 24px;
+  background-color: var(--orgchart-green);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+main .orgchart a.orgchart-doc-button:any-link:hover {
+  background-color: #006c35;
+  color: #fff;
+  text-decoration: none;
+}
+
+main .orgchart a.orgchart-doc-button:any-link::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background-color: currentcolor;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"><path d="M12.75 7.75V13.25a.5.5 0 0 1-.5.5H2.75a.5.5 0 0 1-.5-.5V3.75a.5.5 0 0 1 .5-.5H8.5M10.24 2.36h3.71V6.07M13.95 2.36 7.25 9" stroke="black" stroke-linecap="round" stroke-linejoin="round"/></svg>') center / contain no-repeat;
+}
+
+/* Legend — bordered rounded box */
+.orgchart .orgchart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 32px;
+  padding: 24px;
+  border: 1px solid var(--orgchart-legend-border);
+  border-radius: 16px;
+  list-style: none;
+}
+
+.orgchart .orgchart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--orgchart-label);
+}
+
+.orgchart .orgchart-legend-dot {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Colored legend dots */
+.orgchart .orgchart-legend-dot.orgchart-color-dark-blue { background-color: var(--orgchart-dark-blue); }
+.orgchart .orgchart-legend-dot.orgchart-color-orange { background-color: var(--orgchart-orange); }
+.orgchart .orgchart-legend-dot.orgchart-color-cyan { background-color: var(--orgchart-cyan); }
+.orgchart .orgchart-legend-dot.orgchart-color-grey { background-color: var(--orgchart-grey); }
+
+/* Chart — single responsive column fallback (no grouping info) */
+.orgchart .orgchart-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orgchart .orgchart-node {
+  position: relative;
+  display: flex;
+}
+
+/* ── Tree layout (spine + directorate branch columns) ───────────────────── */
+.orgchart .orgchart-chart-tree {
+  display: block;
+}
+
+/* Spine: the vertical trunk of top-level nodes, stacked with a connector. */
+.orgchart .orgchart-spine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 24px;
+  max-width: 320px;
+}
+
+/* Vertical trunk line running down the left of the spine. */
+.orgchart .orgchart-spine::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 0;
+  width: 1px;
+  background-color: var(--orgchart-connector);
+}
+
+.orgchart .orgchart-spine .orgchart-node {
+  position: relative;
+}
+
+/* Horizontal stub branch from the trunk to each spine card. */
+.orgchart .orgchart-spine .orgchart-node::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  width: 24px;
+  height: 1px;
+  background-color: var(--orgchart-connector);
+}
+
+/* Branches: the executive-directorate columns laid side by side. */
+.orgchart .orgchart-branches {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px 32px;
+  margin-top: 24px;
+}
+
+.orgchart .orgchart-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (width >= 900px) {
+  .orgchart .orgchart-branches {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (width >= 1200px) {
+  .orgchart .orgchart-branches {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Pill-shaped card */
+.orgchart .orgchart-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 320px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 64px 16px 24px;
+  border: 1px solid var(--orgchart-card-border);
+  border-radius: 16px;
+  background-color: var(--orgchart-card-bg);
+  transition: box-shadow 0.2s ease;
+}
+
+.orgchart .orgchart-card.orgchart-linked,
+.orgchart .orgchart-card.orgchart-flip {
+  cursor: pointer;
+}
+
+.orgchart .orgchart-card.orgchart-flip:hover,
+.orgchart .orgchart-card.orgchart-flip:focus-visible,
+.orgchart .orgchart-card.orgchart-card-linked:hover {
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  outline: none;
+}
+
+/* Area label — colored by role category */
+.orgchart .orgchart-card-area {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.orgchart .orgchart-color-dark-blue .orgchart-card-area { color: var(--orgchart-dark-blue); }
+.orgchart .orgchart-color-orange .orgchart-card-area { color: var(--orgchart-orange); }
+.orgchart .orgchart-color-cyan .orgchart-card-area { color: var(--orgchart-cyan); }
+.orgchart .orgchart-color-grey .orgchart-card-area { color: var(--orgchart-grey); }
+
+/* Back face (responsible person + contact) shown when flipped */
+.orgchart .orgchart-card-back {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.orgchart .orgchart-card.is-flipped .orgchart-card-back {
+  display: flex;
+}
+
+.orgchart .orgchart-card-responsible {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--orgchart-label);
+}
+
+.orgchart .orgchart-card-contact {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--orgchart-grey);
+}
+
+/* Card link covers only the icon button; label is not a link */
+.orgchart .orgchart-card-link {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  display: block;
+  line-height: 0;
+  transform: translateY(-50%);
+}
+
+/* Green circular icon button on the right */
+.orgchart .orgchart-card-button {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--orgchart-green);
+  border-radius: 100px;
+  color: var(--orgchart-green);
+  transform: translateY(-50%);
+}
+
+.orgchart .orgchart-card-link .orgchart-card-button {
+  position: static;
+  transform: none;
+}
+
+.orgchart .orgchart-card-button svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Tablet+: the single-column fallback chart wraps into a responsive grid.
+   (Does not apply to the tree layout, which manages its own columns.) */
+@media (width >= 900px) {
+  .orgchart .orgchart-chart:not(.orgchart-chart-tree) {
+    flex-flow: row wrap;
+    align-items: flex-start;
+    gap: 24px 32px;
+  }
+
+  .orgchart .orgchart-chart:not(.orgchart-chart-tree) .orgchart-node {
+    flex: 0 1 284px;
+  }
+
+  .orgchart .orgchart-card {
+    max-width: none;
+  }
+}
