@@ -12,6 +12,7 @@
   --orgchart-legend-border: #d7d7d7;
   --orgchart-connector: #d7d7d7;
   --orgchart-label: #373737;
+  --orgchart-arrow: #272833;
 
   display: block;
   color: var(--orgchart-label);
@@ -239,8 +240,18 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   padding: 0;
   border: none;
   background: none;
-  color: var(--orgchart-grey);
+  color: var(--orgchart-arrow);
   cursor: pointer;
+}
+
+.orgchart .orgchart-arrow:focus {
+  outline: none;
+}
+
+.orgchart .orgchart-arrow:focus-visible {
+  outline: 2px solid var(--orgchart-green);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .orgchart .orgchart-arrow:disabled {
