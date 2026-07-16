@@ -229,6 +229,12 @@ export default function decorate(block) {
     spineRows.forEach(({ cells }) => spine.append(buildCard(cells)));
     chart.append(spine);
 
+    // Branches area: navigator + progress bar + controls stacked together,
+    // so the scrollbar and arrows stay tight under the columns regardless of
+    // the spine's height.
+    const branchesArea = document.createElement('div');
+    branchesArea.className = 'orgchart-branches-area';
+
     // Branches: horizontally-scrollable slider of directorate columns.
     const navigator = document.createElement('div');
     navigator.className = 'orgchart-navigator';
@@ -248,7 +254,8 @@ export default function decorate(block) {
       branches.append(col);
     });
     navigator.append(branches);
-    chart.append(navigator);
+    branchesArea.append(navigator);
+    chart.append(branchesArea);
     chart.classList.add('orgchart-chart-tree');
 
     // Green progress-bar scrollbar under the navigator (matches source site).
@@ -257,7 +264,7 @@ export default function decorate(block) {
     const progressBar = document.createElement('div');
     progressBar.className = 'orgchart-progress-bar';
     progress.append(progressBar);
-    chart.append(progress);
+    branchesArea.append(progress);
 
     // Prev/next arrow controls that scroll the navigator (slider behaviour).
     const controls = document.createElement('div');
@@ -308,7 +315,7 @@ export default function decorate(block) {
     window.addEventListener('resize', updateArrows);
 
     controls.append(prev, next);
-    chart.append(controls);
+    branchesArea.append(controls);
     // Compute initial arrow state once layout has settled. A single rAF can
     // fire before the responsive grid applies, so re-check after paint too.
     requestAnimationFrame(updateArrows);

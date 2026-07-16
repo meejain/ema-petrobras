@@ -10,9 +10,10 @@
   --orgchart-card-bg: #fff;
   --orgchart-card-border: #959595;
   --orgchart-legend-border: #d7d7d7;
-  --orgchart-connector: #d7d7d7;
+  --orgchart-connector: #959595;
+  --orgchart-progress-track: #d7d7d7;
   --orgchart-label: #373737;
-  --orgchart-arrow: #272833;
+  --orgchart-arrow: #008542;
 
   display: block;
   color: var(--orgchart-label);
@@ -197,7 +198,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   width: 100%;
   height: 4px;
   border-radius: 2px;
-  background: var(--orgchart-connector);
+  background: var(--orgchart-progress-track);
 }
 
 .orgchart .orgchart-progress-bar {
@@ -217,6 +218,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 }
 
 .orgchart .orgchart-column {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -224,11 +226,35 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   width: 248px;
 }
 
-/* Prev/next slider controls, aligned to the right (as on the source). */
+/* Vertical connector line linking a column's header to its sub-department
+   cards. The line runs the full height behind the cards; since cards have an
+   opaque white background it is only visible in the gaps between them. */
+.orgchart .orgchart-column::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 40px;
+  width: 1px;
+  background-color: var(--orgchart-connector);
+}
+
+/* Single-card columns need no connector. */
+.orgchart .orgchart-column:has(.orgchart-node:only-child)::before {
+  content: none;
+}
+
+.orgchart .orgchart-column .orgchart-node {
+  position: relative;
+  z-index: 0;
+}
+
+/* Prev/next slider controls, aligned to the right (as on the source).
+   The two arrows sit directly adjacent (no gap), matching the source. */
 .orgchart .orgchart-controls {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 0;
 }
 
 .orgchart .orgchart-arrow {
@@ -265,34 +291,30 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   height: 40px;
 }
 
-/* Tablet+ : spine and branch slider sit side by side; arrows span below. */
+/* Branches area: navigator + scrollbar + arrows stacked with a tight 16px gap,
+   so the scrollbar/arrows stay directly under the columns (matches source). */
+.orgchart .orgchart-branches-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Tablet+ : spine and the branches area sit side by side. */
 @media (width >= 768px) {
   .orgchart .orgchart-chart-tree {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      "spine navigator"
-      "spine progress"
-      "spine controls";
-    align-items: start;
-    gap: 16px 32px;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 32px;
   }
 
   .orgchart .orgchart-chart-tree .orgchart-spine {
-    grid-area: spine;
+    flex: 0 0 209px;
     width: 209px;
   }
 
-  .orgchart .orgchart-chart-tree .orgchart-navigator {
-    grid-area: navigator;
-  }
-
-  .orgchart .orgchart-chart-tree .orgchart-progress {
-    grid-area: progress;
-  }
-
-  .orgchart .orgchart-chart-tree .orgchart-controls {
-    grid-area: controls;
+  .orgchart .orgchart-chart-tree .orgchart-branches-area {
+    flex: 1 1 auto;
   }
 }
 
