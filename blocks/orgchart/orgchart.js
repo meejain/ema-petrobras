@@ -33,6 +33,10 @@ const ICON_EXTERNAL = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height
 // Exchange / transfer icon — used by cards that flip to reveal a person/contact.
 const ICON_EXCHANGE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,181.66l-32,32a8,8,0,0,1-11.32-11.32L188.69,184H48a8,8,0,0,1,0-16H188.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,213.66,181.66Zm-139.32-64a8,8,0,0,0,11.32-11.32L67.31,88H208a8,8,0,0,0,0-16H67.31L85.66,53.66A8,8,0,0,0,74.34,42.34l-32,32a8,8,0,0,0,0,11.32Z"/></svg>';
 
+// Left/right navigation arrows for the branch slider (from the source site).
+const ICON_ARROW_LEFT = '<svg xmlns="http://www.w3.org/2000/svg" width="41" height="40" viewBox="0 0 41 40" fill="none" aria-hidden="true"><path d="M27 19C27.5523 19 28 19.4477 28 20C28 20.5523 27.5523 21 27 21L27 19ZM0.292893 20.7071C-0.0976314 20.3166 -0.0976315 19.6834 0.292892 19.2929L6.65685 12.9289C7.04738 12.5384 7.68054 12.5384 8.07107 12.9289C8.46159 13.3195 8.46159 13.9526 8.07107 14.3431L2.41421 20L8.07107 25.6569C8.46159 26.0474 8.46159 26.6805 8.07107 27.0711C7.68054 27.4616 7.04738 27.4616 6.65686 27.0711L0.292893 20.7071ZM27 21L1 21L1 19L27 19L27 21Z" fill="currentColor"/></svg>';
+const ICON_ARROW_RIGHT = '<svg xmlns="http://www.w3.org/2000/svg" width="41" height="40" viewBox="0 0 41 40" fill="none" aria-hidden="true"><path d="M14 19C13.4477 19 13 19.4477 13 20C13 20.5523 13.4477 21 14 21L14 19ZM40.7071 20.7071C41.0976 20.3166 41.0976 19.6834 40.7071 19.2929L34.3431 12.9289C33.9526 12.5384 33.3195 12.5384 32.9289 12.9289C32.5384 13.3195 32.5384 13.9526 32.9289 14.3431L38.5858 20L32.9289 25.6569C32.5384 26.0474 32.5384 26.6805 32.9289 27.0711C33.3195 27.4616 33.9526 27.4616 34.3431 27.0711L40.7071 20.7071ZM14 21L40 21L40 19L14 19L14 21Z" fill="currentColor"/></svg>';
+
 function normalizeColor(value) {
   const v = (value || '').trim().toLowerCase();
   if (v === 'darkblue' || v === 'dark-blue' || v === 'blue') return 'dark-blue';
@@ -225,7 +229,10 @@ export default function decorate(block) {
     spineRows.forEach(({ cells }) => spine.append(buildCard(cells)));
     chart.append(spine);
 
-    // Branches: one column per directorate; the first card is the column header.
+    // Branches: horizontally-scrollable slider of directorate columns.
+    const navigator = document.createElement('div');
+    navigator.className = 'orgchart-navigator';
+
     const branches = document.createElement('div');
     branches.className = 'orgchart-branches';
     columnGroups.forEach((g) => {
@@ -240,8 +247,73 @@ export default function decorate(block) {
         });
       branches.append(col);
     });
-    chart.append(branches);
+    navigator.append(branches);
+    chart.append(navigator);
     chart.classList.add('orgchart-chart-tree');
+
+    // Green progress-bar scrollbar under the navigator (matches source site).
+    const progress = document.createElement('div');
+    progress.className = 'orgchart-progress';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'orgchart-progress-bar';
+    progress.append(progressBar);
+    chart.append(progress);
+
+    // Prev/next arrow controls that scroll the navigator (slider behaviour).
+    const controls = document.createElement('div');
+    controls.className = 'orgchart-controls';
+
+    const prev = document.createElement('button');
+    prev.type = 'button';
+    prev.className = 'orgchart-arrow orgchart-arrow-prev';
+    prev.setAttribute('aria-label', 'Anterior');
+    prev.innerHTML = ICON_ARROW_LEFT;
+
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'orgchart-arrow orgchart-arrow-next';
+    next.setAttribute('aria-label', 'Próximo');
+    next.innerHTML = ICON_ARROW_RIGHT;
+
+    const step = () => {
+      const first = branches.querySelector('.orgchart-column');
+      const gap = parseFloat(getComputedStyle(branches).columnGap) || 24;
+      return first ? first.getBoundingClientRect().width + gap : 272;
+    };
+    const updateArrows = () => {
+      const scrollable = navigator.scrollWidth - navigator.clientWidth;
+      if (scrollable <= 1) {
+        // Everything fits — no scrolling needed, disable both, fill the bar.
+        prev.disabled = true;
+        next.disabled = true;
+        progressBar.style.width = '100%';
+        progressBar.style.transform = 'translateX(0)';
+        return;
+      }
+      prev.disabled = navigator.scrollLeft <= 0;
+      next.disabled = navigator.scrollLeft >= scrollable - 1;
+      // Size the thumb to the visible fraction; offset it by the scroll ratio.
+      const visible = navigator.clientWidth / navigator.scrollWidth;
+      const ratio = navigator.scrollLeft / scrollable;
+      progressBar.style.width = `${visible * 100}%`;
+      progressBar.style.transform = `translateX(${(ratio * (1 - visible) * 100) / visible}%)`;
+    };
+    prev.addEventListener('click', () => {
+      navigator.scrollBy({ left: -step(), behavior: 'smooth' });
+    });
+    next.addEventListener('click', () => {
+      navigator.scrollBy({ left: step(), behavior: 'smooth' });
+    });
+    navigator.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+
+    controls.append(prev, next);
+    chart.append(controls);
+    // Compute initial arrow state once layout has settled. A single rAF can
+    // fire before the responsive grid applies, so re-check after paint too.
+    requestAnimationFrame(updateArrows);
+    setTimeout(updateArrows, 200);
+    window.addEventListener('load', updateArrows);
   } else {
     // No grouping info — render all cards in a single responsive column.
     nodeRows.forEach(({ cells }) => chart.append(buildCard(cells)));

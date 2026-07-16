@@ -65,7 +65,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   gap: 32px;
 }
 
-@media (width >= 900px) {
+@media (width >= 768px) {
   .orgchart .orgchart-body {
     flex-direction: row;
     gap: 40px;
@@ -133,9 +133,12 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   display: flex;
 }
 
-/* ── Tree layout (spine + directorate branch columns) ───────────────────── */
+/* ── Tree layout (spine + directorate branch slider) ─────────────────────
+   Mobile-first: spine stacks, then the branch slider, controls below. */
 .orgchart .orgchart-chart-tree {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* Spine: the vertical trunk of top-level nodes, stacked with a connector. */
@@ -145,6 +148,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   flex-direction: column;
   gap: 16px;
   padding-left: 24px;
+  width: 100%;
   max-width: 320px;
 }
 
@@ -174,29 +178,110 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   background-color: var(--orgchart-connector);
 }
 
-/* Branches: the executive-directorate columns laid side by side. */
+/* Navigator: the horizontally-scrollable viewport for the branch columns.
+   The native scrollbar is hidden; a green progress bar (below) tracks it. */
+.orgchart .orgchart-navigator {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.orgchart .orgchart-navigator::-webkit-scrollbar {
+  display: none;
+}
+
+/* Green progress-style scrollbar under the navigator (matches source site). */
+.orgchart .orgchart-progress {
+  overflow: hidden;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--orgchart-connector);
+}
+
+.orgchart .orgchart-progress-bar {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--orgchart-green);
+  transition: transform 0.15s ease;
+}
+
+/* Branches: the executive-directorate columns laid in a horizontal row. */
 .orgchart .orgchart-branches {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px 32px;
-  margin-top: 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  width: max-content;
 }
 
 .orgchart .orgchart-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 0 0 248px;
+  width: 248px;
 }
 
-@media (width >= 900px) {
-  .orgchart .orgchart-branches {
-    grid-template-columns: repeat(4, 1fr);
+/* Prev/next slider controls, aligned to the right (as on the source). */
+.orgchart .orgchart-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.orgchart .orgchart-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 41px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--orgchart-grey);
+  cursor: pointer;
+}
+
+.orgchart .orgchart-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.orgchart .orgchart-arrow svg {
+  display: block;
+  width: 41px;
+  height: 40px;
+}
+
+/* Tablet+ : spine and branch slider sit side by side; arrows span below. */
+@media (width >= 768px) {
+  .orgchart .orgchart-chart-tree {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "spine navigator"
+      "spine progress"
+      "spine controls";
+    align-items: start;
+    gap: 16px 32px;
   }
-}
 
-@media (width >= 1200px) {
-  .orgchart .orgchart-branches {
-    grid-template-columns: repeat(4, 1fr);
+  .orgchart .orgchart-chart-tree .orgchart-spine {
+    grid-area: spine;
+    width: 209px;
+  }
+
+  .orgchart .orgchart-chart-tree .orgchart-navigator {
+    grid-area: navigator;
+  }
+
+  .orgchart .orgchart-chart-tree .orgchart-progress {
+    grid-area: progress;
+  }
+
+  .orgchart .orgchart-chart-tree .orgchart-controls {
+    grid-area: controls;
   }
 }
 
@@ -205,7 +290,6 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  max-width: 320px;
   min-height: 80px;
   display: flex;
   flex-direction: column;
@@ -216,6 +300,11 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   border-radius: 16px;
   background-color: var(--orgchart-card-bg);
   transition: box-shadow 0.2s ease;
+}
+
+/* Fallback (non-tree) single-column cards keep a comfortable max width. */
+.orgchart .orgchart-chart:not(.orgchart-chart-tree) .orgchart-card {
+  max-width: 320px;
 }
 
 .orgchart .orgchart-card.orgchart-linked,
@@ -316,7 +405,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 
 /* Tablet+: the single-column fallback chart wraps into a responsive grid.
    (Does not apply to the tree layout, which manages its own columns.) */
-@media (width >= 900px) {
+@media (width >= 768px) {
   .orgchart .orgchart-chart:not(.orgchart-chart-tree) {
     flex-flow: row wrap;
     align-items: flex-start;
