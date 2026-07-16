@@ -1,0 +1,48 @@
+{
+  "variantName": "orgchart",
+  "baseBlock": "orgchart",
+  "version": "1.0.0",
+  "created": "2026-07-16T00:00:00.000Z",
+  "isNewBaseBlock": true,
+  "sourceContext": {
+    "originUrl": "https://petrobras.com.br/quem-somos/liderancas",
+    "originPage": "Petrobras Lideranças (leadership / who we are)",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "orgchart",
+    "imagePattern": "icon"
+  },
+  "contentPattern": {
+    "structure": "heading + intro paragraph + document button + legend + interactive tree of flip cards",
+    "nodeCount": 69,
+    "colorCategories": ["darkBlue", "orange", "cyan", "grey"],
+    "legendCategories": [
+      "Presidente e Diretor Executivo",
+      "Gerente Executivo",
+      "Gerente Geral",
+      "Funções Específicas"
+    ],
+    "cardFront": "area/department name + optional external link",
+    "cardBack": "responsible person name + contact (flip on click/keyboard)"
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "organizational charts / organograma pages",
+      "leadership / governance structure pages",
+      "any color-coded department hierarchy with per-node people and contacts"
+    ],
+    "notSuitableFor": [
+      "simple bulleted lists of people",
+      "team member photo grids (use cards instead)",
+      "tabular data (use table instead)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/quem-somos/liderancas"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-16T00:00:00.000Z"
+  }
+}
