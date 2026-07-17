@@ -72,12 +72,19 @@
  * Styled key/value table matching petrobras.com.br "Etapas do processo e edital":
  * transparent table, 1px #eeeeee cell borders, white header, bold left labels.
  */
+.table.block.process {
+  background-color: #f8f8f8;
+  padding: 40px 24px;
+}
+
 .table.block.process table {
   border-collapse: separate;
   border-spacing: 0;
   background-color: transparent;
   border: 1px solid #eee;
   font-size: var(--body-font-size-s);
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 /* Header row */
@@ -118,7 +125,7 @@
 
 /* Links inside value cells */
 .table.block.process table td a {
-  color: var(--link-color, #008542);
+  color: #008542;
   text-decoration: underline;
 }
 
@@ -132,6 +139,8 @@
   border-collapse: collapse;
   border: 1px solid #e0e0e0;
   font-size: var(--body-font-size-s);
+  max-width: 1075px;
+  margin: 0 auto;
 }
 
 .table.block.specs table thead tr {
@@ -169,10 +178,10 @@
   font-weight: 700;
 }
 
-/* First (product) column: left-aligned, bold (specs) */
-.table.block.specs table tbody td:first-child {
+/* First (product) column and header: left-aligned (specs) */
+.table.block.specs table tbody td:first-child,
+.table.block.specs table thead th:first-child {
   text-align: left;
-  font-weight: 700;
 }
 
 /* Remove trailing bottom border on last row (process) */
@@ -181,5 +190,5 @@
 }
 
 .table.block.process table td a:hover {
-  color: var(--link-hover-color, #006b35);
+  color: #006b35;
 }
