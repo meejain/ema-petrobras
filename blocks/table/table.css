@@ -178,10 +178,11 @@
   font-weight: 700;
 }
 
-/* First (product) column and header: left-aligned (specs) */
+/* First (product) column and header: left-aligned, wide (specs) */
 .table.block.specs table tbody td:first-child,
 .table.block.specs table thead th:first-child {
   text-align: left;
+  width: 60%;
 }
 
 /* Remove trailing bottom border on last row (process) */
