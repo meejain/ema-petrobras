@@ -1,0 +1,10 @@
+{
+  "$comment": "SINGLE SOURCE OF TRUTH for this project's responsive breakpoints (lift-and-shift: adopted from the source site https://petrobras.com.br). See AGENTS.md → The Breakpoint Rule and skills/responsive-breakpoints. Decided ONCE at the start of the migration — do NOT re-litigate per task.",
+  "breakpoints": [576, 768, 992, 1280],
+  "source": "https://petrobras.com.br/",
+  "sampledPages": [
+    "https://petrobras.com.br/ (theme main.css + clay.css + homepage inline styles)"
+  ],
+  "decidedOn": "2026-08-18",
+  "notes": "The source site is a Liferay site built on the Clay/Bootstrap design system; 576/768/992/1280 is its grid. Detected via breakpoint-discover.mjs run against the site's fetched CSS. Excluded as noise: 767/769 (the ±1 pair straddling the 768 boundary) and 1024/1440 (page-builder fragment styles, not the layout grid). Fallback if empty: 600/900/1200."
+}
