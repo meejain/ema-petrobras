@@ -316,15 +316,19 @@ main > .section {
 
 main > .section > div:not(.hero-wrapper) {
   box-sizing: border-box;
-  width: 100%;
-  max-width: var(--content-max-width);
+
+  /* Match the source .breakpoint container: content fills the full 1440px
+     max-width (flush, no inner padding), the side gutter comes purely from
+     centering. Below max-width the gutter is a minimum inset — 32px on mobile,
+     72px from 768px up — via width: min(100% - 2*gutter, max-width). */
+  width: min(100% - (2 * var(--layout-gutter)), var(--content-max-width));
   margin-inline: auto;
-  padding-inline: var(--layout-gutter);
+  padding-inline: 0;
 }
 
 @media (width >= 768px) {
   main > .section > div:not(.hero-wrapper) {
-    padding-inline: var(--space-big);
+    width: min(100% - (2 * var(--space-big)), var(--content-max-width));
   }
 }
 

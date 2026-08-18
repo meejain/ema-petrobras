@@ -123,15 +123,14 @@ main > .section.hero-container {
   transition: background-color 0.2s ease;
 }
 
-/* circular arrow icon at the right (white ring + right-arrow) */
+/* plain right chevron at the right (source uses a bare ChevronRight, no ring) */
 .hero .hero-main-content a.hero-cta:any-link::after {
   content: "";
   flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid #fff;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="%23ffffff" stroke-width="2"><line x1="4" y1="9" x2="13" y2="9"/><path d="M9 5l4 4-4 4"/></svg>');
+  width: 20px;
+  height: 20px;
+  border: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="%23ffffff" stroke-width="2.5"><path d="M7 4l7 6-7 6"/></svg>');
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -155,15 +154,12 @@ main > .section.hero-container {
   padding: 24px;
   overflow: hidden;
 
-  /* dark translucent panel (source style); 55% keeps white link text at >=4.5:1
-     for WCAG AA even when it composites over a light hero image */
-  background-color: rgb(0 0 0 / 55%);
-  border-bottom: 1px solid rgb(255 255 255 / 16%);
+  /* dark translucent panel — 28% black + 16px backdrop blur, matching the source
+     (.banner-highlight-card). The blur softens the hero image behind the cards
+     and lifts legibility; the cards form one seamless panel (no divider lines). */
+  background-color: rgb(0 0 0 / 28%);
+  backdrop-filter: blur(16px);
   transition: background-color 0.25s ease;
-}
-
-.hero .hero-card:last-child {
-  border-bottom: 0;
 }
 
 .hero .hero-card-linked {
