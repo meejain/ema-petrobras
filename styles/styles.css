@@ -49,7 +49,7 @@
   src: local('Arial');
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   :root {
     /* heading sizes (desktop) */
     --heading-font-size-xxl: 38px;
@@ -316,24 +316,15 @@ main > .section {
 
 main > .section > div:not(.hero-wrapper) {
   box-sizing: border-box;
-  width: auto;
+  width: 100%;
   max-width: var(--content-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0;
+  margin-inline: auto;
+  padding-inline: var(--layout-gutter);
 }
 
-@media (width <= 1440px) {
+@media (width >= 768px) {
   main > .section > div:not(.hero-wrapper) {
-    margin-left: var(--space-big);
-    margin-right: var(--space-big);
-  }
-}
-
-@media (width <= 767px) {
-  main > .section > div:not(.hero-wrapper) {
-    margin-left: var(--layout-gutter);
-    margin-right: var(--layout-gutter);
+    padding-inline: var(--space-big);
   }
 }
 
@@ -346,23 +337,15 @@ main > .section.hero-container > .hero-wrapper {
 /* shared page container for header/footer inner bands */
 .page-container {
   box-sizing: border-box;
-  width: auto;
+  width: 100%;
   max-width: var(--content-max-width);
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
+  padding-inline: var(--layout-gutter);
 }
 
-@media (width <= 1440px) {
+@media (width >= 768px) {
   .page-container {
-    margin-left: var(--space-big);
-    margin-right: var(--space-big);
-  }
-}
-
-@media (width <= 767px) {
-  .page-container {
-    margin-left: var(--layout-gutter);
-    margin-right: var(--layout-gutter);
+    padding-inline: var(--space-big);
   }
 }
 

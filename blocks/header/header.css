@@ -31,6 +31,7 @@ header nav {
 /* ---------- Utility bar (row 0) ----------
    Source: translucent black bar (rgba(0,0,0,0.32)) over the hero, white text. */
 header .nav-utility {
+  display: none;
   height: var(--nav-util-height);
   background: rgb(0 0 0 / 32%);
   color: #fff;
@@ -145,7 +146,7 @@ header .nav-lang button {
   text-transform: uppercase;
   font-size: 11px;
   font-weight: 700;
-  color: #8a8a8a;
+  color: #6e6e6e;
   background: none;
 }
 
@@ -158,7 +159,7 @@ header .nav-lang button.is-active {
    transparent) so white menu links stay legible over the hero. The white
    quadrilateral logo shape sits on top, so the logo area is unaffected. */
 header .nav-main {
-  height: var(--nav-main-height);
+  height: 72px;
   background: linear-gradient(to bottom, rgb(0 0 0 / 50%) 0%, rgb(0 0 0 / 0%) 100%);
   transition: height 0.25s ease, background-color 0.25s ease;
 }
@@ -167,8 +168,9 @@ header .nav-main-inner {
   display: flex;
   align-items: center;
   height: 100%;
-  padding-right: 24px;
-  gap: 32px;
+  gap: 12px;
+  padding: 0 16px;
+  background: #fff;
 }
 
 /* Quadrilateral logo — extreme left, flush */
@@ -176,8 +178,8 @@ header .nav-logo {
   position: relative;
   display: flex;
   align-items: center;
-  width: 344px;
-  height: var(--nav-main-height);
+  width: 200px;
+  height: 72px;
   flex: 0 0 auto;
   text-decoration: none;
   transition: height 0.25s ease, width 0.25s ease;
@@ -187,6 +189,7 @@ header .nav-logo-shape {
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: none;
 }
 
 header .nav-logo-shape svg {
@@ -197,7 +200,7 @@ header .nav-logo-shape svg {
 header .nav-logo-wordmark {
   position: relative;
   z-index: 1;
-  margin-left: 48px;
+  margin-left: 0;
   width: 176px;
   height: 34px;
   transition: width 0.25s ease, height 0.25s ease;
@@ -205,7 +208,7 @@ header .nav-logo-wordmark {
 
 /* Nav list */
 header .nav-list {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 32px;
   list-style: none;
@@ -266,7 +269,7 @@ header .nav-drop[aria-expanded="true"]::before {
 
 /* Search */
 header .nav-search {
-  display: flex;
+  display: none;
   align-items: center;
   flex: 0 0 auto;
 }
@@ -683,204 +686,203 @@ body.high-contrast header .nav-utility {
   background: #000;
 }
 
-/* mobile panel + bottom bar are hidden on desktop */
-header .nav-mobile-panel,
+/* ---------- Mobile (base) ---------- */
+
+/* bottom tab bar */
 header .nav-mobile-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgb(0 0 0 / 12%);
+}
+
+header .nav-mobile-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  color: #4b4b4b;
+}
+
+header .nav-mobile-ico {
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+header .nav-mobile-ico-lang { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>'); }
+header .nav-mobile-ico-a11y { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%234b4b4b"><circle cx="12" cy="4" r="2"/><path d="M12 7c-3 0-8 1-8 1l.3 2s3-.5 4.7-.7V22h2v-7h2v7h2V9.3c1.7.2 4.7.7 4.7.7l.3-2s-5-1-8-1z"/></svg>'); }
+header .nav-mobile-ico-canais { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%234b4b4b"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'); }
+header .nav-mobile-ico-busca { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>'); }
+
+/* center Menu button — green circle */
+header .nav-mobile-menu {
+  width: 56px;
+  height: 56px;
+  margin-top: -20px;
+  border-radius: 50%;
+  background: var(--petro-green);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+header .nav-mobile-ico-menu {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23fff" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
+}
+
+/* Menu open: green outline circle + × icon */
+header .nav-mobile-menu.is-open {
+  background: #fff;
+  border: 2px solid var(--petro-green);
+}
+
+header .nav-mobile-menu.is-open .nav-mobile-ico-menu {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>');
+}
+
+/* menu panel (full-screen white, above content, below bottom bar) */
+header .nav-mobile-panel {
+  position: fixed;
+  inset: 0 0 64px;
+  z-index: 39;
+  display: block;
+  overflow-y: auto;
+  background: #fff;
+}
+
+header .nav-mobile-panel[hidden] {
   display: none;
 }
 
-/* ---------- Mobile (base, < 900px) ---------- */
-@media (width < 900px) {
-  header .nav-utility { display: none; }
-  header .nav-main { height: 72px; }
+header .nav-mobile-head {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--petro-util-bg);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--petro-util-text);
+}
+
+header .nav-mobile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header .nav-mobile-list > li {
+  border-bottom: 1px solid #eee;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+header .nav-mobile-list > li > a,
+header .nav-mobile-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: #373737;
+  text-decoration: none;
+}
+
+header .nav-mobile-list > li:first-child > a {
+  color: var(--petro-green);
+}
+
+/* chevron on expandable items */
+header .nav-mobile-toggle::after {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid #373737;
+  border-bottom: 2px solid #373737;
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+header .nav-mobile-toggle.is-open::after {
+  transform: rotate(45deg);
+}
+
+header .nav-mobile-sub {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 12px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+header .nav-mobile-sub a {
+  display: block;
+  padding: 10px 8px;
+  font-size: 15px;
+  color: var(--petro-green);
+  text-decoration: none;
+}
+
+/* prevent body scroll when mobile menu open (harmless on desktop) */
+body.nav-mobile-open {
+  overflow: hidden;
+}
+
+/* ---------- Desktop (>= 992px): re-assert the desktop layout ---------- */
+@media (width >= 992px) {
+  header .nav-utility { display: block; }
+  header .nav-main { height: var(--nav-main-height); }
 
   header .nav-main-inner {
-    gap: 12px;
-    padding: 0 16px;
-    background: #fff;
+    gap: 32px;
+    padding-right: 24px;
+    padding-left: 0;
+    background: none;
   }
 
   header .nav-logo {
-    width: 200px;
-    height: 72px;
+    width: 344px;
+    height: var(--nav-main-height);
   }
 
-  header .nav-logo-shape { display: none; }
-  header .nav-logo-wordmark { margin-left: 0; }
+  header .nav-logo-shape { display: block; }
+  header .nav-logo-wordmark { margin-left: 48px; }
 
-  /* hide desktop nav list + search on mobile */
-  header .nav-list,
+  /* show desktop nav list + search */
+  header .nav-list {
+    display: flex;
+  }
+
   header .nav-search {
-    display: none;
+    display: flex;
   }
 
-  /* bottom tab bar */
+  /* mobile panel + bottom bar are hidden on desktop */
+  header .nav-mobile-panel,
   header .nav-mobile-bar {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 40;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 64px;
-    background: #fff;
-    box-shadow: 0 -2px 10px rgb(0 0 0 / 12%);
-  }
-
-  header .nav-mobile-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font: inherit;
-    font-size: 11px;
-    color: #4b4b4b;
-  }
-
-  header .nav-mobile-ico {
-    width: 24px;
-    height: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-  }
-
-  header .nav-mobile-ico-lang { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>'); }
-  header .nav-mobile-ico-a11y { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%234b4b4b"><circle cx="12" cy="4" r="2"/><path d="M12 7c-3 0-8 1-8 1l.3 2s3-.5 4.7-.7V22h2v-7h2v7h2V9.3c1.7.2 4.7.7 4.7.7l.3-2s-5-1-8-1z"/></svg>'); }
-  header .nav-mobile-ico-canais { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%234b4b4b"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'); }
-  header .nav-mobile-ico-busca { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>'); }
-
-  /* center Menu button — green circle */
-  header .nav-mobile-menu {
-    width: 56px;
-    height: 56px;
-    margin-top: -20px;
-    border-radius: 50%;
-    background: var(--petro-green);
-    box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
-  }
-
-  header .nav-mobile-ico-menu {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23fff" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
-  }
-
-  /* Menu open: green outline circle + × icon */
-  header .nav-mobile-menu.is-open {
-    background: #fff;
-    border: 2px solid var(--petro-green);
-  }
-
-  header .nav-mobile-menu.is-open .nav-mobile-ico-menu {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>');
-  }
-
-  /* menu panel (full-screen white, above content, below bottom bar) */
-  header .nav-mobile-panel {
-    position: fixed;
-    inset: 0 0 64px;
-    z-index: 39;
-    display: block;
-    overflow-y: auto;
-    background: #fff;
-  }
-
-  header .nav-mobile-panel[hidden] {
     display: none;
   }
-
-  header .nav-mobile-head {
-    display: flex;
-    align-items: center;
-    height: 48px;
-    padding: 0 16px;
-    background: var(--petro-util-bg);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--petro-util-text);
-  }
-
-  header .nav-mobile-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  header .nav-mobile-list > li {
-    border-bottom: 1px solid #eee;
-  }
-
-  header .nav-mobile-list > li > a,
-  header .nav-mobile-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 18px 16px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font: inherit;
-    font-size: 18px;
-    font-weight: 700;
-    color: #373737;
-    text-decoration: none;
-  }
-
-  header .nav-mobile-list > li:first-child > a {
-    color: var(--petro-green);
-  }
-
-  /* chevron on expandable items */
-  header .nav-mobile-toggle::after {
-    content: '';
-    width: 9px;
-    height: 9px;
-    border-right: 2px solid #373737;
-    border-bottom: 2px solid #373737;
-    transform: rotate(-45deg);
-    transition: transform 0.2s ease;
-  }
-
-  header .nav-mobile-toggle.is-open::after {
-    transform: rotate(45deg);
-  }
-
-  header .nav-mobile-sub {
-    list-style: none;
-    margin: 0;
-    padding: 0 16px 12px;
-  }
-
-  /* stylelint-disable-next-line no-descending-specificity */
-  header .nav-mobile-sub a {
-    display: block;
-    padding: 10px 8px;
-    font-size: 15px;
-    color: var(--petro-green);
-    text-decoration: none;
-  }
-
-  /* prevent body scroll when mobile menu open */
-  body.nav-mobile-open {
-    overflow: hidden;
-  }
 }
 
-@media (width <= 1440px) {
+@media (width >= 768px) {
   header .nav-utility-inner,
   header .nav-megamenu-inner {
-    margin-left: var(--space-big);
-    margin-right: var(--space-big);
-  }
-}
-
-@media (width <= 767px) {
-  header .nav-utility-inner,
-  header .nav-megamenu-inner {
-    margin-left: var(--layout-gutter);
-    margin-right: var(--layout-gutter);
+    padding-left: var(--space-big);
+    padding-right: var(--space-big);
   }
 }

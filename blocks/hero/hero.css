@@ -154,7 +154,10 @@ main > .section.hero-container {
   min-height: 140px;
   padding: 24px;
   overflow: hidden;
-  background-color: rgb(0 0 0 / 28%);
+
+  /* dark translucent panel (source style); 55% keeps white link text at >=4.5:1
+     for WCAG AA even when it composites over a light hero image */
+  background-color: rgb(0 0 0 / 55%);
   border-bottom: 1px solid rgb(255 255 255 / 16%);
   transition: background-color 0.25s ease;
 }
@@ -198,7 +201,7 @@ main > .section.hero-container {
 }
 
 /* ---------- desktop: composite layout ---------- */
-@media (width >= 900px) {
+@media (width >= 992px) {
   .hero .hero-main {
     min-height: min(52vw, 744px);
   }
@@ -234,12 +237,5 @@ main > .section.hero-container {
 
   .hero .hero-card-content a:any-link {
     font-size: 16px;
-  }
-}
-
-@media (width <= 767px) {
-  .hero .hero-main-content {
-    margin-left: var(--layout-gutter);
-    padding: 24px var(--layout-gutter) 24px 0;
   }
 }

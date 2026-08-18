@@ -177,14 +177,14 @@
 }
 
 /* Tablet: fixed-width cards that overflow into a scrollable slider */
-@media (width >= 600px) {
+@media (width >= 576px) {
   .slider-cards > .slider-cards-viewport > ul {
     grid-auto-columns: 340px;
   }
 }
 
 /* Desktop: fixed 396px cards (matches source) — ~3 visible, rest scroll */
-@media (width >= 900px) {
+@media (width >= 992px) {
   .slider-cards > .slider-cards-viewport > ul {
     grid-auto-columns: 396px;
   }

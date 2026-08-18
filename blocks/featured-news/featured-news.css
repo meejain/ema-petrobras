@@ -220,7 +220,7 @@
 /* =====================================================================
    DESKTOP — two-column editorial layout
    ===================================================================== */
-@media (width >= 900px) {
+@media (width >= 992px) {
   .featured-news > ul {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 452px;

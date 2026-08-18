@@ -9,7 +9,7 @@
 }
 
 .banner-notice .banner-notice-inner {
-  padding: 40px 48px;
+  padding: 28px 20px;
 }
 
 .banner-notice .banner-notice-inner h2,
@@ -41,8 +41,8 @@
   color: #373737;
 }
 
-@media (width < 900px) {
+@media (width >= 992px) {
   .banner-notice .banner-notice-inner {
-    padding: 28px 20px;
+    padding: 40px 48px;
   }
 }

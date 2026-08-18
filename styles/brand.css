@@ -23,7 +23,7 @@
   --heading-size-xs: 16px;
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   :root {
     --section-spacing: 64px;
   }

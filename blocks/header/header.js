@@ -1,7 +1,7 @@
 // Petrobras header: utility bar + main nav with quadrilateral logo,
 // click-triggered megamenus, expandable search, and sticky compact-on-scroll.
 
-const isDesktop = window.matchMedia('(min-width: 900px)');
+const isDesktop = window.matchMedia('(min-width: 992px)');
 
 // Nav fragment links may be direct children of <li> or wrapped in <p> (CMS markup).
 function getLiLink(li) {
@@ -494,7 +494,7 @@ export default async function decorate(block) {
   overlay.addEventListener('click', () => closeAllMegamenus(nav));
   wrapper.append(overlay);
 
-  // mobile menu panel + bottom tab bar (shown only below 900px via CSS)
+  // mobile menu panel + bottom tab bar (shown only below 992px via CSS)
   const mobile = sections[1] ? buildMobileNav(sections[1], wrapper) : null;
 
   block.append(wrapper);
