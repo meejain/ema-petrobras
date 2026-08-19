@@ -140,44 +140,60 @@ main > .section.hero-container {
   text-decoration: none;
 }
 
-/* ---------- highlight cards ---------- */
+/* ---------- highlight cards ----------
+   MOBILE (base): the source renders the 3 promo cards below the banner as a
+   vertical stack of white cards, each with a left thumbnail image + dark title
+   text (not the desktop dark-overlay panels). Desktop re-asserts the translucent
+   dark panel design in the >=992px block. */
 .hero .hero-cards {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  padding: 24px var(--layout-gutter);
+  background: #fff;
 }
 
 .hero .hero-card {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 140px;
-  padding: 24px;
+  gap: 16px;
+  padding: 12px;
   overflow: hidden;
-
-  /* dark translucent panel — 28% black + 16px backdrop blur, matching the source
-     (.banner-highlight-card). The blur softens the hero image behind the cards
-     and lifts legibility; the cards form one seamless panel (no divider lines). */
-  background-color: rgb(0 0 0 / 28%);
-  backdrop-filter: blur(16px);
-  transition: background-color 0.25s ease;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  transition: box-shadow 0.25s ease;
 }
 
 .hero .hero-card-linked {
   cursor: pointer;
 }
 
-/* source shows translucent panels only — the per-card image is hidden */
+/* MOBILE: left thumbnail image (source ~93x62). Desktop hides it. */
 .hero .hero-card-image {
-  display: none;
+  flex: 0 0 auto;
+  width: 93px;
+  height: 62px;
+  line-height: 0;
+}
+
+.hero .hero-card-image picture,
+.hero .hero-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 .hero .hero-card-linked:hover {
-  background-color: rgb(150 143 133 / 70%);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
 }
 
 .hero .hero-card-content {
   position: relative;
   z-index: 1;
+  flex: 1;
 }
 
 .hero .hero-card-content p {
@@ -185,10 +201,10 @@ main > .section.hero-container {
 }
 
 .hero .hero-card-content a:any-link {
-  color: #fff;
+  color: #1f1f1f;
   font-size: 16px;
   font-weight: 700;
-  line-height: 1.125;
+  line-height: 1.25;
   text-decoration: none;
 }
 
@@ -212,7 +228,8 @@ main > .section.hero-container {
     font-size: 38px;
   }
 
-  /* cards overlay on the right, full-height stack */
+  /* cards overlay on the right, full-height stack — dark translucent panels
+     (source .banner-highlight-card), NOT the mobile white-card list */
   .hero .hero-cards {
     position: absolute;
 
@@ -223,15 +240,39 @@ main > .section.hero-container {
     bottom: 0;
     z-index: 3;
     width: 400px;
+    gap: 0;
+    padding: 0;
+    background: none;
   }
 
   .hero .hero-card {
     flex: 1;
+    align-items: center;
+    gap: 0;
     padding: 32px;
     min-height: 0;
+    border-radius: 0;
+    box-shadow: none;
+
+    /* dark translucent panel — 28% black + 16px backdrop blur, forming one
+       seamless panel (no divider lines) */
+    background-color: rgb(0 0 0 / 28%);
+    backdrop-filter: blur(16px);
+    transition: background-color 0.25s ease;
+  }
+
+  /* desktop: per-card image hidden (panels only) */
+  .hero .hero-card-image {
+    display: none;
+  }
+
+  .hero .hero-card-linked:hover {
+    box-shadow: none;
+    background-color: rgb(150 143 133 / 70%);
   }
 
   .hero .hero-card-content a:any-link {
+    color: #fff;
     font-size: 16px;
   }
 }

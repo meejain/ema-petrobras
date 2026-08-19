@@ -29,11 +29,13 @@ header nav {
 }
 
 /* ---------- Utility bar (row 0) ----------
-   Source: translucent black bar (rgba(0,0,0,0.32)) over the hero, white text. */
+   MOBILE (base): the source shows only a "Você está em: SITE PETROBRAS" strip
+   over the hero — white bold text on a soft top-down dark gradient (for
+   legibility), no links/controls, no logo bar. Desktop re-asserts the full
+   translucent black utility bar in the >=992px block below. */
 header .nav-utility {
-  display: none;
-  height: var(--nav-util-height);
-  background: rgb(0 0 0 / 32%);
+  display: block;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 0%) 100%);
   color: #fff;
   font-size: 12px;
 }
@@ -42,29 +44,29 @@ header .nav-utility-inner {
   display: flex;
   align-items: center;
   gap: 0;
-  height: 100%;
   box-sizing: border-box;
-  width: auto;
-  max-width: var(--content-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0;
+
+  /* MOBILE: label-only strip padded to the mobile gutter (source: label sits
+     32px from the left, ~11px from the top). Desktop re-asserts the centered
+     full-height row below. */
+  padding: 11px var(--layout-gutter) 12px;
 }
 
 header .nav-utility-label {
   font-weight: 700;
-  font-size: 12px;
   white-space: nowrap;
   color: #fff;
 
-  /* source: "Acesse também" starts 100px after the label's right edge (340 vs
-     the label ending at 240 at 1440px) — not distributed by space-between */
-  margin-right: 100px;
+  /* MOBILE: the strip title is 20px on the source; desktop shrinks it to 12px
+     and adds the 100px right offset before "Acesse também" below. */
+  font-size: 20px;
 }
 
 
 header .nav-utility-links {
-  display: flex;
+  /* MOBILE: only the "Você está em" label shows; links live nowhere on mobile
+     (controls move to the bottom tab bar). Desktop re-asserts display:flex. */
+  display: none;
   align-items: center;
   gap: 16px;
 }
@@ -88,7 +90,9 @@ header .nav-utility-links a:hover {
 }
 
 header .nav-utility-controls {
-  display: flex;
+  /* MOBILE: hidden — these controls live in the bottom tab bar. Desktop
+     re-asserts display:flex. */
+  display: none;
   align-items: center;
 
   /* source spaces the font-sizer / contrast / language controls 32px apart
@@ -184,10 +188,13 @@ header .nav-lang button.is-active {
 }
 
 /* ---------- Main nav (row 1) ----------
-   Source .subMenu.linear: top-down dark gradient (darkest at top, fading to
-   transparent) so white menu links stay legible over the hero. The white
-   quadrilateral logo shape sits on top, so the logo area is unaffected. */
+   MOBILE (base): the source has NO logo/nav bar on mobile — navigation lives in
+   the fixed bottom tab bar, and only the "Você está em" strip shows at the top.
+   So the main nav row is hidden on mobile and re-asserted at >=992px.
+   Desktop uses .subMenu.linear: a top-down dark gradient so white menu links
+   stay legible over the hero, with the white quadrilateral logo on top. */
 header .nav-main {
+  display: none;
   height: 72px;
   background: linear-gradient(to bottom, rgb(0 0 0 / 50%) 0%, rgb(0 0 0 / 0%) 100%);
   transition: height 0.25s ease, background-color 0.25s ease;
@@ -924,8 +931,39 @@ body.nav-mobile-open {
 
 /* ---------- Desktop (>= 992px): re-assert the desktop layout ---------- */
 @media (width >= 992px) {
-  header .nav-utility { display: block; }
-  header .nav-main { height: var(--nav-main-height); }
+  /* utility bar: full translucent black row (not the mobile gradient strip) */
+  header .nav-utility {
+    display: block;
+    height: var(--nav-util-height);
+    background: rgb(0 0 0 / 32%);
+  }
+
+  header .nav-utility-inner {
+    height: 100%;
+    width: auto;
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+  }
+
+  /* show the utility links + controls, hidden on mobile */
+  header .nav-utility-links,
+  header .nav-utility-controls {
+    display: flex;
+  }
+
+  /* label back to 12px with the 100px offset before "Acesse também" */
+  header .nav-utility-label {
+    font-size: 12px;
+    margin-right: 100px;
+  }
+
+  /* main nav row reappears */
+  header .nav-main {
+    display: block;
+    height: var(--nav-main-height);
+  }
 
   header .nav-main-inner {
     gap: 32px;
