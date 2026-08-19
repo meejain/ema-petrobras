@@ -224,7 +224,12 @@
   .featured-news > ul {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 452px;
-    grid-template-rows: repeat(3, 1fr);
+
+    /* source: the 3 right-column cards are a fixed 136px tall each; the featured
+       card spans their full stacked height (3*136 + 2*24 = 456px). Locking the
+       rows (instead of 1fr) stops the right cards from stretching and keeps the
+       featured card the same 456px height as the source. */
+    grid-template-rows: repeat(3, 136px);
 
     /* source: 32px between the featured (left) and the right column, 24px
        vertically between the 3 stacked right cards */
@@ -245,11 +250,14 @@
     max-height: none;
   }
 
-  /* featured body fills the card; the CTA sits bottom-left with ~40px of space
-     below it (source .link-container bottom offset) */
+  /* featured body fills the card; box-sizing: border-box keeps height:100% +
+     padding inside the card (otherwise the padding overflows and the space
+     below the CTA gets clipped). The CTA sits bottom-left with ~22px of space
+     below it, matching the source .link-container bottom offset. */
   .featured-news > ul > li:first-child .featured-news-card-body {
+    box-sizing: border-box;
     height: 100%;
-    padding: 0 48px 40px;
+    padding: 0 48px 22px;
   }
 
   .featured-news > ul > li:first-child .featured-news-card-body h2 {

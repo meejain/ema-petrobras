@@ -156,7 +156,7 @@
   gap: 8px;
   font-size: 14px;
   font-weight: 400;
-  color: var(--link-color); /* #0b5fff */
+  color: #008542; /* Petrobras green — matches the source "Conheça o …" links */
   text-decoration: underline;
 }
 
@@ -183,9 +183,10 @@
   }
 }
 
-/* Desktop: fixed 396px cards (matches source) — ~3 visible, rest scroll */
+/* Desktop: fixed 446px cards (matches source .card-container) — 24px padding
+   leaves a full-width 398px image, edge-to-edge like the source. */
 @media (width >= 992px) {
   .slider-cards > .slider-cards-viewport > ul {
-    grid-auto-columns: 396px;
+    grid-auto-columns: 446px;
   }
 }
