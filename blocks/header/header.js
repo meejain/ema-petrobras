@@ -372,6 +372,78 @@ function buildMainNav(section, nav) {
   return main;
 }
 
+// Build one mobile accordion list level from the nav fragment's <li> nodes.
+// Recurses into nested category <ul>s (skipping image/megamenu lists) so the
+// full hierarchy (e.g. Sustentabilidade → Meio Ambiente → …) is reproduced.
+// `level` sets the indentation depth (0 = top level, dark-green bold).
+function buildMobileList(liNodes, level) {
+  const list = document.createElement('ul');
+  list.className = 'nav-mobile-list';
+  if (level > 0) list.dataset.level = String(level);
+
+  liNodes.forEach((li) => {
+    const topA = getLiLink(li);
+    // a nested category <ul> (the sublist we expand) — ignore image/megamenu lists
+    const catUl = [...li.querySelectorAll(':scope > ul')].find((ul) => !ul.querySelector('img'));
+    const item = document.createElement('li');
+
+    if (catUl) {
+      // Expandable accordion row. The label comes from the direct link, or the
+      // li's own text when there's no link.
+      const label = topA ? topA.textContent.trim() : [...li.childNodes]
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent.trim())
+        .filter(Boolean)
+        .join(' ');
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'nav-mobile-toggle';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = `<span>${label}</span>`;
+
+      // recurse for the child level
+      const childLis = [...catUl.children].filter((c) => c.tagName === 'LI');
+      const sub = buildMobileList(childLis, level + 1);
+      sub.classList.add('nav-mobile-sub');
+      sub.hidden = true;
+      const subId = `nav-mobile-sub-${(level)}-${Math.round(list.childElementCount)}-${label.replace(/\s+/g, '-').toLowerCase()}`;
+      sub.id = subId;
+      btn.setAttribute('aria-controls', subId);
+
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        // single-open accordion (source behaviour): collapse any sibling that is
+        // currently expanded at this same level before opening this one.
+        if (!open) {
+          [...list.children].forEach((sib) => {
+            if (sib === item) return;
+            const sibBtn = sib.querySelector(':scope > .nav-mobile-toggle');
+            const sibSub = sib.querySelector(':scope > .nav-mobile-sub');
+            if (sibBtn && sibBtn.getAttribute('aria-expanded') === 'true') {
+              sibBtn.setAttribute('aria-expanded', 'false');
+              if (sibSub) sibSub.hidden = true;
+              sib.classList.remove('is-open');
+            }
+          });
+        }
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+        sub.hidden = open;
+        item.classList.toggle('is-open', !open);
+      });
+      item.append(btn, sub);
+    } else if (topA) {
+      const link = document.createElement('a');
+      link.href = topA.getAttribute('href');
+      link.textContent = topA.textContent.trim();
+      item.append(link);
+    }
+    if (item.childElementCount) list.append(item);
+  });
+
+  return list;
+}
+
 // Build the mobile menu panel (accordion) + bottom tab bar from the nav fragment.
 function buildMobileNav(section, wrapper) {
   const topUl = section.querySelector(':scope > ul');
@@ -382,79 +454,149 @@ function buildMobileNav(section, wrapper) {
   panel.className = 'nav-mobile-panel';
   panel.hidden = true;
 
-  const head = document.createElement('div');
+  // panel title (source: "Navegue nas Seções:")
+  const head = document.createElement('p');
   head.className = 'nav-mobile-head';
-  head.innerHTML = '<span>Você está em: SITE PETROBRAS</span>';
+  head.textContent = 'Navegue nas Seções:';
   panel.append(head);
 
-  const list = document.createElement('ul');
-  list.className = 'nav-mobile-list';
-
-  // "Início" home entry first
+  // build the top-level accordion list, prefixed with the "Início" home entry
+  const topLis = [...topUl.children].filter((li) => li.tagName === 'LI');
+  const list = buildMobileList(topLis, 0);
   const homeLi = document.createElement('li');
   homeLi.innerHTML = '<a href="https://petrobras.com.br">Início</a>';
-  list.append(homeLi);
-
-  [...topUl.children].filter((li) => li.tagName === 'LI').forEach((li) => {
-    const topA = getLiLink(li);
-    const nestedUls = [...li.querySelectorAll(':scope > ul')];
-    const catUl = nestedUls.find((ul) => !ul.querySelector('img'));
-    const item = document.createElement('li');
-
-    if (catUl && topA) {
-      // expandable accordion section
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'nav-mobile-toggle';
-      btn.innerHTML = `<span>${topA.textContent.trim()}</span>`;
-      const sub = document.createElement('ul');
-      sub.className = 'nav-mobile-sub';
-      sub.hidden = true;
-      [...catUl.children].filter((c) => c.tagName === 'LI').forEach((c) => {
-        const ca = getLiLink(c);
-        if (!ca) return;
-        const sli = document.createElement('li');
-        const link = document.createElement('a');
-        link.href = ca.getAttribute('href');
-        link.textContent = ca.textContent.trim();
-        sli.append(link);
-        sub.append(sli);
-      });
-      btn.addEventListener('click', () => {
-        const open = !sub.hidden;
-        sub.hidden = open;
-        btn.classList.toggle('is-open', !open);
-      });
-      item.append(btn, sub);
-    } else if (topA) {
-      const link = document.createElement('a');
-      link.href = topA.getAttribute('href');
-      link.textContent = topA.textContent.trim();
-      item.append(link);
-    }
-    list.append(item);
-  });
+  list.prepend(homeLi);
   panel.append(list);
+
+  // --- secondary bottom-bar panels (Idioma / Acessibilidade / Canais / Busca) ---
+  // Each opens above the fixed bar like the main menu; only one panel is open at
+  // a time. Content mirrors the source.
+
+  // Idioma: "Selecione um idioma:" with Português / Inglês
+  const langPanel = document.createElement('div');
+  langPanel.className = 'nav-mobile-panel nav-mobile-panel-simple';
+  langPanel.hidden = true;
+  langPanel.innerHTML = `
+    <p class="nav-mobile-head">Idioma:</p>
+    <div class="nav-mobile-simple">
+      <p class="nav-mobile-simple-label">Selecione um idioma:</p>
+      <div class="nav-mobile-lang-opts">
+        <button type="button" class="is-active">Português</button>
+        <button type="button">Inglês</button>
+      </div>
+    </div>`;
+  langPanel.querySelectorAll('.nav-mobile-lang-opts button').forEach((b) => {
+    b.addEventListener('click', () => {
+      langPanel.querySelectorAll('.nav-mobile-lang-opts button').forEach((x) => x.classList.remove('is-active'));
+      b.classList.add('is-active');
+    });
+  });
+
+  // Acessibilidade: Alto-Contraste + Texto Grande toggles
+  const a11yPanel = document.createElement('div');
+  a11yPanel.className = 'nav-mobile-panel nav-mobile-panel-simple';
+  a11yPanel.hidden = true;
+  a11yPanel.innerHTML = `
+    <p class="nav-mobile-head">Acessibilidade</p>
+    <div class="nav-mobile-simple">
+      <label class="nav-mobile-a11y-row">
+        <span class="nav-mobile-a11y-text">Alto-Contraste</span>
+        <input type="checkbox" class="nav-mobile-contrast-toggle">
+      </label>
+      <label class="nav-mobile-a11y-row">
+        <span class="nav-mobile-a11y-text">Texto Grande</span>
+        <input type="checkbox" class="nav-mobile-bigtext-toggle">
+      </label>
+    </div>`;
+  // Alto-Contraste mirrors the utility-bar high-contrast toggle
+  a11yPanel.querySelector('.nav-mobile-contrast-toggle').addEventListener('change', (e) => {
+    document.body.classList.toggle('high-contrast', e.target.checked);
+  });
+  // Texto Grande zooms the page up (source "large text")
+  a11yPanel.querySelector('.nav-mobile-bigtext-toggle').addEventListener('change', (e) => {
+    document.documentElement.style.zoom = e.target.checked ? 1.2 : 1;
+  });
+
+  // Canais: "Escolha um Canal:" with channel card tiles (icon + label), 2-col grid
+  const canaisPanel = document.createElement('div');
+  canaisPanel.className = 'nav-mobile-panel nav-mobile-panel-simple';
+  canaisPanel.hidden = true;
+  canaisPanel.innerHTML = `
+    <p class="nav-mobile-head">Escolha um Canal:</p>
+    <ul class="nav-mobile-canais">
+      <li><a href="https://transparencia.petrobras.com.br/">
+        <span class="nav-mobile-canal-ico nav-mobile-canal-ico-transp"></span>
+        <span class="nav-mobile-canal-label">Portal da Transparência</span>
+      </a></li>
+      <li><a href="https://www.investidorpetrobras.com.br/">
+        <span class="nav-mobile-canal-ico nav-mobile-canal-ico-invest"></span>
+        <span class="nav-mobile-canal-label">Investidor Petrobras</span>
+      </a></li>
+      <li><a href="https://nossaenergia.petrobras.com.br/">
+        <span class="nav-mobile-canal-ico nav-mobile-canal-ico-energia"></span>
+        <span class="nav-mobile-canal-label">Nossa Energia</span>
+      </a></li>
+    </ul>`;
+
+  // Busca: "Faça uma busca:" with a search field
+  const buscaPanel = document.createElement('div');
+  buscaPanel.className = 'nav-mobile-panel nav-mobile-panel-simple';
+  buscaPanel.hidden = true;
+  buscaPanel.innerHTML = `
+    <p class="nav-mobile-head">Faça uma busca:</p>
+    <form class="nav-mobile-busca" role="search">
+      <input type="search" aria-label="Campo de pesquisa" placeholder="Buscar">
+      <button type="submit" class="nav-mobile-busca-submit" aria-label="Buscar"></button>
+    </form>`;
+  buscaPanel.querySelector('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = buscaPanel.querySelector('input').value.trim();
+    if (q) window.location.assign(`https://petrobras.com.br/busca?q=${encodeURIComponent(q)}`);
+  });
 
   // bottom tab bar
   const bar = document.createElement('div');
   bar.className = 'nav-mobile-bar';
   bar.innerHTML = `
-    <button type="button" class="nav-mobile-btn" data-action="lang" aria-label="Idioma"><span class="nav-mobile-ico nav-mobile-ico-lang"></span>Idioma</button>
-    <button type="button" class="nav-mobile-btn" data-action="a11y" aria-label="Acessibilidade"><span class="nav-mobile-ico nav-mobile-ico-a11y"></span>Acessibilidade</button>
-    <button type="button" class="nav-mobile-btn nav-mobile-menu" data-action="menu" aria-label="Menu"><span class="nav-mobile-ico nav-mobile-ico-menu"></span></button>
-    <button type="button" class="nav-mobile-btn" data-action="canais" aria-label="Canais"><span class="nav-mobile-ico nav-mobile-ico-canais"></span>Canais</button>
-    <button type="button" class="nav-mobile-btn" data-action="busca" aria-label="Busca"><span class="nav-mobile-ico nav-mobile-ico-busca"></span>Busca</button>`;
+    <button type="button" class="nav-mobile-btn" data-action="lang" aria-label="Idioma" aria-expanded="false"><span class="nav-mobile-ico nav-mobile-ico-lang"></span>Idioma</button>
+    <button type="button" class="nav-mobile-btn" data-action="a11y" aria-label="Acessibilidade" aria-expanded="false"><span class="nav-mobile-ico nav-mobile-ico-a11y"></span>Acessibilidade</button>
+    <button type="button" class="nav-mobile-btn nav-mobile-menu" data-action="menu" aria-label="Menu" aria-expanded="false"><span class="nav-mobile-ico nav-mobile-ico-menu"></span></button>
+    <button type="button" class="nav-mobile-btn" data-action="canais" aria-label="Canais" aria-expanded="false"><span class="nav-mobile-ico nav-mobile-ico-canais"></span>Canais</button>
+    <button type="button" class="nav-mobile-btn" data-action="busca" aria-label="Busca" aria-expanded="false"><span class="nav-mobile-ico nav-mobile-ico-busca"></span>Busca</button>`;
 
   const menuBtn = bar.querySelector('.nav-mobile-menu');
-  menuBtn.addEventListener('click', () => {
-    const opening = panel.hidden;
-    panel.hidden = !opening;
-    menuBtn.classList.toggle('is-open', opening);
-    document.body.classList.toggle('nav-mobile-open', opening);
+
+  // map each bar button to its panel; only one open at a time
+  const panelMap = [
+    { btn: bar.querySelector('[data-action="lang"]'), panel: langPanel },
+    { btn: bar.querySelector('[data-action="a11y"]'), panel: a11yPanel },
+    { btn: menuBtn, panel },
+    { btn: bar.querySelector('[data-action="canais"]'), panel: canaisPanel },
+    { btn: bar.querySelector('[data-action="busca"]'), panel: buscaPanel },
+  ];
+
+  const closeAllPanels = (exceptPanel) => {
+    panelMap.forEach(({ btn, panel: p }) => {
+      if (p === exceptPanel) return;
+      p.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+      btn.classList.remove('is-open');
+    });
+  };
+
+  panelMap.forEach(({ btn, panel: p }) => {
+    btn.addEventListener('click', () => {
+      const opening = p.hidden;
+      closeAllPanels(opening ? p : null);
+      p.hidden = !opening;
+      btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+      btn.classList.toggle('is-open', opening);
+      if (btn === menuBtn) btn.setAttribute('aria-label', opening ? 'Fechar menu' : 'Menu');
+      document.body.classList.toggle('nav-mobile-open', opening);
+    });
   });
 
-  wrapper.append(panel, bar);
+  wrapper.append(panel, langPanel, a11yPanel, canaisPanel, buscaPanel, bar);
   return {
     panel, bar, menuBtn, logoImg,
   };

@@ -774,7 +774,8 @@ body.high-contrast main .section.highlight {
 
 /* ---------- Mobile (base) ---------- */
 
-/* bottom tab bar */
+/* bottom tab bar — white, with a thin top hairline (source has a subtle top
+   border, not a heavy drop shadow). */
 header .nav-mobile-bar {
   position: fixed;
   inset: auto 0 0;
@@ -784,7 +785,7 @@ header .nav-mobile-bar {
   align-items: center;
   height: 64px;
   background: #fff;
-  box-shadow: 0 -2px 10px rgb(0 0 0 / 12%);
+  border-top: 1px solid #e4e4e4;
 }
 
 header .nav-mobile-btn {
@@ -813,21 +814,31 @@ header .nav-mobile-ico-a11y { background-image: url('data:image/svg+xml;utf8,<sv
 header .nav-mobile-ico-canais { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%234b4b4b"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'); }
 header .nav-mobile-ico-busca { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>'); }
 
-/* center Menu button — green circle */
+/* center Menu button (closed): a raised white circle with a thin light-grey
+   outline ring and a dark hamburger inside. It protrudes above the bar's top
+   edge (source), with no drop shadow. */
 header .nav-mobile-menu {
-  width: 56px;
-  height: 56px;
-  margin-top: -20px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 68px;
+  height: 68px;
+  margin-top: -34px;
+  padding: 0;
   border-radius: 50%;
-  background: var(--petro-green);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+  background: #fff;
+  border: 1px solid #b0b0b0;
+  box-shadow: none;
 }
 
 header .nav-mobile-ico-menu {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23fff" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>');
 }
 
-/* Menu open: green outline circle + × icon */
+/* Menu open: white circle with a green outline ring + green × icon */
 header .nav-mobile-menu.is-open {
   background: #fff;
   border: 2px solid var(--petro-green);
@@ -837,91 +848,276 @@ header .nav-mobile-menu.is-open .nav-mobile-ico-menu {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>');
 }
 
-/* menu panel (full-screen white, above content, below bottom bar) */
+/* menu panel — occupies the viewport above the fixed 64px bottom bar and
+   scrolls internally (source "Navegue nas Seções" drawer). */
 header .nav-mobile-panel {
   position: fixed;
   inset: 0 0 64px;
   z-index: 39;
   display: block;
   overflow-y: auto;
-  background: #fff;
+  background: #f8f8f8;
+  padding-bottom: 40px;
+
+  /* momentum scroll on iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 header .nav-mobile-panel[hidden] {
   display: none;
 }
 
+/* panel title: centered, dark-grey, bold — "Navegue nas Seções:" */
 header .nav-mobile-head {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  padding: 0 16px;
-  background: var(--petro-util-bg);
-  font-size: 12px;
+  margin: 0;
+  padding: 40px 16px 32px;
+  text-align: center;
+  font-size: 22px;
   font-weight: 700;
-  color: var(--petro-util-text);
+  color: #373737;
 }
 
+/* the top-level list carries the continuous green vertical navigation line on
+   its left; child lists (data-level) inherit indentation but not the line. */
 header .nav-mobile-list {
   list-style: none;
-  margin: 0;
+  margin: 0 32px;
   padding: 0;
 }
 
-header .nav-mobile-list > li {
-  border-bottom: 1px solid #eee;
+header .nav-mobile-panel > .nav-mobile-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 25px;
+  border-left: 1px solid var(--petro-green);
 }
 
+/* top-level rows */
+header .nav-mobile-list > li {
+  position: relative;
+}
+
+/* row: link or accordion toggle. Source: 14px bold #008542, 12px vertical
+   margin (rhythm), left-aligned with a small gap before the chevron. */
 /* stylelint-disable-next-line no-descending-specificity */
 header .nav-mobile-list > li > a,
 header .nav-mobile-toggle {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   width: 100%;
-  padding: 18px 16px;
+  margin: 12px 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.44;
+  color: var(--petro-green);
+  text-align: left;
+  text-decoration: none;
+}
+
+/* expanded group box: the source draws a thin green rectangle around the
+   INNERMOST open accordion group only (an open item that has no deeper open
+   child). Drawn with box-shadow so it adds no layout shift; padding gives the
+   inner breathing room. When a deeper group is opened, the box moves down to
+   it and the ancestor loses its box (keeping only the yellow indicator). */
+header .nav-mobile-list li.is-open:not(:has(.is-open)) {
+  box-shadow: 0 0 0 1px var(--petro-green);
+  border-radius: 2px;
+  padding: 2px 12px 8px;
+}
+
+/* yellow active indicator: a short bar sitting ON the green vertical line next
+   to the active top-level item (source .active state). Anchored to the li's
+   border-box, which does not move (box uses box-shadow, not border/margin), so
+   the bar stays aligned whether or not the group is boxed. */
+header .nav-mobile-panel > .nav-mobile-list > li.is-open::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: 0;
+  width: 5px;
+  height: 44px;
+  background: var(--petro-yellow);
+}
+
+/* chevron on expandable items (down when closed, up when open) — small + thin
+   to match the source. */
+header .nav-mobile-toggle::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentcolor;
+  border-bottom: 1.5px solid currentcolor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+header .nav-mobile-toggle[aria-expanded="true"]::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+/* nested sublists: lighter medium-green, regular weight, indented one step.
+   Source sub-items are larger (20px) but keep the SAME row-to-row rhythm as the
+   top-level headings (each row has 12px vertical margin), and long labels stay
+   on a single line. */
+header .nav-mobile-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 12px 0 0;
+  padding: 0 0 4px 16px;
+}
+
+header .nav-mobile-sub[hidden] {
+  display: none;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+header .nav-mobile-sub > li > a,
+header .nav-mobile-sub > li > .nav-mobile-toggle {
+  margin: 12px 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #1e7a46;
+}
+
+/* ---------- secondary bottom-bar panels (Idioma / Acessibilidade / Canais /
+   Busca) — same drawer shell as the main menu, simpler content ---------- */
+header .nav-mobile-simple {
+  padding: 8px 32px 0;
+}
+
+header .nav-mobile-simple-label {
+  margin: 0 0 20px;
+  font-size: 16px;
+  color: #373737;
+}
+
+/* language options */
+header .nav-mobile-lang-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+header .nav-mobile-lang-opts button {
+  align-self: flex-start;
   border: none;
   background: none;
   cursor: pointer;
   font: inherit;
   font-size: 18px;
-  font-weight: 700;
-  color: #373737;
-  text-decoration: none;
-}
-
-header .nav-mobile-list > li:first-child > a {
   color: var(--petro-green);
 }
 
-/* chevron on expandable items */
-header .nav-mobile-toggle::after {
-  content: '';
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid #373737;
-  border-bottom: 2px solid #373737;
-  transform: rotate(-45deg);
-  transition: transform 0.2s ease;
+header .nav-mobile-lang-opts button.is-active {
+  font-weight: 700;
 }
 
-header .nav-mobile-toggle.is-open::after {
-  transform: rotate(45deg);
+/* accessibility toggle rows */
+header .nav-mobile-a11y-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #e4e4e4;
+  cursor: pointer;
 }
 
-header .nav-mobile-sub {
+header .nav-mobile-a11y-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #373737;
+}
+
+/* canais: 2-column grid of card tiles (icon + label), matching the source */
+header .nav-mobile-canais {
   list-style: none;
   margin: 0;
-  padding: 0 16px 12px;
+  padding: 8px 32px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
-header .nav-mobile-sub a {
-  display: block;
-  padding: 10px 8px;
-  font-size: 15px;
-  color: var(--petro-green);
+header .nav-mobile-canais a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 12px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #373737;
+  text-align: center;
   text-decoration: none;
+}
+
+header .nav-mobile-canal-ico {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e9e9e9 no-repeat center / 26px;
+}
+
+header .nav-mobile-canal-ico-transp {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 13l3-3 2 2 3-4"/></svg>');
+}
+
+header .nav-mobile-canal-ico-invest {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="1.6"><path d="M4 17l5-5 3 3 6-7"/><circle cx="4" cy="17" r="1"/></svg>');
+}
+
+header .nav-mobile-canal-ico-energia {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%234b4b4b" stroke-width="1.6"><rect x="4" y="4" width="8" height="16"/><rect x="14" y="9" width="6" height="11"/><path d="M7 8h2M7 12h2M17 13h1"/></svg>');
+}
+
+/* busca field */
+header .nav-mobile-busca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 32px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--petro-green);
+  border-radius: 500px;
+}
+
+header .nav-mobile-busca input {
+  flex: 1;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+header .nav-mobile-busca input:focus-visible {
+  outline: none;
+}
+
+header .nav-mobile-busca-submit {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: none;
+  cursor: pointer;
+  background: none no-repeat center / 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
 
 /* prevent body scroll when mobile menu open (harmless on desktop) */
