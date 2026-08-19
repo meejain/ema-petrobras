@@ -72,13 +72,17 @@ function buildUtilityBar(section) {
       <button type="button" aria-label="Alterar idioma para inglês">en</button>
     </div>`;
 
-  // font-size controls: adjust root font scale between 90% and 130%
+  // zoom controls (A-/A+): enlarge/shrink the whole page in 10% steps between
+  // 90% and 130%, matching the source. The source scales all page content (not
+  // just fonts) — because our migrated content is largely px-based, we apply a
+  // real `zoom` on the document element so everything (header + content) grows,
+  // exactly like the source behaviour.
   const [decBtn, incBtn] = controls.querySelectorAll('.nav-fontsize button');
   const pct = controls.querySelector('.nav-fontsize span');
   let scale = 100;
   const applyScale = () => {
     pct.textContent = `${scale}%`;
-    document.documentElement.style.fontSize = `${scale}%`;
+    document.documentElement.style.zoom = scale / 100;
   };
   decBtn.addEventListener('click', () => { scale = Math.max(90, scale - 10); applyScale(); });
   incBtn.addEventListener('click', () => { scale = Math.min(130, scale + 10); applyScale(); });

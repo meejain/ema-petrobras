@@ -721,15 +721,48 @@ header .nav-wrapper.is-compact .nav-logo-wordmark {
 }
 
 /* high-contrast mode (toggled by the utility-bar contrast button).
-   Matches the source (body.high-contrast-active): it does NOT filter the page —
-   it remaps the brand colour tokens to dark neutrals (brand green #008542 ->
-   #525252 neutral-700; darker/lighter variants to neutral-800/500), keeping the
-   white background. */
+   Matches the source (body.high-contrast-active): the whole page flips to a
+   dark, monochrome theme — near-black backgrounds, white text, neutral-grey
+   brand colours, and desaturated (grayscale) imagery. */
 body.high-contrast {
+  --background-color: #010101;
+  --text-color: #fff;
+  --link-color: #d7d7d7;
+  --link-hover-color: #fff;
   --petro-green: #525252;
   --petro-green-dark: #404040;
-  --link-color: #525252;
-  --link-hover-color: #404040;
+  --section-light-color: #373737;
+
+  background: #010101;
+}
+
+/* light text across default content on the dark theme, plus a grayscale filter
+   so the whole content reads as one monochrome high-contrast theme — this
+   neutralises every hardcoded brand colour at once (the green CTA pill, the
+   yellow accent bars, and all imagery), matching the source. */
+body.high-contrast main,
+body.high-contrast footer {
+  color: #fff;
+  filter: grayscale(1);
+}
+
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h3,
+body.high-contrast h4,
+body.high-contrast h5,
+body.high-contrast h6,
+body.high-contrast main p,
+body.high-contrast footer p,
+body.high-contrast main a:any-link,
+body.high-contrast footer a:any-link {
+  color: #fff;
+}
+
+/* light "section.light/highlight" bands become dark neutral */
+body.high-contrast main .section.light,
+body.high-contrast main .section.highlight {
+  background-color: #010101;
 }
 
 /* ---------- Mobile (base) ---------- */
@@ -936,4 +969,26 @@ body.nav-mobile-open {
     padding-left: var(--space-big);
     padding-right: var(--space-big);
   }
+}
+
+/* high-contrast: cards / bordered surfaces flip to dark neutral with a visible
+   light border. Placed at end of file to satisfy no-descending-specificity. */
+body.high-contrast .featured-news > ul > li,
+body.high-contrast .featured-news > ul > li:not(:first-child) .featured-news-card-body,
+body.high-contrast .slider-cards ul > li {
+  background: #373737;
+  border-color: #959595;
+}
+
+/* high-contrast: desaturate the whole content + footer so the page reads as one
+   monochrome theme. A single grayscale filter on the containers neutralises every
+   hardcoded brand colour at once — the green CTA pill, the yellow accent bars, and
+   all imagery — matching the source (brand colours -> neutral grey). The header
+   logo (green/yellow wordmark + yellow shape) also goes monochrome. Placed at end
+   of file to satisfy no-descending-specificity. */
+
+/* the header logo (green/yellow wordmark + yellow shape) also goes monochrome */
+/* stylelint-disable-next-line no-descending-specificity */
+body.high-contrast header .nav-logo {
+  filter: grayscale(1);
 }
