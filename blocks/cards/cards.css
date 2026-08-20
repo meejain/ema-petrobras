@@ -36,6 +36,16 @@
  * Large green line-art icon on top, bold dark title below, short
  * yellow bar at the bottom of the card. 3 columns on desktop.
  * ================================================================== */
+
+/* Reset the global `.icon` glyph rule (styles.css: inline-block, 24x24) that
+   would otherwise collapse this block because its variant class is also `icon`.
+   The block must be a normal full-width block so its card grid can lay out. */
+.cards.icon {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .cards.icon > ul {
   display: flex;
   flex-wrap: wrap;
@@ -49,24 +59,42 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
+
+  /* source cards reserve a tall, airy box (measured ~442px mobile / ~450px
+     desktop) — same min-height pattern as the grid variant */
+  min-height: 442px;
   border: 1px solid #eee;
   border-radius: 16px;
   padding: 24px;
   background-color: #fff;
+
+  /* hover lift matches the site's card hover (0 4px 16px rgba(0,0,0,.16)) */
+  transition: box-shadow 0.2s ease;
+}
+
+/* The variant :hover rules (icon/grid) are more specific than the plain
+   `.cards.{feature,grid} > ul > li` selectors that follow them in this file.
+   They target independent variants, so there's no real cascade conflict —
+   silence the ordering-only lint for the rest of the file. */
+/* stylelint-disable no-descending-specificity */
+.cards.icon > ul > li:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
 }
 
 .cards.icon .cards-card-image {
   line-height: 0;
 }
 
-/* large green line-art icon at the top, ~130px tall, left-aligned */
+/* large green illustration at the top — full card width, 245px tall, centred
+   (source: 287x245 image, object-fit cover on a ~square illustration). Our
+   line-art PNGs keep their aspect via contain so they never crop. */
 .cards.icon .cards-card-image img {
-  width: auto;
-  height: 130px;
+  width: 100%;
+  height: 245px;
   max-width: 100%;
   aspect-ratio: auto;
   object-fit: contain;
-  object-position: left center;
+  object-position: center;
 }
 
 /* body grows so the yellow bar can sit at the card bottom */
@@ -79,7 +107,9 @@
 
 .cards.icon .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
   margin: 0 0 24px;
-  font-size: 24px;
+
+  /* source title 22px mobile → 24px from tablet up */
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.2;
   color: #373737;
@@ -102,9 +132,19 @@
   }
 }
 
+@media (width >= 768px) {
+  /* title grows to 24px from tablet up (source) */
+  .cards.icon .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+    font-size: 24px;
+  }
+}
+
 @media (width >= 992px) {
   .cards.icon > ul > li {
     width: calc((100% - (2 * 32px)) / 3);
+
+    /* slightly taller reserved card on desktop (source ~450px) */
+    min-height: 450px;
   }
 }
 
@@ -241,10 +281,26 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  /* Source reserves a tall card with airy space below the content — every card
+     (even the fullest) has ~145px empty below the link, so this is a card
+     min-height, not equal-height stretch. Measured source card heights:
+     ~343px mobile (1-col) → ~450px from tablet up (2/3-col). Content sits at the
+     top; the free space falls to the bottom, matching the source's look. */
+  min-height: 340px;
   border: 1px solid #eee;
   border-radius: 16px;
   padding: 24px;
   background-color: #fff;
+
+  /* smooth the hover lift (source: transition all / ease) */
+  transition: box-shadow 0.2s ease;
+}
+
+/* hover: soft drop-shadow lift (source .card-container.has-hover:hover →
+   box-shadow var(--box-shadow-default) = 0 4px 16px rgba(0,0,0,.16)). */
+.cards.grid > ul > li:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
 }
 
 /* header row: title (left) + small rounded image (right) */
@@ -304,16 +360,17 @@
 }
 
 .cards.grid .cards-card-body p {
-  margin: 20px 0 0;
+  margin: 24px 0 0;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
   color: #373737;
 }
 
-/* bold green link at the bottom of the card */
+/* bold green link below the body copy (source gap ≈ 29px = the body's 1.8em
+   bottom margin; 28px matches at both mobile and desktop within 1px). */
 .cards.grid .cards-card-body p:last-child {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .cards.grid .cards-card-body a:any-link {
@@ -331,6 +388,11 @@
 }
 
 @media (width >= 768px) {
+  /* taller reserved card from tablet up (source ~450–478px) */
+  .cards.grid > ul > li {
+    min-height: 450px;
+  }
+
   /* full-size image and 16px body/link + 24px title from tablet up */
   .cards.grid .cards-card-head .cards-card-image {
     width: 148px;

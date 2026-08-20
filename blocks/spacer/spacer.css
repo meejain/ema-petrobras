@@ -1,0 +1,7 @@
+/* Spacer block — an empty, purely-structural gap. Height is set inline by
+   spacer.js from the authored per-device config; this file just makes sure the
+   block reserves that space and adds no visuals of its own. */
+.spacer {
+  display: block;
+  width: 100%;
+}

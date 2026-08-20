@@ -193,6 +193,96 @@ PNG icons for the card samples.
 - Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
   `test:a11y …/hero-diagonal-split` pass. Verified at 1440px against live `/bolivia`.
 
+### 2026-08-20 (slider-cards — mobile/tablet must STACK, not slide)
+- **Corrected earlier misread.** Re-measured the source (homepage `/`) across widths: the product
+  cards **stack vertically** (`flex-direction: column`, full-width cards, **arrows hidden**) at
+  **<992px** — confirmed at 390 (stacked, no arrows) and 768 (stacked, no arrows). The horizontal
+  scrolling slider only appears at **≥992px** (`flex-direction: row` in the source; 446px cards,
+  arrows shown). My prior "peek slider on mobile" was wrong and diverged from the source.
+- **Fix (slider-cards.css):** base is now a vertical stack — `.slider-cards-viewport { overflow-x:
+  visible }`, `> ul { display:flex; flex-direction:column; gap:24px }`, and `.slider-cards-controls
+  { display:none }`. The `@media (width >= 992px)` block re-asserts the slider: viewport
+  `overflow-x:auto` + right-edge full-bleed, `ul` → `grid; grid-auto-flow:column;
+  grid-auto-columns:446px; gap:32px; padding-right:space-big`, and controls `display:flex`. Removed
+  the old ≥576 tablet rule (source stacks at 768).
+- Verified vs source: 390 stacked full-width no arrows; 768 stacked full-width no arrows; 1440
+  horizontal 446px slider with arrows, scrollable. Gate: `npm run lint` 0 errors, `breakpoint-check`
+  pass, `test:a11y …/slider-cards` pass.
+- NOTE: could not remove the `block-samples/index` page — content deletion is hook-blocked
+  ("never delete existing content; use the import script"). Flag for the content owner to
+  unpublish/delete via Document Authoring; it can't be done from the code repo.
+
+### 2026-08-20 (cards icon — parity + global `.icon` collision fix)
+- Validated `cards.icon` vs `/transicao-energetica` at 390/768/1440. Fixes:
+  - **Image was wrong:** rendered small (130px, left-aligned, contain). Source icon is a large
+    centred illustration **245px tall, full card width**. Changed `.cards.icon .cards-card-image img`
+    → `width:100%; height:245px; object-fit:contain; object-position:center`.
+  - **Airy card min-height** like the grid variant: `min-height:442px` (base) → `450px` at ≥992px
+    (source cards measured ~442px mobile / ~450px desktop).
+  - **Title** `22px` mobile → `24px` at ≥768px (source).
+  - **Hover** lift added (`0 4px 16px rgba(0,0,0,.16)`), matching the site card hover.
+- **Footer overlap ROOT CAUSE (pre-existing, not the spacer work):** the variant class `icon`
+  collided with the boilerplate global `styles.css` rule `.icon { display:inline-block; height:24px;
+  width:24px }`. That collapsed the whole `.cards.icon` block to 24×24, so its 450px card `<ul>`
+  overflowed and bled over the footer. Fix: `.cards.icon { display:block; width:100%; height:auto }`
+  resets the glyph rule. Verified: block now 450px, section grows to contain it, footer sits 112px
+  below the cards (no overlap). Also wrapped the variant `:hover` rules in a scoped
+  `stylelint-disable no-descending-specificity` (cross-variant ordering only, no real conflict).
+- Verified all viewports: 1 col @390 (card 442, img 245, title 22), 3 col @1440 (card 450, img 245,
+  title 24). Gate: `npm run lint` 0 errors, `breakpoint-check` pass, `test:a11y …/cards-icon` pass.
+
+### 2026-08-20 (new `spacer` block + block-sample pages de-heroed)
+- **Why:** the block-sample pages each opened with a placeholder `hero` (full banner) that
+  existed only to push content clear of the fixed header — confusing when demoing an unrelated
+  block. Replaced it with a lightweight, reusable **`spacer`** block.
+- **New block `blocks/spacer/`:** `spacer.js` reads a `readBlockConfig` table
+  (`Desktop`/`Tablet`/`Mobile` → CSS heights) and sets the block's inline height for the current
+  breakpoint (≥1280 desktop, ≥992 tablet→falls back to mobile, else mobile), re-applied on resize;
+  empties its own config markup so it renders as pure empty space. `spacer.css` is minimal
+  (block-scoped, no visuals). Adapted from the user's sunstar snippet: import from `scripts/aem.js`
+  (not lib-franklin), project breakpoints, resize listener, `.textContent=''` clear.
+- **Sample pages (`content/drafts/block-samples/*.plain.html`):** transformed programmatically via
+  `tools/samples/add-spacers.mjs` (idempotent; NOT hand-edited) — (1) swapped the placeholder hero
+  section for a top `spacer` (180/170/96px desktop/tablet/mobile, clearing the 152/56px header),
+  (2) wrapped each demoed sample block with 48px (40px mobile) `spacer` gaps above & below.
+  `hero-diagonal-split` left as-is (the hero IS its demo block). `index` got only the top spacer.
+- Verified on real content pages (not a drafts harness) at 1440/1000/390: top spacer 180/170/96,
+  gaps 48/48/40, all spacers emptied, `<h1>` clears the fixed header (y=244/… /144), no placeholder
+  hero remains on any page. Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings),
+  `breakpoint-check` pass, `test:a11y` pass on cards-grid + featured-news.
+
+### 2026-08-20 (cards grid — hover effect added)
+- **Missing:** the source cards lift on hover (`.card-container.has-hover:hover`), ours had no
+  `:hover` rule at all. Source effect (measured): `box-shadow: var(--box-shadow-default)` =
+  `0 4px 16px rgba(0,0,0,.16)`; no transform/border change; transition all/ease.
+- **Fix (cards.css):** added `.cards.grid > ul > li:hover { box-shadow: 0 4px 16px rgb(0 0 0/16%) }`
+  plus `transition: box-shadow 0.2s ease` on the card. Verified on real hover — the card computes
+  `rgba(0,0,0,0.16) 0px 4px 16px`, matching the source.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y …/cards-grid` pass.
+
+### 2026-08-20 (cards grid — full-viewport parity validation vs /produtos-mais-sustentaveis)
+- Validated the `cards.grid` variant against the source at 390 / 600 / 768 / 992 / 1280 / 1440.
+- **Column progression matches exactly:** source 1→2→3 at (≤~575) / (576–991) / (≥992); ours uses
+  the same `≥576→2`, `≥992→3` breakpoints. Confirmed 390=1, 600=2, 768=2, 992=3, 1440=3 both sides.
+- **Card internals match** (measured @1440): border 1px #eee, radius 16px, padding 24px; title
+  24px/700 #373737 (22px @mobile); yellow bar 24×3 #fdc82f under the title; image 148×104 radius 8
+  (72×52 @mobile, top-right beside the title); body 14→16px/1.6 #373737; link 14→16px/700 #008542
+  underline. Mobile (390): card width, title, and 72×52 image position all pixel-match the source.
+- **Deltas fixed:** (1) body paragraph sat 20px below the image locally vs **24px** on the source —
+  `.cards-card-body p` margin-top `20px`→`24px`. (2) body→link gap was 24px vs the source's **~29px**
+  (the source body `<p>` carries a 1.8em/28.8px bottom margin before the link) — bumped the link
+  paragraph `margin-top` `24px`→`28px`. Re-measured all within-card gaps @1440: pad-top 24, title
+  top 25, title→bar 16–17, image→body 24, body→link 28 — all match the source within 1px.
+- **Card height (corrected):** re-measured — the source cards' tall "airy bottom" is NOT
+  equal-height stretch. Even the fullest card (longest title + body) reserves ~145px empty space
+  below its link, and every card is the same height regardless of content: **~343px mobile (1-col)
+  → ~450–478px from tablet up**. So the source cards carry a real **min-height**. Added
+  `min-height: 340px` on `.cards.grid > li` (base) and `450px` at ≥768px. Verified local now
+  renders 340px mobile / 450px desktop — matching the source's airy card.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y …/cards-grid` pass.
+
 ### 2026-08-20 (header — PT/EN rebuilt as a toggle SWITCH with sliding knob)
 - **Symptom (user):** our PT/EN was a flat white pill (just "PT EN" text); the source is a toggle
   **switch** — a pill track with a circular knob sitting over the active language.

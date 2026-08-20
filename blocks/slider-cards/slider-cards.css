@@ -20,9 +20,11 @@
   width: 100%;
 }
 
-/* slider viewport (horizontal scroll track) */
+/* slider viewport. MOBILE + TABLET (<992px): the source is NOT a slider — it
+   stacks the cards vertically, full width, with the arrow controls hidden. The
+   horizontal scroll slider only kicks in at desktop (>=992px, below). */
 .slider-cards .slider-cards-viewport {
-  overflow-x: auto;
+  overflow-x: visible;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -32,19 +34,20 @@
   display: none;
 }
 
+/* MOBILE/TABLET: vertical stack of full-width cards (source flex-direction:
+   column). Desktop re-asserts the horizontal scrolling grid. */
 .slider-cards > .slider-cards-viewport > ul {
   list-style: none;
   margin: 0;
   padding: 4px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* arrow controls */
+/* arrow controls — hidden below desktop (source shows them only at >=992px) */
 .slider-cards .slider-cards-controls {
-  display: flex;
+  display: none;
   justify-content: flex-end;
   gap: 16px;
   margin-top: 24px;
@@ -191,28 +194,34 @@
   color: var(--link-hover-color);
 }
 
-/* Tablet: fixed-width cards that overflow into a scrollable slider */
-@media (width >= 576px) {
-  .slider-cards > .slider-cards-viewport > ul {
-    grid-auto-columns: 340px;
-  }
-}
-
-/* Desktop: fixed 446px cards (matches source .card-container) — 24px padding
-   leaves a full-width 398px image, edge-to-edge like the source. */
+/* Desktop (>=992px): the source switches from a vertical stack to a horizontal
+   scrolling slider — fixed 446px cards in a row, arrow controls shown, and the
+   track full-bleeds to the window's right edge so the next card peeks. */
 @media (width >= 992px) {
+  /* full-bleed the track to the window's right edge (source behaviour): the
+     left edge stays at the content gutter but the track extends past the
+     centered 1440 box on the right, so the next card peeks in. */
+  .slider-cards .slider-cards-viewport {
+    margin-right: calc((100% - 100vw) / 2);
+    overflow-x: auto;
+  }
+
   .slider-cards > .slider-cards-viewport > ul {
+    display: grid;
+    grid-auto-flow: column;
+
+    /* fixed 446px cards (source .card-container) — 24px padding leaves a
+       full-width 398px image, edge-to-edge like the source. */
+    grid-auto-columns: 446px;
+    gap: 32px;
+
     /* trailing padding so the last card isn't flush against the window edge
        when fully scrolled */
-    grid-auto-columns: 446px;
     padding-right: var(--space-big);
   }
 
-  /* Full-bleed the viewport to the window's right edge (source behaviour): the
-     track keeps its left edge at the content gutter but extends past the
-     centered 1440 box on the right, so the next card peeks in — signalling
-     there's more to scroll. The controls stay within the content box below. */
-  .slider-cards .slider-cards-viewport {
-    margin-right: calc((100% - 100vw) / 2);
+  /* arrow controls appear at desktop */
+  .slider-cards .slider-cards-controls {
+    display: flex;
   }
 }
