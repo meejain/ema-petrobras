@@ -43,14 +43,16 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 // gold frame stay coherent and can only ever be changed together — never derived
 // from live DOM, so they cannot drift.
 //
-// HERO_DS_CORNERS: the photo clip. In objectBoundingBox units (0..1). Matches the
-// source's diagonal crop — top-left notched in/down, bottom-left lifted, and the
-// right edge running off the media box.
+// HERO_DS_CORNERS: the photo clip, in objectBoundingBox units (fractions of the
+// media/photo box). MEASURED from the source's computed clip-path on the photo
+// (petrobras.com.br/bolivia, 1440px). The photo box is proportioned 735x848; the
+// right corners exceed 1 on purpose (the photo bleeds off the right edge — the clip
+// simply extends past the box there, so the photo shows up to its own/viewport edge).
 const HERO_DS_CORNERS = [
-  [0.167, 0.093], // top-left  — notched right + down
-  [0.992, 0], // top-right — at the top edge, hard right
-  [1, 1], // bottom-right — full corner (photo bleeds off the right)
-  [0, 0.755], // bottom-left — on the left edge, lifted up from the bottom
+  [0.336, 0.254], // top-left  — notched in + down
+  [1.929, 0.188], // top-right — rises slightly, runs far off the right
+  [1.944, 0.894], // bottom-right — off the right, near the bottom
+  [0.008, 0.708], // bottom-left — on the left edge, lifted up from the bottom
 ];
 
 // HERO_DS_OUTLINE_CORNERS: the decorative gold frame. NOT a scaled echo of the
@@ -61,10 +63,10 @@ const HERO_DS_CORNERS = [
 // exceed 0..1 on purpose (the frame overflows the media box); the outline svg uses
 // overflow:visible so the excess renders past the photo like the source.
 const HERO_DS_OUTLINE_CORNERS = [
-  [0.12, 0.505], // top-left  — floats left, mid-height (gap above the photo's TL)
-  [1.81, -0.014], // top-right — rises up and flies well past the right edge
-  [1.85, 1.265], // bottom-right — off the right, below the photo
-  [0.263, 1.149], // bottom-left — below the photo, inset from the left
+  [0.12, 0.35], // top-left  — floats left, above the photo's TL
+  [1.85, 0.017], // top-right — rises up and flies well past the right edge
+  [1.85, 0.877], // bottom-right — off the right, near the photo bottom
+  [0.263, 0.797], // bottom-left — below the photo's BL, inset from the left
 ];
 
 // corner fillet radius, as a fraction of the bounding box (soft rounded corners)
@@ -187,34 +189,37 @@ function decorateDiagonalSplit(block) {
   const mediaCell = cells.find((c) => c.querySelector('picture, img'));
   const contentCell = cells.find((c) => c !== mediaCell) || cells[0];
 
-  // --- content column ---
+  // breadcrumb: authored as a <ul> inside the content cell; render as an
+  // accessible <nav><ol> and HOIST it to be the block's first child so, on
+  // mobile, the stack order matches the source (breadcrumb, photo, heading, body).
+  let breadcrumb = null;
+  const list = contentCell ? contentCell.querySelector('ul, ol') : null;
+  if (list) {
+    breadcrumb = document.createElement('nav');
+    breadcrumb.className = 'hero-ds-breadcrumb';
+    breadcrumb.setAttribute('aria-label', 'Breadcrumb');
+    const ol = document.createElement('ol');
+    [...list.children].forEach((li, i, arr) => {
+      const item = document.createElement('li');
+      const link = li.querySelector('a');
+      if (link && i < arr.length - 1) {
+        item.append(link);
+      } else {
+        // current page (or a plain-text crumb): no link, mark as current.
+        const span = document.createElement('span');
+        span.textContent = li.textContent.trim();
+        span.setAttribute('aria-current', 'page');
+        item.append(span);
+      }
+      ol.append(item);
+    });
+    breadcrumb.append(ol);
+    list.remove();
+  }
+
+  // --- content column (heading + body) ---
   if (contentCell) {
     contentCell.className = 'hero-ds-content';
-
-    // breadcrumb: authored as a <ul>; render as an accessible <nav><ol>.
-    const list = contentCell.querySelector('ul, ol');
-    if (list) {
-      const nav = document.createElement('nav');
-      nav.className = 'hero-ds-breadcrumb';
-      nav.setAttribute('aria-label', 'Breadcrumb');
-      const ol = document.createElement('ol');
-      [...list.children].forEach((li, i, arr) => {
-        const item = document.createElement('li');
-        const link = li.querySelector('a');
-        if (link && i < arr.length - 1) {
-          item.append(link);
-        } else {
-          // current page (or a plain-text crumb): no link, mark as current.
-          const span = document.createElement('span');
-          span.textContent = li.textContent.trim();
-          span.setAttribute('aria-current', 'page');
-          item.append(span);
-        }
-        ol.append(item);
-      });
-      nav.append(ol);
-      list.replaceWith(nav);
-    }
 
     const heading = contentCell.querySelector('h1, h2, h3, h4, h5, h6');
     if (heading) heading.classList.add('hero-ds-heading');
@@ -235,10 +240,13 @@ function decorateDiagonalSplit(block) {
     mediaCell.prepend(buildOutline());
   }
 
-  // Hoist the two cells to be direct children of the block so the block's
-  // flex layout controls the content/media split, then drop the empty row.
-  if (contentCell) block.append(contentCell);
+  // Hoist to direct children of the block in source stacking order —
+  // breadcrumb, media, content — so the block layout controls the split, then
+  // drop the empty authored row. On desktop the CSS grid repositions the
+  // breadcrumb and content into the left column and the media into the right.
+  if (breadcrumb) block.append(breadcrumb);
   if (mediaCell) block.append(mediaCell);
+  if (contentCell) block.append(contentCell);
   row.remove();
 }
 

@@ -1,0 +1,224 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner:
+    - navigation "Main navigation" [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: "Você está em: SITE PETROBRAS"
+        - generic [ref=e7]:
+          - generic [ref=e8]: "Acesse também:"
+          - link "ACESSO À INFORMAÇÃO" [ref=e9] [cursor=pointer]:
+            - /url: https://transparencia.petrobras.com.br/
+          - link "INVESTIDORES" [ref=e10] [cursor=pointer]:
+            - /url: https://www.investidorpetrobras.com.br/
+          - link "IMPRENSA" [ref=e11] [cursor=pointer]:
+            - /url: https://agencia.petrobras.com.br/
+          - link "FORNECEDORES" [ref=e12] [cursor=pointer]:
+            - /url: https://canalfornecedor.petrobras.com.br/
+          - link "CLIENTES" [ref=e13] [cursor=pointer]:
+            - /url: https://canalcliente.petrobras.com.br/s/
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - button "Diminuir tamanho da fonte" [ref=e16] [cursor=pointer]: A-
+            - generic [ref=e17]: 100%
+            - button "Aumentar tamanho da fonte" [ref=e18] [cursor=pointer]: A+
+          - button "Ativar alto contraste" [ref=e19] [cursor=pointer]
+          - group "Alterar idioma" [ref=e20]:
+            - button "Alterar idioma para português" [ref=e21] [cursor=pointer]: pt
+            - button "Alterar idioma para inglês" [ref=e22] [cursor=pointer]: en
+      - generic [ref=e24]:
+        - link "Página inicial Petrobras" [ref=e25] [cursor=pointer]:
+          - /url: https://petrobras.com.br
+          - img "Petrobras" [ref=e26] [cursor=pointer]
+        - list [ref=e27]:
+          - listitem [ref=e28]:
+            - link "Transição Energética" [ref=e29] [cursor=pointer]:
+              - /url: https://petrobras.com.br/transicao-energetica
+          - listitem [ref=e30]:
+            - button "Sustentabilidade" [ref=e31] [cursor=pointer]:
+              - generic [ref=e32] [cursor=pointer]: Sustentabilidade
+          - listitem [ref=e33]:
+            - button "Inovação e Tecnologia" [ref=e34] [cursor=pointer]:
+              - generic [ref=e35] [cursor=pointer]: Inovação e Tecnologia
+          - listitem [ref=e36]:
+            - link "Negócios" [ref=e37] [cursor=pointer]:
+              - /url: https://petrobras.com.br/negocios
+          - listitem [ref=e38]:
+            - button "Quem Somos" [ref=e39] [cursor=pointer]:
+              - generic [ref=e40] [cursor=pointer]: Quem Somos
+          - listitem [ref=e41]:
+            - link "Carreiras" [ref=e42] [cursor=pointer]:
+              - /url: https://petrobras.com.br/quem-somos/carreiras
+        - button "Abrir barra de pesquisa" [ref=e44] [cursor=pointer]
+  - main [ref=e45]:
+    - region [ref=e48]:
+      - navigation "Breadcrumb" [ref=e49]:
+        - list [ref=e50]:
+          - listitem [ref=e51]:
+            - link "Home" [ref=e52] [cursor=pointer]:
+              - /url: /
+            - text: ›
+          - listitem [ref=e53]:
+            - link "Quem Somos" [ref=e54] [cursor=pointer]:
+              - /url: /quem-somos
+            - text: ›
+          - listitem [ref=e55]:
+            - link "Nossos Escritórios" [ref=e56] [cursor=pointer]:
+              - /url: /quem-somos/nossos-escritorios
+            - text: ›
+          - listitem [ref=e57]:
+            - generic [ref=e58]: Bolívia
+      - generic [ref=e59]:
+        - img
+        - img "Vista aérea das operações da Petrobras na Bolívia, com instalações industriais em meio à paisagem árida." [ref=e61]
+      - generic [ref=e62]:
+        - 'heading "Petrobras en Bolivia: conozca nuestras operaciones" [level=1] [ref=e63]'
+        - paragraph [ref=e64]: Somos Petrobras Bolivia S. A. (PEB), una subsidiaria integral de Petrobras International Braspetro BV (PIB BV), que opera en Bolivia desde 1996.
+    - generic [ref=e66]:
+      - heading "Hero (diagonal-split)" [level=2] [ref=e67]
+      - paragraph [ref=e68]:
+        - text: Hero variant with a breadcrumb trail, a dark bold heading with a yellow accent bar, a body paragraph, and a photo clipped into a diagonal parallelogram. Author the block as
+        - strong [ref=e69]: Hero (diagonal-split)
+        - text: .
+      - paragraph [ref=e70]:
+        - text: "Source:"
+        - link "https://petrobras.com.br/bolivia" [ref=e71] [cursor=pointer]:
+          - /url: /bolivia
+  - contentinfo [ref=e72]:
+    - generic [ref=e74]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - paragraph [ref=e78]:
+            - link "Logo da Petrobras" [ref=e79] [cursor=pointer]:
+              - /url: https://petrobras.com.br
+              - img "Logo da Petrobras" [ref=e81] [cursor=pointer]
+          - list [ref=e82]:
+            - listitem [ref=e83]:
+              - link "Página da Petrobras no Bluesky" [ref=e84] [cursor=pointer]:
+                - /url: https://bsky.app/profile/petrobras.com.br
+                - img "Página da Petrobras no Bluesky" [ref=e86] [cursor=pointer]
+            - listitem [ref=e87]:
+              - link "Página da Petrobras no Threads" [ref=e88] [cursor=pointer]:
+                - /url: https://www.threads.net/@petrobras
+                - img "Página da Petrobras no Threads" [ref=e90] [cursor=pointer]
+            - listitem [ref=e91]:
+              - link "Página da Petrobras no Facebook" [ref=e92] [cursor=pointer]:
+                - /url: https://www.facebook.com/petrobras
+                - img "Página da Petrobras no Facebook" [ref=e94] [cursor=pointer]
+            - listitem [ref=e95]:
+              - link "Página da Petrobras no Instagram" [ref=e96] [cursor=pointer]:
+                - /url: https://instagram.com/petrobras
+                - img "Página da Petrobras no Instagram" [ref=e98] [cursor=pointer]
+            - listitem [ref=e99]:
+              - link "Página da Petrobras no Youtube" [ref=e100] [cursor=pointer]:
+                - /url: https://www.youtube.com/petrobras
+                - img "Página da Petrobras no Youtube" [ref=e102] [cursor=pointer]
+            - listitem [ref=e103]:
+              - link "Página da Petrobras no TikTok" [ref=e104] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@petrobras
+                - img "Página da Petrobras no TikTok" [ref=e106] [cursor=pointer]
+            - listitem [ref=e107]:
+              - link "Página da Petrobras no Linkedin" [ref=e108] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/petrobras
+                - img "Página da Petrobras no Linkedin" [ref=e110] [cursor=pointer]
+        - generic [ref=e111]:
+          - paragraph [ref=e112]: Utilize nossa busca para encontrar o que procura
+          - search [ref=e113]:
+            - searchbox "Campo de pesquisa" [ref=e114]
+            - button "Buscar" [ref=e115] [cursor=pointer]
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - img "Imagem representando um telefone remetendo ao SAC" [ref=e118]
+            - generic [ref=e119]:
+              - paragraph [ref=e120]: SAC Petrobras
+              - paragraph [ref=e121]:
+                - strong [ref=e122]: 0800 728 9001
+          - generic [ref=e123]:
+            - img "Logo informação" [ref=e124]
+            - generic [ref=e125]:
+              - paragraph [ref=e126]: Acesso à Informação
+              - link "Portal da Transparência" [ref=e127] [cursor=pointer]:
+                - /url: https://transparencia.petrobras.com.br/
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - button
+          - list [ref=e131]:
+            - listitem [ref=e132]:
+              - link "Carreiras" [ref=e133] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/carreiras
+            - listitem [ref=e134]:
+              - link "Estratégia" [ref=e135] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/estrategia
+            - listitem [ref=e136]:
+              - link "Negócios" [ref=e137] [cursor=pointer]:
+                - /url: https://petrobras.com.br/negocios
+            - listitem [ref=e138]:
+              - link "Produtos" [ref=e139] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/produtos
+            - listitem [ref=e140]:
+              - link "Patrocínios" [ref=e141] [cursor=pointer]:
+                - /url: https://petrobras.com.br/sustentabilidade/patrocinios
+        - generic [ref=e142]:
+          - button
+          - list [ref=e143]:
+            - listitem [ref=e144]:
+              - link "Web Stories" [ref=e145] [cursor=pointer]:
+                - /url: https://petrobras.com.br/web-stories
+            - listitem [ref=e146]:
+              - link "Inovação e Tecnologia" [ref=e147] [cursor=pointer]:
+                - /url: https://petrobras.com.br/inovacao-e-tecnologia
+            - listitem [ref=e148]:
+              - link "Jornada da Energia" [ref=e149] [cursor=pointer]:
+                - /url: https://petrobras.com.br/jornada-da-energia
+            - listitem [ref=e150]:
+              - link "Trajetória" [ref=e151] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/trajetoria
+        - generic [ref=e152]:
+          - button
+          - list [ref=e153]:
+            - listitem [ref=e154]:
+              - link "Fale Conosco" [ref=e155] [cursor=pointer]:
+                - /url: https://petrobras.com.br/fale-conosco
+            - listitem [ref=e156]:
+              - link "Canal de Denúncias" [ref=e157] [cursor=pointer]:
+                - /url: https://www.contatoseguro.com.br/petrobras
+            - listitem [ref=e158]:
+              - link "Ouvidoria" [ref=e159] [cursor=pointer]:
+                - /url: https://petrobras.com.br/ouvidoria
+            - listitem [ref=e160]:
+              - link "Portal do ex-Empregado e Aposentado" [ref=e161] [cursor=pointer]:
+                - /url: https://petrobras.service-now.com/familiapetrobras
+        - generic [ref=e162]:
+          - button
+          - list [ref=e163]:
+            - listitem [ref=e164]:
+              - link "Preço de combustíveis" [ref=e165] [cursor=pointer]:
+                - /url: https://precos.petrobras.com.br
+            - listitem [ref=e166]:
+              - link "Nossa Energia" [ref=e167] [cursor=pointer]:
+                - /url: https://nossaenergia.petrobras.com.br/
+            - listitem [ref=e168]:
+              - link "Canal Cliente" [ref=e169] [cursor=pointer]:
+                - /url: https://www.canalcliente.petrobras.com.br/s/
+            - listitem [ref=e170]:
+              - link "Canal Fornecedor" [ref=e171] [cursor=pointer]:
+                - /url: https://www.canalfornecedor.petrobras.com.br
+            - listitem [ref=e172]:
+              - link "Imprensa" [ref=e173] [cursor=pointer]:
+                - /url: https://agencia.petrobras.com.br
+            - listitem [ref=e174]:
+              - link "Relações com Investidores" [ref=e175] [cursor=pointer]:
+                - /url: https://www.investidorpetrobras.com.br
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - link "Definições de Cookies" [ref=e179] [cursor=pointer]:
+            - /url: /privacidade-protecao-de-dados
+          - link "Privacidade e Dados Pessoais" [ref=e180] [cursor=pointer]:
+            - /url: /privacidade-protecao-de-dados
+          - link "Acessibilidade" [ref=e181] [cursor=pointer]:
+            - /url: /acessibilidade
+          - link "Sitemap" [ref=e182] [cursor=pointer]:
+            - /url: /sitemap
+        - paragraph [ref=e183]: © Copyright Petrobras 2025. Todos os direitos reservados.
+```
