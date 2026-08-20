@@ -36,12 +36,88 @@
  */
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+// Shared geometry for the diagonal-split photo — the SINGLE source of truth.
+// Four corners in objectBoundingBox units (0..1), listed clockwise from the
+// top-left, describing the source's gently tilted parallelogram. BOTH the image
+// clipPath AND the decorative gold outline are generated from THIS array, so the
+// outline is always an exact offset "echo" of the clip and can never drift out
+// of alignment. Left edge is deliberately steep (TL/BL pulled right) to match
+// the source's dramatic diagonal crop.
+const HERO_DS_CORNERS = [
+  [0.33, 0.22], // top-left — starts ~1/3 in for the source's dramatic steep diagonal
+  [0.99, 0.05], // top-right (photo bleeds off the right edge)
+  [1, 0.86], // bottom-right
+  [0.01, 0.71], // bottom-left
+];
+// corner fillet radius, as a fraction of the bounding box (soft rounded corners)
+const HERO_DS_ROUND = 0.025;
+// how far the gold outline is pushed OUTWARD from the clip (fraction of box), so
+// it reads as a thin frame that traces the clipped photo surface and flies off
+// past the right edge (source graphism).
+const HERO_DS_OUTSET = 0.035;
+
+/** unit vector from (0,0) toward (dx,dy) */
+function unit(dx, dy) {
+  const len = Math.hypot(dx, dy) || 1;
+  return [dx / len, dy / len];
+}
+
+/** round to 3 decimals to keep path strings compact */
+const fx = (v) => Math.round(v * 1000) / 1000;
+
 /**
- * Build the decorative thin gold outline that traces the diagonal photo.
- * Mirrors the source's stroked <svg> graphism (stroke #E8AD02, ~2px): a
- * parallelogram offset slightly outward from the image clip so it peeks past
- * the top-right and bottom edges. Rendered as a viewBox 0 0 100 100 polygon
- * with a non-scaling stroke so the line stays crisp at any block size.
+ * Build a rounded-quadrilateral SVG path `d` string from four corners.
+ * Each corner arrives short of the vertex along the incoming edge, quadratic-
+ * curves THROUGH the vertex, then leaves short along the outgoing edge — an even
+ * fillet at all four corners.
+ * @param {number[][]} corners four [x,y] points (clockwise)
+ * @param {number} radius fillet radius in the same units as the corners
+ * @param {number} scale multiply every coordinate (1 = bbox units, 100 = viewBox)
+ * @returns {string} the path data
+ */
+function roundedQuadPath(corners, radius, scale) {
+  const p = corners.map(([x, y]) => [x * scale, y * scale]);
+  const r = radius * scale;
+  const n = p.length;
+  const pts = p.map((cur, i) => {
+    const prev = p[(i - 1 + n) % n];
+    const next = p[(i + 1) % n];
+    const inDir = unit(prev[0] - cur[0], prev[1] - cur[1]);
+    const outDir = unit(next[0] - cur[0], next[1] - cur[1]);
+    return {
+      cur,
+      entry: [cur[0] + inDir[0] * r, cur[1] + inDir[1] * r],
+      exit: [cur[0] + outDir[0] * r, cur[1] + outDir[1] * r],
+    };
+  });
+  const parts = [`M ${fx(pts[0].entry[0])} ${fx(pts[0].entry[1])}`];
+  for (let i = 0; i < n; i += 1) {
+    const { cur, exit } = pts[i];
+    const nextEntry = pts[(i + 1) % n].entry;
+    parts.push(`Q ${fx(cur[0])} ${fx(cur[1])} ${fx(exit[0])} ${fx(exit[1])}`);
+    parts.push(`L ${fx(nextEntry[0])} ${fx(nextEntry[1])}`);
+  }
+  parts.push('Z');
+  return parts.join(' ');
+}
+
+/** push corners outward from their centroid by `outset` (bbox-fraction units) */
+function outsetCorners(corners, outset) {
+  const cx = corners.reduce((s, c) => s + c[0], 0) / corners.length;
+  const cy = corners.reduce((s, c) => s + c[1], 0) / corners.length;
+  return corners.map(([x, y]) => {
+    const [ux, uy] = unit(x - cx, y - cy);
+    return [x + ux * outset, y + uy * outset];
+  });
+}
+
+/**
+ * Build the decorative gold outline that traces the diagonal photo. It is an
+ * exact offset echo of the image clip (same corners, pushed outward from the
+ * centroid) so it frames the photo and peeks past its edges — matching the
+ * source's stroked <svg> graphism (stroke ~#E6A817, ~3px). Rendered in a
+ * viewBox 0 0 100 100 with `preserveAspectRatio: none` so it stretches to the
+ * media box; corners pushed past the box draw outside it (overflow: visible).
  * @returns {SVGElement} the decorative outline
  */
 function buildOutline() {
@@ -51,22 +127,9 @@ function buildOutline() {
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
-  // A thin gold parallelogram offset OUTWARD from the photo clip, with rounded
-  // corners echoing the clip. viewBox 0-100; corners pushed a few units past
-  // each clip vertex so the line peeks around the photo (source graphism).
   const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', [
-    'M 19 21',
-    'L 96 13',
-    'Q 100.5 12.5 100.5 17',
-    'L 101.5 86',
-    'Q 101.5 90.5 97 89.5',
-    'L 2 72',
-    'Q -2.5 71 -2.3 66.5',
-    'L 14 25',
-    'Q 14.5 21.5 19 21',
-    'Z',
-  ].join(' '));
+  const echo = outsetCorners(HERO_DS_CORNERS, HERO_DS_OUTSET);
+  path.setAttribute('d', roundedQuadPath(echo, HERO_DS_ROUND, 100));
   path.setAttribute('fill', 'none');
   path.setAttribute('vector-effect', 'non-scaling-stroke');
   svg.append(path);
@@ -77,11 +140,10 @@ function buildOutline() {
 let heroDsClipSeq = 0;
 
 /**
- * Build an SVG clipPath (objectBoundingBox units) that reproduces the source's
- * diagonal parallelogram WITH softly rounded corners — a plain CSS polygon()
- * clip can only make sharp corners. The path walks the four corners
- * (0.17,0.25 → 0.99,0.19 → 1,0.89 → 0.01,0.72) and rounds each with a short
- * quadratic curve. Returns { defs, id } so the image can reference url(#id).
+ * Build an SVG clipPath (objectBoundingBox units) reproducing the source's
+ * diagonal parallelogram with softly rounded corners — generated from the SAME
+ * HERO_DS_CORNERS the outline uses. Returns { defs, id } so the image can
+ * reference url(#id).
  * @returns {{ defs: SVGElement, id: string }}
  */
 function buildClip() {
@@ -98,23 +160,7 @@ function buildClip() {
   clip.setAttribute('id', id);
   clip.setAttribute('clipPathUnits', 'objectBoundingBox');
   const path = document.createElementNS(SVG_NS, 'path');
-  // corners + short quadratic fillets (~0.02 in x, ~0.03 in y) at each vertex
-  // Each corner: arrive short of the vertex, quadratic-curve THROUGH it, then
-  // leave short on the next edge — a generous, even fillet at all four corners
-  // (larger radius to match the source's soft parallelogram).
-  // Corners: TL(0.17,0.25) TR(0.99,0.19) BR(1,0.89) BL(0.01,0.72).
-  path.setAttribute('d', [
-    'M 0.205 0.242',
-    'L 0.95 0.194',
-    'Q 0.99 0.19 0.99 0.235',
-    'L 1 0.845',
-    'Q 1 0.89 0.96 0.879',
-    'L 0.05 0.71',
-    'Q 0.01 0.72 0.012 0.675',
-    'L 0.165 0.285',
-    'Q 0.17 0.25 0.205 0.242',
-    'Z',
-  ].join(' '));
+  path.setAttribute('d', roundedQuadPath(HERO_DS_CORNERS, HERO_DS_ROUND, 1));
   clip.append(path);
   defs.append(clip);
   svg.append(defs);

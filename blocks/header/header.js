@@ -699,41 +699,10 @@ export default async function decorate(block) {
 
   block.append(wrapper);
 
-  // Header theme: the source uses a white-text/transparent OVERLAY treatment only
-  // when the page opens with a full-bleed DARK hero banner (e.g. the homepage);
-  // on ordinary white-top pages (e.g. /bolivia, /novas-fronteiras) the header is
-  // the LIGHT theme from the top (green nav links, dark utility text). We detect
-  // the dark banner by looking for a `.hero` block (the default hero variant, NOT
-  // `.hero.diagonal-split`) as the FIRST block of the page.
-  //
-  // The hero block may not exist in the DOM yet when the header decorates (block
-  // load order isn't guaranteed), and if the header wrongly defaults to the light
-  // theme the green nav links are invisible over the dark hero. So we detect it
-  // synchronously if present, and otherwise observe `main` until the hero mounts.
-  const isDarkHero = () => {
-    const firstBlock = document.querySelector('main .hero, main [data-block-name="hero"]');
-    return !!(firstBlock && !firstBlock.classList.contains('diagonal-split'));
-  };
-  const applyHeaderTheme = () => {
-    wrapper.classList.toggle('has-hero-banner', isDarkHero());
-  };
-  applyHeaderTheme();
-  if (!wrapper.classList.contains('has-hero-banner')) {
-    // watch for the hero block appearing/decorating; stop once found or after
-    // the DOM settles (whichever comes first).
-    const mainEl = document.querySelector('main');
-    if (mainEl && 'MutationObserver' in window) {
-      const obs = new MutationObserver(() => {
-        applyHeaderTheme();
-        if (wrapper.classList.contains('has-hero-banner')) obs.disconnect();
-      });
-      obs.observe(mainEl, {
-        childList: true, subtree: true, attributes: true, attributeFilter: ['class'],
-      });
-      // safety: stop observing after the page settles
-      window.addEventListener('load', () => { applyHeaderTheme(); obs.disconnect(); });
-    }
-  }
+  // Header theme (dark-hero overlay vs. light) is handled entirely in CSS via a
+  // `body:has(main .hero:not(.diagonal-split))` selector — no JS/class toggling,
+  // so it reacts to the DOM directly with no load-order/timing dependency and
+  // can never flash the wrong colour. See header.css.
 
   document.addEventListener('keydown', (e) => {
     if (e.code === 'Escape') closeAllMegamenus(nav);

@@ -40,8 +40,13 @@ header .nav-utility {
   font-size: 12px;
 }
 
-/* over a dark hero banner: soft top-down dark gradient + white text (source) */
-header .nav-wrapper.has-hero-banner .nav-utility {
+/* over a dark hero banner: soft top-down dark gradient + white text (source).
+   Detected purely in CSS via :has() — the page contains a default `.hero` block
+   (NOT the white-top `.hero.diagonal-split`) — so the overlay applies the
+   instant that hero exists in the DOM, with no JavaScript/timing dependency.
+   Excludes the scrolled (is-compact) and open (is-open) states, which are dark
+   text on a solid white bar. */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility {
   background: linear-gradient(to bottom, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 0%) 100%);
   color: #fff;
 }
@@ -69,7 +74,7 @@ header .nav-utility-label {
 }
 
 /* over a dark hero banner: the strip label is white (source) */
-header .nav-wrapper.has-hero-banner .nav-utility-label {
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-label {
   color: #fff;
 }
 
@@ -212,7 +217,7 @@ header .nav-main {
 
 /* over a dark hero banner: top-down dark gradient so white menu links stay
    legible (source .subMenu.linear) */
-header .nav-wrapper.has-hero-banner .nav-main {
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-main {
   background: linear-gradient(to bottom, rgb(0 0 0 / 50%) 0%, rgb(0 0 0 / 0%) 100%);
 }
 
@@ -294,8 +299,8 @@ header .nav-drop {
 }
 
 /* over a dark hero banner: nav links are white (source) */
-header .nav-wrapper.has-hero-banner .nav-link,
-header .nav-wrapper.has-hero-banner .nav-drop {
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-link,
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-drop {
   color: #fff;
 }
 
@@ -364,7 +369,7 @@ header .nav-search-toggle {
 }
 
 /* over a dark hero banner: white search icon (source) */
-header .nav-wrapper.has-hero-banner .nav-search-toggle {
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-search-toggle {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23ffffff" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
 
@@ -378,6 +383,7 @@ header .nav-main-inner.is-searching .nav-search {
   margin-left: 32px;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-main-inner.is-searching .nav-search-toggle {
   display: none;
 }
@@ -705,15 +711,18 @@ header .nav-overlay.is-visible {
 }
 
 /* header turns solid white when a megamenu is open */
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-open .nav-main {
   background: #fff;
 }
 
 /* on white open-state, nav links/triggers turn dark so they stay visible */
+/* stylelint-disable no-descending-specificity */
 header .nav-wrapper.is-open .nav-link,
 header .nav-wrapper.is-open .nav-drop {
   color: #373737;
 }
+/* stylelint-enable no-descending-specificity */
 
 /* the open megamenu's trigger gets a green label + blue focus box (source) */
 header .nav-wrapper.is-open .nav-drop[aria-expanded="true"] {
@@ -721,26 +730,32 @@ header .nav-wrapper.is-open .nav-drop[aria-expanded="true"] {
 }
 
 /* white open-state search icon turns dark */
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-open .nav-search-toggle {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23373737" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
 
 /* ---------- Sticky compact-on-scroll ---------- */
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-compact .nav-utility {
   display: none;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-compact .nav-main {
   height: var(--nav-main-compact);
   background: #fff;
   box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
+/* stylelint-disable no-descending-specificity */
 header .nav-wrapper.is-compact .nav-link,
 header .nav-wrapper.is-compact .nav-drop {
   color: #373737;
 }
+/* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-compact .nav-search-toggle {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23373737" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
@@ -1308,7 +1323,7 @@ body.nav-mobile-open {
     background: transparent;
   }
 
-  header .nav-wrapper.has-hero-banner .nav-utility {
+  body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility {
     background: rgb(0 0 0 / 32%);
   }
 
@@ -1362,8 +1377,8 @@ body.nav-mobile-open {
 
   /* over a dark hero banner: the white quadrilateral shape bleeds to the edge
      and the wordmark sits on it, 48px in. */
-  header .nav-wrapper.has-hero-banner .nav-logo-shape { display: block; }
-  header .nav-wrapper.has-hero-banner .nav-logo-wordmark { margin-left: 48px; }
+  body:has(main .hero:not(.diagonal-split)) header .nav-wrapper .nav-logo-shape { display: block; }
+  body:has(main .hero:not(.diagonal-split)) header .nav-wrapper .nav-logo-wordmark { margin-left: 48px; }
 
   /* show desktop nav list + search */
   header .nav-list {
