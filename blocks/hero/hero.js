@@ -36,25 +36,39 @@
  */
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-// Shared geometry for the diagonal-split photo — the SINGLE source of truth.
-// Four corners in objectBoundingBox units (0..1), listed clockwise from the
-// top-left, describing the source's gently tilted parallelogram. BOTH the image
-// clipPath AND the decorative gold outline are generated from THIS array, so the
-// outline is always an exact offset "echo" of the clip and can never drift out
-// of alignment. Left edge is deliberately steep (TL/BL pulled right) to match
-// the source's dramatic diagonal crop.
+// Shared geometry for the diagonal-split hero — the SINGLE source of truth.
+// Both arrays were MEASURED from the source (petrobras.com.br/bolivia) and are
+// expressed in the SAME coordinate system: fractions of the media (photo) box,
+// clockwise from the top-left. They live side-by-side here so the clip and the
+// gold frame stay coherent and can only ever be changed together — never derived
+// from live DOM, so they cannot drift.
+//
+// HERO_DS_CORNERS: the photo clip. In objectBoundingBox units (0..1). Matches the
+// source's diagonal crop — top-left notched in/down, bottom-left lifted, and the
+// right edge running off the media box.
 const HERO_DS_CORNERS = [
-  [0.33, 0.22], // top-left — starts ~1/3 in for the source's dramatic steep diagonal
-  [0.99, 0.05], // top-right (photo bleeds off the right edge)
-  [1, 0.86], // bottom-right
-  [0.01, 0.71], // bottom-left
+  [0.167, 0.093], // top-left  — notched right + down
+  [0.992, 0], // top-right — at the top edge, hard right
+  [1, 1], // bottom-right — full corner (photo bleeds off the right)
+  [0, 0.755], // bottom-left — on the left edge, lifted up from the bottom
 ];
+
+// HERO_DS_OUTLINE_CORNERS: the decorative gold frame. NOT a scaled echo of the
+// clip — the source draws a SEPARATE, more-skewed parallelogram that floats OFF
+// the photo: its top-left clears the photo's top-left with a gap, its top edge
+// rises steeply and flies far past the right edge, and its bottom sits below the
+// photo. Measured (as media-box fractions) from the source's stroked <svg>. Values
+// exceed 0..1 on purpose (the frame overflows the media box); the outline svg uses
+// overflow:visible so the excess renders past the photo like the source.
+const HERO_DS_OUTLINE_CORNERS = [
+  [0.12, 0.505], // top-left  — floats left, mid-height (gap above the photo's TL)
+  [1.81, -0.014], // top-right — rises up and flies well past the right edge
+  [1.85, 1.265], // bottom-right — off the right, below the photo
+  [0.263, 1.149], // bottom-left — below the photo, inset from the left
+];
+
 // corner fillet radius, as a fraction of the bounding box (soft rounded corners)
 const HERO_DS_ROUND = 0.025;
-// how far the gold outline is pushed OUTWARD from the clip (fraction of box), so
-// it reads as a thin frame that traces the clipped photo surface and flies off
-// past the right edge (source graphism).
-const HERO_DS_OUTSET = 0.035;
 
 /** unit vector from (0,0) toward (dx,dy) */
 function unit(dx, dy) {
@@ -101,23 +115,18 @@ function roundedQuadPath(corners, radius, scale) {
   return parts.join(' ');
 }
 
-/** push corners outward from their centroid by `outset` (bbox-fraction units) */
-function outsetCorners(corners, outset) {
-  const cx = corners.reduce((s, c) => s + c[0], 0) / corners.length;
-  const cy = corners.reduce((s, c) => s + c[1], 0) / corners.length;
-  return corners.map(([x, y]) => {
-    const [ux, uy] = unit(x - cx, y - cy);
-    return [x + ux * outset, y + uy * outset];
-  });
-}
-
 /**
- * Build the decorative gold outline that traces the diagonal photo. It is an
- * exact offset echo of the image clip (same corners, pushed outward from the
- * centroid) so it frames the photo and peeks past its edges — matching the
- * source's stroked <svg> graphism (stroke ~#E6A817, ~3px). Rendered in a
- * viewBox 0 0 100 100 with `preserveAspectRatio: none` so it stretches to the
- * media box; corners pushed past the box draw outside it (overflow: visible).
+ * Build the decorative gold outline that FLOATS around the diagonal photo. It is
+ * NOT a scaled echo of the clip — it draws the SEPARATE, more-skewed source
+ * parallelogram (HERO_DS_OUTLINE_CORNERS) as a translated/parallel frame: it
+ * clears the photo's top-left with a gap and flies off past the right edge,
+ * matching the source's stroked <svg> graphism (stroke #E8AD02, ~1.3px).
+ *
+ * The outline shares the media box's coordinate system with the clip (both in
+ * media-box fractions), so it stays aligned to the photo at every viewport. It is
+ * rendered in a viewBox 0 0 100 100 with `preserveAspectRatio: none` so it
+ * stretches to the media box; corners with coordinates outside 0..100 draw past
+ * the photo (svg overflow: visible), just like the source.
  * @returns {SVGElement} the decorative outline
  */
 function buildOutline() {
@@ -128,8 +137,7 @@ function buildOutline() {
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   const path = document.createElementNS(SVG_NS, 'path');
-  const echo = outsetCorners(HERO_DS_CORNERS, HERO_DS_OUTSET);
-  path.setAttribute('d', roundedQuadPath(echo, HERO_DS_ROUND, 100));
+  path.setAttribute('d', roundedQuadPath(HERO_DS_OUTLINE_CORNERS, HERO_DS_ROUND, 100));
   path.setAttribute('fill', 'none');
   path.setAttribute('vector-effect', 'non-scaling-stroke');
   svg.append(path);

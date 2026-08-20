@@ -291,8 +291,8 @@ main > .section.hero-container {
 .hero.diagonal-split {
   --hero-ds-dark: #373737;
   --hero-ds-yellow: rgb(253 200 47);
-  --hero-ds-outline: #e6a817;
-  --hero-ds-clip: polygon(33% 22%, 99% 5%, 100% 86%, 1% 71%);
+  --hero-ds-outline: #e8ad02;
+  --hero-ds-clip: polygon(16.7% 9.3%, 99.2% 0%, 100% 100%, 0% 75.5%);
 
   position: relative;
   box-sizing: border-box;
@@ -311,9 +311,16 @@ main > .section.hero-container {
 
 /* contain the diagonal photo's right-edge bleed + the outline's outward overflow
    at the SECTION level, so it never triggers a horizontal scrollbar while the
-   hero itself stays overflow:visible (outline can peek past the photo). */
+   hero itself stays overflow:visible (outline can peek past the photo).
+
+   Also offset the whole section below the FIXED header. Unlike the homepage's
+   dark banner hero (which is intentionally full-bleed UNDER the transparent
+   header), the diagonal-split is a white-top page whose content must start below
+   the header — matching the source /bolivia. The header is the mobile utility
+   strip height at base; the >=992px block below swaps in the desktop height. */
 .section.hero-container:has(.hero.diagonal-split) {
   overflow: hidden;
+  padding-top: var(--nav-mobile-height, 56px);
 }
 
 /* ---------- content column ---------- */
@@ -383,8 +390,8 @@ main > .section.hero-container {
   content: "";
   display: block;
   width: 40px;
-  height: 4px;
-  margin-top: 24px;
+  height: 4.1px;
+  margin-top: 26px;
   background-color: var(--hero-ds-yellow);
 }
 
@@ -462,6 +469,13 @@ main > .section.hero-container {
    right ≈ vw+63). Reproduced by insetting the content and giving the media a
    large basis so it overflows the right (wrapper clips the overflow). */
 @media (width >= 992px) {
+  /* desktop header is taller (utility bar 48px + main nav 104px = 152px); push
+     the whole diagonal-split section below it so the photo's top corner is not
+     hidden under the fixed header (source /bolivia). */
+  .section.hero-container:has(.hero.diagonal-split) {
+    padding-top: var(--nav-desktop-height, 152px);
+  }
+
   .hero.diagonal-split {
     flex-direction: row;
     gap: 32px;

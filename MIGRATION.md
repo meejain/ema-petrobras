@@ -105,11 +105,14 @@ PNG icons for the card samples.
 
 ## 6. Open issues / TODO
 
-- ⚠️ **Homepage header 1st-row color** — user reports it is STILL not correct in their view
-  (deferred by user: "we'll check that later"). Code-side, the pure-CSS `:has()` fix computes
-  white links locally (verified `rgb(255,255,255)`), but the user still sees an issue —
-  **needs another look with the user on the actual preview they're viewing.** Re-confirm
-  whether it's the `.aem.page`/`.aem.live` env vs local, and whether a hard cache refresh is involved.
+- ✅ **Homepage header 1st-row color** — RESOLVED 2026-08-20. Root cause: the dark-hero
+  `:has()` overlay only whitened the utility strip *background* + the "Você está em" label,
+  but the rest of row 1 (the "Acesse também:" span, the 5 quick-access links, and the
+  A-/100%/A+ font-size controls) kept their base `color: var(--text-color)` (dark `rgb(39,40,51)`),
+  so they read dark/invisible over the dark hero. Added dark-hero overlay rules whitening those
+  elements + lightening the font-size pill/contrast-ring borders. Verified all row-1 elements
+  compute `rgb(255,255,255)` over the dark hero and match the source screenshot. Confined to the
+  non-compact/non-open dark-hero state (light/white-top + scrolled/open states untouched).
 - Continue per-page parity validation as more pages are migrated.
 
 ---
@@ -157,6 +160,46 @@ PNG icons for the card samples.
   - Verified at 1440px + mobile (390px) against live `/bolivia`: steep diagonal, thin gold
     line tracing the clipped edge and exiting right, rounded corners — close match.
     Confirmed **no horizontal scrollbar** (doc width == viewport width).
+
+### 2026-08-20 (homepage header row-1 fix)
+- Fixed the long-open homepage 1st-row color bug (see §6). The dark-hero `:has()` theme
+  wasn't covering all of row 1 — only the strip background + "Você está em" label were
+  whitened. Added overlays for `.nav-utility-links > span`, `.nav-utility-links a`,
+  `.nav-fontsize span`, `.nav-utility-controls button`, plus white borders on the font-size
+  pill and contrast ring — all scoped to `body:has(main .hero:not(.diagonal-split))
+  ... :not(.is-compact, .is-open)`. Wrapped the later `body.high-contrast` a:any-link block
+  in a scoped `stylelint-disable no-descending-specificity` (same convention as the rest of
+  the file). Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings),
+  `breakpoint-check` pass, `test:a11y http://localhost:3000/` pass.
+
+### 2026-08-20 (hero diagonal-split parity fixes)
+- **Fixed-nav overlap:** the header is `position: fixed` (152px desktop / 56px mobile) but the
+  diagonal-split section had no top offset, so the photo's top corner tucked under the nav.
+  Added `padding-top` to `.section.hero-container:has(.hero.diagonal-split)` — mobile height at
+  base, `--nav-desktop-height` (152px) at ≥992px. **Scoped to diagonal-split only** so the
+  homepage's default dark hero stays intentionally full-bleed UNDER the transparent header
+  (verified: homepage hero section padding-top still 0, heroTop 0).
+- **Outline color:** `--hero-ds-outline` `#e6a817` → **`#e8ad02`** (source-exact `.tertiary-graphism`
+  stroke). Outline SVG was already a sibling of `<picture>` and already outset outside the clip
+  via hero.js centroid math — left the working geometry intact.
+- **Heading accent bar:** `::after` height `4px`→`4.1px`, margin-top `24px`→`26px` (source).
+- **Outline alignment:** the gold line was hugging the clip edge (reading as "cutting through"
+  the photo). Inspected source `.tertiary-graphism` (viewBox 0 0 615 722, but path coords span
+  ~1314×790 → a large rounded parallelogram that FLOATS off the photo with a clear top-left gap
+  and flies off right). Increased `HERO_DS_OUTSET` `0.035`→`0.075` in hero.js so the echo stands
+  clearly off the photo on every side (offset amplified because the viewBox is stretched
+  non-uniformly to the media's ~1.25 aspect via preserveAspectRatio:none). Now frames the photo
+  like the source rather than tracing its edge.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y …/hero-diagonal-split` pass. Verified at 1440px against live `/bolivia`.
+
+### 2026-08-20 (hero diagonal-split — parity pass REVERTED)
+- Attempted a full measure-and-match pass (absolute-positioned 735×848 portrait photo, block-layout
+  content column with margin-top gap, retuned outline). It regressed the layout in the user's view,
+  so it was REVERTED: desktop CSS is back to the flex row (content flex 521px, media flex min-width
+  780px, aspect 735/588) and `HERO_DS_OUTLINE_CORNERS` restored to prior values. Net state = the
+  earlier working version. Clip corners in hero.js remain the source-derived
+  TL(0.167,0.093)/TR(0.992,0)/BR(1,1)/BL(0,0.755) (gentle left edge) — that part was kept.
 
 ---
 

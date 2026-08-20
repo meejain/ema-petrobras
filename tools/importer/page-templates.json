@@ -83,6 +83,162 @@
           "defaultContent": []
         }
       ]
+    },
+    {
+      "name": "bolivia-institutional",
+      "urls": [
+        "https://petrobras.com.br/bolivia"
+      ],
+      "coverageGaps": [],
+      "description": "Country/institutional page (Petrobras Bolivia) with a diagonal-split hero, multiple rich-text content sections, highlight blocks (bloco-de-destaque), and a grid section. Reference page for hero diagonal-split variant.",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-cd4db938-deb4-23e2-3e5c-89a3536e48a6.lfr-layout-structure-item-container"
+          ],
+          "section": "diagonal-split"
+        },
+        {
+          "name": "columns",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-3e25ff18-9b56-f7a7-8c9b-6951fc420514.lfr-layout-structure-item-container",
+            "#main-content > div.lfr-layout-structure-item-d31dc2b8-18ab-ff58-1978-3d2cf777901f.lfr-layout-structure-item-container",
+            "#main-content > div.lfr-layout-structure-item-7a1dc5b0-cf18-a58b-b715-b7241ea938c5.lfr-layout-structure-item-container",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-3aa78b18-df7d-53b6-d513-dd5bfe8ccadf",
+            "#main-content > div.lfr-layout-structure-item-181699a3-d059-3833-9cd2-d425fbbe51aa.lfr-layout-structure-item-container"
+          ]
+        },
+        {
+          "name": "cards",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-bloco-de-destaque.lfr-layout-structure-item-9d7e1b64-49fa-8f2b-c64f-5de2c7acc606",
+            "#main-content > div.lfr-layout-structure-item-bloco-de-destaque.lfr-layout-structure-item-6ef14252-21d4-3d71-f900-b0ca23f55c1b"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "s18",
+          "name": "ser-nuestro-proveedor",
+          "selector": "#main-content > div.lfr-layout-structure-item-bloco-de-destaque.lfr-layout-structure-item-9d7e1b64-49fa-8f2b-c64f-5de2c7acc606",
+          "style": "highlight",
+          "blocks": ["cards"],
+          "defaultContent": []
+        },
+        {
+          "id": "s28",
+          "name": "gobierno-corporativo",
+          "selector": "#main-content > div.lfr-layout-structure-item-bloco-de-destaque.lfr-layout-structure-item-6ef14252-21d4-3d71-f900-b0ca23f55c1b",
+          "style": "highlight",
+          "blocks": ["columns", "cards"],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "sustainable-products",
+      "urls": [
+        "https://petrobras.com.br/produtos-mais-sustentaveis"
+      ],
+      "coverageGaps": [],
+      "description": "Sustainable products landing page with a banner hero, a grid of product cards (cards grid variant), a CTA banner (columns), and an expandable FAQ (accordion). Reference page for cards grid variant.",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-428e3c52-fcdc-88b9-573f-37efe1b91121.lfr-layout-structure-item-container"
+          ]
+        },
+        {
+          "name": "cards",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-ce77bb1f-afd5-ba7d-8057-16a3be1887fe",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-16847778-2808-e849-60a2-2811e1361760",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-143321ea-1773-cf09-f4e9-4ff5f227b244"
+          ],
+          "section": "grid"
+        },
+        {
+          "name": "columns",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-28420618-ee87-1ae9-c409-56b15f4a5449.lfr-layout-structure-item-container"
+          ]
+        },
+        {
+          "name": "accordion",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-7eca916b-0066-1d39-4062-c60a30465dd1.lfr-layout-structure-item-container"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "energy-transition",
+      "urls": [
+        "https://petrobras.com.br/transicao-energetica"
+      ],
+      "coverageGaps": [],
+      "description": "Energy transition landing page with a diagonal-split hero, icon cards, feature cards, a green highlight cards block, a big-numbers stats banner, an FAQ (accordion), and a related-content carousel (slider-cards). Reference page for cards icon variant.",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-9656badf-dfcf-b165-0b2b-0c4dab1bd4e5.lfr-layout-structure-item-container"
+          ],
+          "section": "diagonal-split"
+        },
+        {
+          "name": "cards",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-fe122cdf-edcd-0bf8-f548-dfde11a59f44",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-1c036384-50e6-3bf0-9240-b86d8f6d281b",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-3037a3ab-a57f-f6b2-7538-25c439b38d64",
+            "#main-content > div.lfr-layout-structure-item-bloco-destaque.lfr-layout-structure-item-44ae2257-7d96-e957-775f-52b01abc5515",
+            "#main-content > div.lfr-layout-structure-item-grade.lfr-layout-structure-item-9e8c8d4a-05b2-29ee-96c4-88870d72b932",
+            "#main-content > div.lfr-layout-structure-item-banner-big-numbers.lfr-layout-structure-item-d80f196d-858f-6713-6c30-82c695f6bf4a"
+          ]
+        },
+        {
+          "name": "accordion",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-faq.lfr-layout-structure-item-08e28808-cd28-0942-60da-c417c246b02a"
+          ]
+        },
+        {
+          "name": "slider-cards",
+          "instances": [
+            "#main-content > div.lfr-layout-structure-item-lista-de-cards-grafismo.lfr-layout-structure-item-24cee362-37ec-f065-db8b-60e0c23d26df"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "sec6",
+          "name": "fuels-highlight",
+          "selector": "#main-content > div.lfr-layout-structure-item-bloco-destaque.lfr-layout-structure-item-44ae2257-7d96-e957-775f-52b01abc5515",
+          "style": "highlight",
+          "blocks": ["cards"],
+          "defaultContent": []
+        },
+        {
+          "id": "sec8",
+          "name": "investments-big-numbers",
+          "selector": "#main-content > div.lfr-layout-structure-item-banner-big-numbers.lfr-layout-structure-item-d80f196d-858f-6713-6c30-82c695f6bf4a",
+          "style": "dark",
+          "blocks": ["cards"],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "fertilizer-types",
+      "urls": [
+        "https://petrobras.com.br/quem-somos/tipos-de-fertilizantes"
+      ],
+      "coverageGaps": [],
+      "description": "Product detail page (fertilizer types) with a hero, a feature cards row (cards feature variant), several product-spec grids, and a contact cards row. Reference page for cards feature variant.",
+      "blocks": []
     }
   ]
 }

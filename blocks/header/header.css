@@ -202,6 +202,28 @@ header .nav-lang button.is-active {
   color: var(--petro-green);
 }
 
+/* over a dark hero banner: the WHOLE utility strip (row 1) is white — the
+   "Acesse também:" label, the quick-access links, and the font-size controls
+   (A- 100% A+). The base rules above color these dark (var(--text-color)) for
+   the light/white-top pages; these overlays flip them white over the dark hero,
+   matching the source. Placed after their base rules to avoid descending
+   specificity. The language pill stays a solid white pill (its own colors). */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-links > span,
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-links a,
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-fontsize span,
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-controls button {
+  color: #fff;
+}
+
+/* font-size pill + contrast ring borders lighten to white over the dark hero */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-fontsize {
+  border-color: rgb(255 255 255 / 60%);
+}
+
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-controls button.nav-contrast {
+  border-color: #fff;
+}
+
 /* ---------- Main nav (row 1) ----------
    MOBILE (base): the source has NO logo/nav bar on mobile — navigation lives in
    the fixed bottom tab bar, and only the "Você está em" strip shows at the top.
@@ -795,6 +817,11 @@ body.high-contrast footer {
   filter: grayscale(1);
 }
 
+/* stylelint-disable no-descending-specificity */
+
+/* high-contrast is an opt-in body-level theme; its lower-specificity a:any-link
+   rules legitimately follow the higher-specificity dark-hero :has() row-1
+   overlay above (different contexts, no real conflict). */
 body.high-contrast h1,
 body.high-contrast h2,
 body.high-contrast h3,
@@ -807,6 +834,7 @@ body.high-contrast main a:any-link,
 body.high-contrast footer a:any-link {
   color: #fff;
 }
+/* stylelint-enable no-descending-specificity */
 
 /* light "section.light/highlight" bands become dark neutral */
 body.high-contrast main .section.light,

@@ -1,0 +1,38 @@
+{
+  "variantName": "accordion",
+  "baseBlock": "accordion",
+  "version": "1.0.0",
+  "created": "2026-08-20T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://petrobras.com.br/produtos-mais-sustentaveis",
+    "originPage": "Sustainable products landing page",
+    "blockPosition": "bottom"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "faq",
+    "imagePattern": "noimg"
+  },
+  "contentPattern": {
+    "structure": "question label + answer body per row",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "FAQ sections",
+      "expandable question and answer lists",
+      "progressive disclosure of long-form content"
+    ],
+    "notSuitableFor": [
+      "tabbed content (use tabs)",
+      "non-interactive stacked content"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/produtos-mais-sustentaveis"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-20T00:00:00.000Z"
+  }
+}
