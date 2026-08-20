@@ -37,109 +37,48 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // Shared geometry for the diagonal-split hero — the SINGLE source of truth.
-// Both arrays were MEASURED from the source (petrobras.com.br/bolivia) and are
-// expressed in the SAME coordinate system: fractions of the media (photo) box,
-// clockwise from the top-left. They live side-by-side here so the clip and the
-// gold frame stay coherent and can only ever be changed together — never derived
-// from live DOM, so they cannot drift.
+// Both paths are the EXACT source shapes (petrobras.com.br/bolivia, 1440px),
+// captured from the live DOM and expressed in the SAME coordinate system:
+// objectBoundingBox fractions of the photo box (proportioned 735x848), so the
+// clip and the gold frame stay perfectly coherent at every viewport. Curves are
+// preserved verbatim (the source's bottom/left edges bow slightly — reproducing
+// them avoids the over-pointed corners a straight-line quad would give).
+// Coordinates exceed 1 on purpose: the photo/frame bleed off the right edge.
 //
-// HERO_DS_CORNERS: the photo clip, in objectBoundingBox units (fractions of the
-// media/photo box). MEASURED from the source's computed clip-path on the photo
-// (petrobras.com.br/bolivia, 1440px). The photo box is proportioned 735x848; the
-// right corners exceed 1 on purpose (the photo bleeds off the right edge — the clip
-// simply extends past the box there, so the photo shows up to its own/viewport edge).
-const HERO_DS_CORNERS = [
-  [0.336, 0.254], // top-left  — notched in + down
-  [1.929, 0.188], // top-right — rises slightly, runs far off the right
-  [1.944, 0.894], // bottom-right — off the right, near the bottom
-  [0.008, 0.708], // bottom-left — on the left edge, lifted up from the bottom
-];
+// HERO_DS_CLIP_PATH — the photo clip (source's computed clip-path, normalised).
+const HERO_DS_CLIP_PATH = 'M 0.33592 0.25350 L 1.92875 0.18793 L 1.94439 0.89371 '
+  + 'C 1.70684 0.86300 0.03327 0.72993 0.01282 0.72098 '
+  + 'C -0.00763 0.71202 0.00089 0.69142 0.00771 0.68223 '
+  + 'C 0.08951 0.55740 0.25596 0.30257 0.26742 0.28191 '
+  + 'C 0.27887 0.26125 0.31786 0.25436 0.33592 0.25350 Z';
 
-// HERO_DS_OUTLINE_CORNERS: the decorative gold frame. NOT a scaled echo of the
-// clip — the source draws a SEPARATE, more-skewed parallelogram that floats OFF
-// the photo: its top-left clears the photo's top-left with a gap, its top edge
-// rises steeply and flies far past the right edge, and its bottom sits below the
-// photo. Measured (as media-box fractions) from the source's stroked <svg>. Values
-// exceed 0..1 on purpose (the frame overflows the media box); the outline svg uses
-// overflow:visible so the excess renders past the photo like the source.
-const HERO_DS_OUTLINE_CORNERS = [
-  [0.12, 0.35], // top-left  — floats left, above the photo's TL
-  [1.85, 0.017], // top-right — rises up and flies well past the right edge
-  [1.85, 0.877], // bottom-right — off the right, near the photo bottom
-  [0.263, 0.797], // bottom-left — below the photo's BL, inset from the left
-];
-
-// corner fillet radius, as a fraction of the bounding box (soft rounded corners)
-const HERO_DS_ROUND = 0.025;
-
-/** unit vector from (0,0) toward (dx,dy) */
-function unit(dx, dy) {
-  const len = Math.hypot(dx, dy) || 1;
-  return [dx / len, dy / len];
-}
-
-/** round to 3 decimals to keep path strings compact */
-const fx = (v) => Math.round(v * 1000) / 1000;
+// HERO_DS_OUTLINE_PATH — the decorative gold frame (source's stroked <svg> path,
+// mapped through its screen CTM into the SAME photo-box fractions). A subtle line
+// near the top-left whose dominant sweep runs off toward the bottom-right, tracing
+// just outside the photo's edges as an offset echo.
+const HERO_DS_OUTLINE_PATH = 'M 0.12013 0.34988 L 1.81047 -0.00986 '
+  + 'C 1.83067 -0.01416 1.85017 -0.00091 1.85017 0.01713 L 1.85017 0.87740 '
+  + 'C 1.85017 0.89362 1.83419 0.90640 1.81553 0.90510 L 0.26267 0.79671 '
+  + 'C 0.24954 0.79579 0.23839 0.78801 0.23456 0.77708 L 0.09710 0.38495 '
+  + 'C 0.09175 0.36970 0.10227 0.35369 0.12013 0.34988 Z';
 
 /**
- * Build a rounded-quadrilateral SVG path `d` string from four corners.
- * Each corner arrives short of the vertex along the incoming edge, quadratic-
- * curves THROUGH the vertex, then leaves short along the outgoing edge — an even
- * fillet at all four corners.
- * @param {number[][]} corners four [x,y] points (clockwise)
- * @param {number} radius fillet radius in the same units as the corners
- * @param {number} scale multiply every coordinate (1 = bbox units, 100 = viewBox)
- * @returns {string} the path data
- */
-function roundedQuadPath(corners, radius, scale) {
-  const p = corners.map(([x, y]) => [x * scale, y * scale]);
-  const r = radius * scale;
-  const n = p.length;
-  const pts = p.map((cur, i) => {
-    const prev = p[(i - 1 + n) % n];
-    const next = p[(i + 1) % n];
-    const inDir = unit(prev[0] - cur[0], prev[1] - cur[1]);
-    const outDir = unit(next[0] - cur[0], next[1] - cur[1]);
-    return {
-      cur,
-      entry: [cur[0] + inDir[0] * r, cur[1] + inDir[1] * r],
-      exit: [cur[0] + outDir[0] * r, cur[1] + outDir[1] * r],
-    };
-  });
-  const parts = [`M ${fx(pts[0].entry[0])} ${fx(pts[0].entry[1])}`];
-  for (let i = 0; i < n; i += 1) {
-    const { cur, exit } = pts[i];
-    const nextEntry = pts[(i + 1) % n].entry;
-    parts.push(`Q ${fx(cur[0])} ${fx(cur[1])} ${fx(exit[0])} ${fx(exit[1])}`);
-    parts.push(`L ${fx(nextEntry[0])} ${fx(nextEntry[1])}`);
-  }
-  parts.push('Z');
-  return parts.join(' ');
-}
-
-/**
- * Build the decorative gold outline that FLOATS around the diagonal photo. It is
- * NOT a scaled echo of the clip — it draws the SEPARATE, more-skewed source
- * parallelogram (HERO_DS_OUTLINE_CORNERS) as a translated/parallel frame: it
- * clears the photo's top-left with a gap and flies off past the right edge,
- * matching the source's stroked <svg> graphism (stroke #E8AD02, ~1.3px).
- *
- * The outline shares the media box's coordinate system with the clip (both in
- * media-box fractions), so it stays aligned to the photo at every viewport. It is
- * rendered in a viewBox 0 0 100 100 with `preserveAspectRatio: none` so it
- * stretches to the media box; corners with coordinates outside 0..100 draw past
- * the photo (svg overflow: visible), just like the source.
+ * Build the decorative gold outline tracing the diagonal photo — the EXACT source
+ * stroked path (HERO_DS_OUTLINE_PATH), drawn in a unit viewBox (0 0 1 1) with
+ * `preserveAspectRatio: none` so it stretches to the same box as the photo clip.
+ * `vector-effect: non-scaling-stroke` keeps the 1.3px stroke crisp despite the
+ * tiny user units; `overflow: visible` lets the frame fly off the right edge.
  * @returns {SVGElement} the decorative outline
  */
 function buildOutline() {
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('class', 'hero-ds-outline');
-  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('viewBox', '0 0 1 1');
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', roundedQuadPath(HERO_DS_OUTLINE_CORNERS, HERO_DS_ROUND, 100));
+  path.setAttribute('d', HERO_DS_OUTLINE_PATH);
   path.setAttribute('fill', 'none');
   path.setAttribute('vector-effect', 'non-scaling-stroke');
   svg.append(path);
@@ -150,10 +89,9 @@ function buildOutline() {
 let heroDsClipSeq = 0;
 
 /**
- * Build an SVG clipPath (objectBoundingBox units) reproducing the source's
- * diagonal parallelogram with softly rounded corners — generated from the SAME
- * HERO_DS_CORNERS the outline uses. Returns { defs, id } so the image can
- * reference url(#id).
+ * Build an SVG clipPath (objectBoundingBox units) reproducing the source's exact
+ * diagonal parallelogram (HERO_DS_CLIP_PATH). Returns { defs, id } so the image
+ * can reference url(#id).
  * @returns {{ defs: SVGElement, id: string }}
  */
 function buildClip() {
@@ -170,7 +108,7 @@ function buildClip() {
   clip.setAttribute('id', id);
   clip.setAttribute('clipPathUnits', 'objectBoundingBox');
   const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', roundedQuadPath(HERO_DS_CORNERS, HERO_DS_ROUND, 1));
+  path.setAttribute('d', HERO_DS_CLIP_PATH);
   clip.append(path);
   defs.append(clip);
   svg.append(defs);

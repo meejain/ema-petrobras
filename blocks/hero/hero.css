@@ -299,9 +299,9 @@ main > .section.hero-container {
   --hero-ds-yellow: rgb(253 200 47);
   --hero-ds-outline: #e8ad02;
 
-  /* fallback sharp polygon (JS swaps in a rounded url(#hero-ds-clip-N)); matches
-     HERO_DS_CORNERS. Right corners clamp to 100% here (bleed handled by the box). */
-  --hero-ds-clip: polygon(33.6% 25.4%, 100% 18.8%, 100% 89.4%, 0.8% 70.8%);
+  /* fallback sharp polygon (JS swaps in the exact url(#hero-ds-clip-N) path);
+     matches HERO_DS_CLIP_PATH. Right corners clamp to 100% (bleed via the box). */
+  --hero-ds-clip: polygon(33.6% 25.4%, 100% 18.8%, 100% 89.4%, 0.8% 68.2%);
 
   /* the photo/frame box proportions + how far it bleeds past its column */
   --hero-ds-img-aspect: 735 / 848;
@@ -437,7 +437,13 @@ main > .section.hero-container {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+
+  /* Source uses object-fit: CONTAIN (natural 700x600 fitted to the box width,
+     letterboxed vertically) so the FULL aerial landscape shows at its native
+     framing — cover would zoom/crop it. The transparent letterbox never shows
+     because the diagonal clip sits inside the fitted image region. */
+  object-fit: contain;
+  object-position: 50% 50%;
   clip-path: var(--hero-ds-clip);
 }
 
@@ -478,7 +484,11 @@ main > .section.hero-container {
 
   .hero.diagonal-split {
     display: grid;
-    grid-template-columns: minmax(0, 521px) minmax(0, 1fr);
+
+    /* Content column scales like the source (measured: 455px@1280, 521px@1440,
+       581px@1920 → ≈36.2vw clamped). The 2nd track is only a placeholder — the
+       photo is a fixed-width, right-anchored overlay (below), NOT this track. */
+    grid-template-columns: clamp(455px, 36.2vw, 581px) minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     gap: 0 40px;
     align-items: start;
@@ -489,10 +499,10 @@ main > .section.hero-container {
     /* content inset toward centre (~183/1440 ≈ 12.7%); no right padding so the
        photo can bleed off the right edge like the source. */
     padding: 40px 0 40px 12.7%;
-    min-height: 41vw;
 
-    /* wider bleed at desktop so the photo runs ~64px past the viewport edge */
-    --hero-ds-img-bleed: calc(100% + 64px);
+    /* FIXED band height (source hero = 588px at 1440); not viewport-relative, so
+       the photo band never overshoots downward as the column widens. */
+    min-height: 588px;
   }
 
   .hero.diagonal-split .hero-ds-breadcrumb {
@@ -517,5 +527,22 @@ main > .section.hero-container {
     grid-row: 1 / 3;
     width: auto;
     height: 100%;
+  }
+
+  /* FIXED photo/frame box — matches the source exactly: the photo is 735px wide
+     at EVERY desktop width (measured 735px @1280/1440/1920), right-anchored so it
+     bleeds ~63px past the viewport edge (source @1440), NOT stretched to the
+     column. This is the horizontal-width fix: previously a 1fr-derived width
+     ballooned to ~1155px at 1920. Height locked to 848px so object-fit:contain
+     gives scale 735/700 = 1.05 (exact source) and the visible band stays ~492px.
+     `min(735px, 62vw)` keeps the fixed 735 for all real desktop widths (>=1186)
+     yet shrinks gracefully on narrow desktops so it never buries the content. */
+  .hero.diagonal-split .hero-ds-media picture,
+  .hero.diagonal-split .hero-ds-outline {
+    left: auto;
+    right: -63px;
+    width: min(735px, 62vw);
+    height: 848px;
+    aspect-ratio: auto;
   }
 }
