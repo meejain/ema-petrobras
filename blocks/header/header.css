@@ -6,7 +6,7 @@
   --petro-green-dark: #00703c;
   --petro-yellow: #fdc82f;
   --petro-util-bg: #f2f2f2;
-  --petro-util-text: #4b4b4b;
+  --petro-util-text: #525252;
   --nav-util-height: 48px;
   --nav-main-height: 104px;
   --nav-main-compact: 56px;
@@ -38,6 +38,14 @@ header .nav-utility {
   background: transparent;
   color: var(--text-color);
   font-size: 12px;
+
+  /* the strip animates its collapse on scroll (see .is-compact below): it slides
+     up and its height goes to 0 so the main nav rises into its place — matching
+     the source, where the utility strip is in normal flow and scrolls away
+     (rather than popping out instantly). */
+  overflow: hidden;
+  transform-origin: top;
+  transition: height 0.25s ease, transform 0.25s ease;
 }
 
 /* over a dark hero banner: soft top-down dark gradient + white text (source).
@@ -66,15 +74,24 @@ header .nav-utility-inner {
 header .nav-utility-label {
   font-weight: 700;
   white-space: nowrap;
-  color: var(--text-color);
+
+  /* source "Você está em:" is dark grey #373737 (not the body #272833) */
+  color: #373737;
 
   /* MOBILE: the strip title is 20px on the source; desktop shrinks it to 12px
      and adds the 100px right offset before "Acesse também" below. */
   font-size: 20px;
 }
 
-/* over a dark hero banner: the strip label is white (source) */
-body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-label {
+/* the site name "SITE PETROBRAS" is green on white-top pages (source #008542) */
+header .nav-utility-site {
+  color: var(--petro-green);
+}
+
+/* over a dark hero banner: the whole strip title is white (source) — both the
+   "Você está em:" label and the green "SITE PETROBRAS" site name flip to white. */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-label,
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-site {
   color: #fff;
 }
 
@@ -89,12 +106,13 @@ header .nav-utility-links {
 /* "Acesse também:" label — same 16px flex gap as the links (source spacing) */
 header .nav-utility-links > span {
   font-weight: 400;
-  color: var(--text-color);
+  color: var(--petro-util-text);
   margin-right: 0;
 }
 
+/* quick-access links — source grey #525252 bold (var(--petro-util-text)) */
 header .nav-utility-links a {
-  color: var(--text-color);
+  color: var(--petro-util-text);
   text-decoration: none;
   font-weight: 700;
   font-size: 12px;
@@ -127,13 +145,17 @@ header .nav-fontsize {
   gap: 0;
   height: 24px;
   padding: 0;
-  border: 1px solid rgb(0 0 0 / 32%);
+
+  /* source: the font-size pill has a green border on white-top pages */
+  border: 1px solid var(--petro-green);
   border-radius: 500px;
 }
 
 header .nav-fontsize span {
   min-width: 49px;
-  color: var(--text-color);
+
+  /* source: the "100%" zoom indicator is green #008542 on white-top pages */
+  color: var(--petro-green);
   font-size: 12px;
   text-align: center;
 }
@@ -150,13 +172,17 @@ header .nav-utility-controls button {
 header .nav-fontsize button {
   min-width: 49px;
   padding: 2px 0;
+
+  /* source: the whole font-size control (A- 100% A+) is green on white-top pages */
+  color: var(--petro-green);
   font-size: 12px;
   font-weight: 700;
   text-align: center;
 }
 
 /* contrast toggle (source .high-contrast-icon): a 24px transparent ring with a
-   1px light border, containing a 16px inner circle split half-dark / half-light. */
+   1px green border on white-top pages, containing a 16px inner circle split
+   half-green / half-light. */
 header .nav-utility-controls button.nav-contrast {
   display: flex;
   align-items: center;
@@ -166,7 +192,9 @@ header .nav-utility-controls button.nav-contrast {
   padding: 0;
   border-radius: 50%;
   background: transparent;
-  border: 1px solid #373737;
+
+  /* source: green ring on white-top pages (dark-hero overlay flips it white) */
+  border: 1px solid var(--petro-green);
   box-sizing: border-box;
 }
 
@@ -175,43 +203,95 @@ header .nav-utility-controls button.nav-contrast::before {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #000 0%, #000 50%, #f8f8f8 50%, #f8f8f8 100%);
+
+  /* source: the filled half of the contrast glyph is green (not pure black) */
+  background: linear-gradient(90deg, var(--petro-green) 0%, var(--petro-green) 50%, #f8f8f8 50%, #f8f8f8 100%);
 }
 
-/* language pill: white rounded pill, PT active green, EN muted */
+/* language toggle SWITCH (source .petro-full-nav): a 50x24 pill track with a
+   24px circular knob that sits over the ACTIVE language and slides to the other
+   side on toggle. On white-top pages the track border + knob are green and the
+   active label (on the knob) is white; the dark-hero overlay flips the knob
+   white with a green active label (see the :has() override below). */
 header .nav-lang {
-  display: flex;
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  background: #fff;
-  border-radius: 500px;
-  overflow: hidden;
   height: 24px;
+  padding: 0;
+  border: 1px solid var(--petro-green);
+  border-radius: 100px;
+  background: transparent;
+}
+
+/* the sliding circular knob — starts over PT (left), slides to EN (right) */
+header .nav-lang::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--petro-green);
+  transition: transform 0.2s ease;
+}
+
+/* knob slides to the right half when EN is the active language */
+header .nav-lang:has(button:last-child.is-active)::before {
+  transform: translateX(100%);
 }
 
 header .nav-lang button {
-  padding: 2px 6px;
-  height: 100%;
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   text-transform: uppercase;
-  font-size: 11px;
-  font-weight: 700;
-  color: #6e6e6e;
+  font-size: 10px;
+  font-weight: 600;
+
+  /* inactive label = the accent colour (green on white-top pages) */
+  color: var(--petro-green);
   background: none;
+  border: none;
 }
 
+/* the ACTIVE label sits ON the knob, so it takes the contrasting colour */
 header .nav-lang button.is-active {
+  color: #fff;
+}
+
+/* over a dark hero banner: track border white/48%, WHITE knob, active label
+   green (on the white knob), inactive label near-white (source homepage). */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-lang {
+  border-color: rgb(255 255 255 / 48%);
+}
+
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-lang::before {
+  background: #fff;
+}
+
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-lang button {
+  color: #f8f8f8;
+}
+
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-lang button.is-active {
   color: var(--petro-green);
 }
 
 /* over a dark hero banner: the WHOLE utility strip (row 1) is white — the
    "Acesse também:" label, the quick-access links, and the font-size controls
-   (A- 100% A+). The base rules above color these dark (var(--text-color)) for
-   the light/white-top pages; these overlays flip them white over the dark hero,
-   matching the source. Placed after their base rules to avoid descending
-   specificity. The language pill stays a solid white pill (its own colors). */
+   (A- 100% A+). The base rules above color these for the light/white-top pages
+   (grey links #525252, green "100%"); these overlays flip them white over the
+   dark hero, matching the source. Placed after their base rules to avoid
+   descending specificity. The language pill stays a solid white pill. */
 body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-links > span,
 body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-links a,
 body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-fontsize span,
-body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-controls button {
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-fontsize button {
   color: #fff;
 }
 
@@ -222,6 +302,11 @@ body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .
 
 body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-controls button.nav-contrast {
   border-color: #fff;
+}
+
+/* over the dark hero the contrast glyph's filled half flips green→white too */
+body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility-controls button.nav-contrast::before {
+  background: linear-gradient(90deg, #fff 0%, #fff 50%, rgb(255 255 255 / 25%) 50%, rgb(255 255 255 / 25%) 100%);
 }
 
 /* ---------- Main nav (row 1) ----------
@@ -760,7 +845,11 @@ header .nav-wrapper.is-open .nav-search-toggle {
 /* ---------- Sticky compact-on-scroll ---------- */
 /* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-compact .nav-utility {
-  display: none;
+  /* collapse the utility strip by sliding it up and zeroing its height, so the
+     main nav rises smoothly into its place (source: the strip scrolls away). Not
+     `display:none`, which can't animate and made the row pop out instantly. */
+  height: 0;
+  transform: translateY(-100%);
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
@@ -770,16 +859,19 @@ header .nav-wrapper.is-compact .nav-main {
   box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
+/* scrolled/compact: white solid bar with GREEN nav links + caret (source: over
+   the dark hero they were white; once the bar turns white they flip to green,
+   matching the white-top base link colour). */
 /* stylelint-disable no-descending-specificity */
 header .nav-wrapper.is-compact .nav-link,
 header .nav-wrapper.is-compact .nav-drop {
-  color: #373737;
+  color: var(--petro-green);
 }
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable-next-line no-descending-specificity */
 header .nav-wrapper.is-compact .nav-search-toggle {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23373737" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="%23008542" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>');
 }
 
 header .nav-wrapper.is-compact .nav-logo {

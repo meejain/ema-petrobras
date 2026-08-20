@@ -54,7 +54,14 @@ function buildUtilityBar(section) {
 
   const label = document.createElement('span');
   label.className = 'nav-utility-label';
-  label.textContent = 'Você está em: SITE PETROBRAS';
+  // Source splits the strip title: "Você está em:" in dark text, the site name
+  // "SITE PETROBRAS" in green — so wrap the site name in its own span to colour
+  // it independently (green on white-top pages, white over the dark hero).
+  label.append('Você está em: ');
+  const site = document.createElement('span');
+  site.className = 'nav-utility-site';
+  site.textContent = 'SITE PETROBRAS';
+  label.append(site);
   inner.append(label);
 
   const links = document.createElement('div');
@@ -108,13 +115,36 @@ function buildUtilityBar(section) {
     contrastBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 
-  // language toggle (visual active state)
-  const langBtns = controls.querySelectorAll('.nav-lang button');
-  langBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      langBtns.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-    });
+  // language toggle: route between the PT (default) and EN sites, matching the
+  // source — EN lives under an `/en` path prefix (e.g. `/` -> `/en`,
+  // `/bolivia` -> `/en/bolivia`), PT is the same path without that prefix.
+  // Marks the current language active from the URL and navigates on click.
+  const [ptBtn, enBtn] = controls.querySelectorAll('.nav-lang button');
+  const stripEnPrefix = (path) => path.replace(/^\/en(?=\/|$)/, '') || '/';
+  const addEnPrefix = (path) => `/en${path === '/' ? '' : path}`;
+  const isEnglish = () => /^\/en(\/|$)/.test(window.location.pathname);
+  const syncLangActive = () => {
+    const en = isEnglish();
+    enBtn.classList.toggle('is-active', en);
+    ptBtn.classList.toggle('is-active', !en);
+  };
+  syncLangActive();
+  // Slide the knob first (toggle the active classes so the CSS transition plays),
+  // then navigate once it has animated — matching the source, where the switch
+  // visibly slides before the page changes. 220ms ~= the knob transition.
+  const KNOB_SLIDE_MS = 220;
+  const switchTo = (targetPath, makeEnActive) => {
+    enBtn.classList.toggle('is-active', makeEnActive);
+    ptBtn.classList.toggle('is-active', !makeEnActive);
+    window.setTimeout(() => { window.location.pathname = targetPath; }, KNOB_SLIDE_MS);
+  };
+  ptBtn.addEventListener('click', () => {
+    if (!isEnglish()) return;
+    switchTo(stripEnPrefix(window.location.pathname), false);
+  });
+  enBtn.addEventListener('click', () => {
+    if (isEnglish()) return;
+    switchTo(addEnPrefix(window.location.pathname), true);
   });
 
   inner.append(controls);

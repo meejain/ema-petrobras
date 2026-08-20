@@ -193,6 +193,106 @@ PNG icons for the card samples.
 - Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
   `test:a11y …/hero-diagonal-split` pass. Verified at 1440px against live `/bolivia`.
 
+### 2026-08-20 (header — PT/EN rebuilt as a toggle SWITCH with sliding knob)
+- **Symptom (user):** our PT/EN was a flat white pill (just "PT EN" text); the source is a toggle
+  **switch** — a pill track with a circular knob sitting over the active language.
+- **Source anatomy measured (both themes):** 50×24 track, `border-radius:100px`, transparent bg;
+  a **24px circular knob** over the active language that slides to the other side on toggle;
+  10px/600 labels. Dark hero (homepage): track border `rgb(255 255 255 / .48)`, **white knob**,
+  active PT green (on knob), inactive EN `#f8f8f8`. White-top (`/bolivia`): track border + **knob
+  green**, active PT white, inactive EN green.
+- **Fix (header.css `.nav-lang`):** rebuilt as a switch — relative pill track with `1px petro-green`
+  border; a `::before` green **knob** (24px circle) that `translateX(100%)` slides right when EN is
+  active (`.nav-lang:has(button:last-child.is-active)::before`); buttons are 24px cells, inactive
+  green, active white (sits on the knob). Dark-hero `:has()` overlay flips track border white/48%,
+  knob white, active label green, inactive `#f8f8f8`. Knob position is driven by the same
+  `.is-active` class the routing JS already sets from the URL, so it reflects the current language.
+- Verified vs source: homepage — white knob left over PT (green), EN `#f8f8f8`, border white/48%;
+  white-top — green knob over PT (white), EN green, green border. Both pixel-match the source.
+- **Slide-before-navigate:** clicking PT/EN was navigating instantly, so the knob slide was never
+  seen. `header.js` now toggles the `.is-active` classes on click (knob starts its 0.2s
+  `translateX(100%)` slide) and defers the actual navigation by 220ms (`KNOB_SLIDE_MS`), so the
+  switch visibly animates first — matching the source. Verified: on EN click `en_active` flips
+  true immediately with `transition: transform 0.2s` on the knob, then it routes to `/en`.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y` pass on both `/` and the white-top page.
+
+### 2026-08-20 (header — PT/EN routing, scroll-collapse animation, compact green links)
+Three source-parity fixes (source `https://petrobras.com.br/`), all scoped to the header:
+1. **PT/EN language toggle now routes (was visual-only).** Source: clicking EN navigates to an
+   `/en` path prefix (`/`→`/en`, `/bolivia`→`/en/bolivia`), PT strips it back; the current
+   language is marked active from the URL. `header.js` — replaced the class-only toggle with
+   `stripEnPrefix`/`addEnPrefix`/`isEnglish` helpers; `syncLangActive()` sets `.is-active` from
+   `location.pathname` on load, PT/EN click navigate via `window.location.pathname`. Verified:
+   PT active on `/`, clicking EN → `/en` with EN active (local `/en` 404s only because that
+   content isn't migrated yet — the routing behaviour matches source exactly).
+2. **Scroll: utility strip now collapses smoothly (was "stagnant then popped").** Source keeps
+   the strip in normal flow so it scrolls up naturally. We kept the whole `.nav-wrapper` fixed and
+   `display:none`d the strip on `.is-compact` — `display` can't animate, so it vanished instantly.
+   `header.css` — base `.nav-utility` got `overflow:hidden; transform-origin:top;
+   transition:height/transform .25s`; the `.is-compact` rule now `height:0; translateY(-100%)`
+   instead of `display:none`, so the strip slides up and the main nav rises into its place.
+   Verified on `/`: util height animates 48px→0 with a transform on scroll.
+3. **Compact nav links now GREEN (were dark `#373737`).** Source: once the scrolled bar turns
+   white the links flip green. `header.css` — `.is-compact .nav-link/.nav-drop`→`var(--petro-green)`
+   and the compact search icon stroke `#373737`→`#008542`. Verified on `/`: links compute
+   `rgb(0,133,66)` when scrolled.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y` pass on both `/` and the white-top hero-diagonal-split page.
+
+### 2026-08-20 (header top-row FULLY GREEN on white-top pages)
+- **Symptom (user):** on white-top pages (e.g. `/bolivia`) the top utility row read all-dark;
+  the source shows the **entire** row in green — site name, the A-/100%/A+ font-size control
+  (text + pill border), the contrast toggle ring + glyph, and the PT/EN language labels.
+- **Source colours measured on live `/bolivia` (1440):** "Você está em:" `#373737`;
+  **"SITE PETROBRAS" green `#008542`**; quick-links (ACESSO À INFORMAÇÃO…) grey `#525252` bold;
+  **A- / "100%" / A+ all green `#008542`** with a **green pill border**; **contrast toggle ring
+  border green** + its inner glyph's filled half green (not black); **PT and EN both green**
+  `#008542`. Local rendered all of these dark `rgb(39,40,51)` / dark grey.
+- **Fix:**
+  - `header.js` `buildUtilityBar()` — split the strip title so the site name is its own
+    element: `"Você está em: "` (text) + `<span class="nav-utility-site">SITE PETROBRAS</span>`.
+  - `header.css` base (light-theme), all → `var(--petro-green)` unless noted:
+    `.nav-utility-label`→`#373737`; new `.nav-utility-site`→green; `.nav-utility-links a` +
+    "Acesse também:" span →`var(--petro-util-text)` (retuned `#4b4b4b`→**`#525252`**, token only
+    used here); `.nav-fontsize span` ("100%"), `.nav-fontsize button` (A-/A+), the `.nav-fontsize`
+    **border**, the `.nav-contrast` **ring border**, the `.nav-contrast::before` glyph's filled
+    half, and both `.nav-lang button` (PT/EN) → green.
+- **Hero-theme logic preserved (homepage NOT impacted) + bug fixed:** the dark-hero `:has()`
+  overlay whitens row 1 over the dark hero. **Bug caught & fixed:** the overlay whitened
+  `.nav-utility-controls button`, which includes the PT/EN language buttons — but those sit on an
+  always-white pill, so on the homepage they'd be white-on-white (invisible). Re-scoped that
+  selector to `.nav-fontsize button` only (so the language pill keeps its green PT/EN everywhere,
+  matching the source note "the language pill stays a solid white pill / its own colours"), and
+  added overlay rules whitening the contrast glyph's filled half. Verified — homepage `/`
+  (dark hero): SITE PETROBRAS + A-/100%/A+ + contrast ring/glyph all `rgb(255,255,255)`, pill
+  border light, **language pill white bg with green PT/EN (readable)**; white-top page:
+  every row-1 accent green `rgb(0,133,66)`, quick-links `rgb(82,82,82)`, "Você está em:"
+  `rgb(55,55,55)`. Used `var(--petro-green)` (not a hex) so high-contrast mode's
+  `--petro-green:#525252` override neutralises it automatically.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass,
+  `test:a11y` **pass on BOTH** the white-top page and the homepage `/`.
+
+### 2026-08-20 (hero diagonal-split — content inset made band-aware, left↔right gap fixed)
+- **Symptom (user):** on wide desktops the gap between the left text column and the
+  right photo looked too big; breadcrumb/heading/body sat too far left of the image.
+- **Root cause:** desktop content inset was `padding-left: 12.7%` of the raw **viewport**.
+  That only equals the source at exactly 1440px. Measured live `/bolivia` vs local:
+  content left-x — 1280 `169→169✓`, 1440 `183→183✓`, **1920 `363→244✗`** (120px too far
+  left) — because the source insets the text from a *centred max-width-1440 band* (72px
+  side gutters), not from the viewport. So above 1440 our text drifted left and the
+  left↔right gap ballooned (content→image gap @1920 `264→423`).
+- **Fix (hero.css, `≥992px` only):** replaced the flat `12.7%` with a band-aware calc —
+  `max(--space-big, (100% - --content-max-width)/2) + 0.085 * min(100% - 2*--space-big, --content-max-width)`.
+  Re-measured local: content-x **169 / 182 / 362** at 1280 / 1440 / 1920 — matches the
+  source (`169 / 183 / 363`, ±2px) at every width. Image geometry (right-anchored 735px)
+  left intact; mobile stack (breadcrumb→photo→heading→body, 32px gutters, no h-scroll)
+  untouched (change is inside the desktop media query).
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check`
+  pass (576/768/992/1280), `test:a11y …/hero-diagonal-split` **pass** (run against the
+  extensionless full-page URL, not `.plain.html` — the fragment lacks `<html lang>`/`<title>`).
+  Verified in preview at 1280/1440/1920 + 390 mobile against live `/bolivia`.
+
 ### 2026-08-20 (hero diagonal-split — parity pass REVERTED)
 - Attempted a full measure-and-match pass (absolute-positioned 735×848 portrait photo, block-layout
   content column with margin-top gap, retuned outline). It regressed the layout in the user's view,

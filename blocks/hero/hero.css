@@ -496,9 +496,18 @@ main > .section.hero-container {
     max-width: none;
     margin-inline: 0;
 
-    /* content inset toward centre (~183/1440 ≈ 12.7%); no right padding so the
-       photo can bleed off the right edge like the source. */
-    padding: 40px 0 40px 12.7%;
+    /* Content inset — band-aware, matching the source at EVERY desktop width
+       (not just 1440). The source centres its content in a max-width 1440 band
+       (72px min side gutters) and insets the text ~8.5% into that band, so:
+         content-x = max(72px, (100vw - 1440)/2)  +  0.085 * min(100vw - 144, 1440)
+       Verified vs live /bolivia: x=169@1280, 183@1440, 363@1920 (±2px).
+       A plain "12.7% of viewport" only matched at 1440 and drifted the text far
+       left of the photo on wide screens, blowing the left↔right gap open.
+       No right padding so the photo still bleeds off the right edge. */
+    padding: 40px 0 40px calc(
+      max(var(--space-big), (100% - var(--content-max-width)) / 2)
+      + 0.085 * min(100% - (2 * var(--space-big)), var(--content-max-width))
+    );
 
     /* FIXED band height (source hero = 588px at 1440); not viewport-relative, so
        the photo band never overshoots downward as the column widens. */
