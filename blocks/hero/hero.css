@@ -276,3 +276,216 @@ main > .section.hero-container {
     font-size: 16px;
   }
 }
+
+/* ============================================================
+   Hero variant: diagonal-split  (source: petrobras.com.br/bolivia)
+   Left column: breadcrumb + dark bold heading + yellow accent bar + body.
+   Right column: photo clipped into a diagonal parallelogram, with an
+   offset yellow "echo" of the same shape behind it.
+   Extracted source values:
+     heading  38px/1.2 700  #373737
+     body     16px/1.6 400
+     breadcrumb 14px, gap 8px, links 400, current 700, #373737
+     yellow   #fdc82f (rgb 253 200 47)   accent bar 40x4, margin-top 24px
+   ============================================================ */
+.hero.diagonal-split {
+  --hero-ds-dark: #373737;
+  --hero-ds-yellow: rgb(253 200 47);
+  --hero-ds-outline: #e8ad02;
+  --hero-ds-clip: polygon(17% 25%, 99% 19%, 100% 89%, 1% 72%);
+
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: stretch;
+  width: 100%;
+  padding: 32px var(--layout-gutter);
+
+  /* clip the outline's outward overflow so it never triggers a horizontal
+     scrollbar on narrow viewports */
+  overflow: hidden;
+  background: var(--background-color);
+}
+
+/* ---------- content column ---------- */
+.hero.diagonal-split .hero-ds-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* breadcrumb */
+.hero.diagonal-split .hero-ds-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero.diagonal-split .hero-ds-breadcrumb li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--hero-ds-dark);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* chevron separator between crumbs */
+.hero.diagonal-split .hero-ds-breadcrumb li:not(:last-child)::after {
+  content: "›";
+  color: var(--hero-ds-dark);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.hero.diagonal-split .hero-ds-breadcrumb a:any-link {
+  color: var(--hero-ds-dark);
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  text-transform: capitalize;
+}
+
+.hero.diagonal-split .hero-ds-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.hero.diagonal-split .hero-ds-breadcrumb [aria-current="page"] {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+/* heading + yellow accent bar */
+.hero.diagonal-split .hero-ds-heading {
+  margin: 0;
+  color: var(--hero-ds-dark);
+  font-family: var(--heading-font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero.diagonal-split .hero-ds-heading::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 24px;
+  background-color: var(--hero-ds-yellow);
+}
+
+/* body copy */
+.hero.diagonal-split .hero-ds-body {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--hero-ds-dark);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ---------- media column (diagonal photo) ---------- */
+.hero.diagonal-split .hero-ds-media {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  line-height: 0;
+}
+
+.hero.diagonal-split .hero-ds-media picture,
+.hero.diagonal-split .hero-ds-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 11;
+  object-fit: cover;
+
+  /* Fallback sharp polygon; hero.js swaps in an inline url(#hero-ds-clip-N)
+     SVG clipPath (objectBoundingBox units) with softly ROUNDED corners to match
+     the source parallelogram. The rounded clip scales at every viewport. */
+  clip-path: var(--hero-ds-clip);
+}
+
+/* thin gold outline tracing the diagonal photo, offset slightly outward so it
+   peeks past the top-right and bottom edges (source: stroked <svg> graphism,
+   stroke #E8AD02 ~2px). A non-scaling 2px stroke keeps the line crisp. */
+.hero.diagonal-split .hero-ds-outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero.diagonal-split .hero-ds-outline polygon,
+.hero.diagonal-split .hero-ds-outline path {
+  fill: none;
+  stroke: var(--hero-ds-outline);
+  stroke-width: 2px;
+}
+
+/* clipPath <defs> holder: zero-size, no layout impact */
+.hero.diagonal-split .hero-ds-clip-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ---------- tablet ---------- */
+@media (width >= 768px) {
+  .hero.diagonal-split .hero-ds-heading {
+    font-size: 32px;
+  }
+}
+
+/* ---------- desktop: two-column split, FULL-BLEED ----------
+   Source (1440): the hero spans the full viewport. The content column is INSET
+   ~12.7% from the left (x≈183, NOT the 72px page gutter) in a ~521px column,
+   and the diagonal photo is large and runs OFF the right viewport edge (media
+   right ≈ vw+63). Reproduced by insetting the content and giving the media a
+   large basis so it overflows the right (wrapper clips the overflow). */
+@media (width >= 992px) {
+  .hero.diagonal-split {
+    flex-direction: row;
+    gap: 32px;
+    align-items: center;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+
+    /* content inset toward centre (~183/1440 ≈ 12.7%); no right padding so the
+       photo can bleed off the right edge like the source. */
+    padding: 40px 0 40px 12.7%;
+  }
+
+  .hero.diagonal-split .hero-ds-content {
+    flex: 0 0 521px;
+    min-width: 0;
+    max-width: 521px;
+  }
+
+  .hero.diagonal-split .hero-ds-heading {
+    font-size: 38px;
+  }
+
+  /* photo column takes the remaining width AND bleeds past the right edge:
+     a min-width larger than its track forces the overflow the source shows
+     (source media ≈ 735px wide, bleeding ~63px past a 1440 viewport). */
+  .hero.diagonal-split .hero-ds-media {
+    flex: 1 1 auto;
+    min-width: 780px;
+  }
+
+  .hero.diagonal-split .hero-ds-media picture,
+  .hero.diagonal-split .hero-ds-media img {
+    aspect-ratio: 735 / 588;
+  }
+}

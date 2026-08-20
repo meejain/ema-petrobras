@@ -1,3 +1,6 @@
+/* ------------------------------------------------------------------ *
+ * Default cards (boilerplate: image + heading + body + link)
+ * ------------------------------------------------------------------ */
 .cards > ul {
   list-style: none;
   margin: 0;
@@ -24,4 +27,335 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+}
+
+/* ================================================================== *
+ * Variant: cards icon
+ * Source: petrobras.com.br/transicao-energetica
+ * White card, 1px #eee border, 16px radius, 24px padding, 24px gap.
+ * Large green line-art icon on top, bold dark title below, short
+ * yellow bar at the bottom of the card. 3 columns on desktop.
+ * ================================================================== */
+.cards.icon > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  grid-template-columns: none;
+}
+
+.cards.icon > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 24px;
+  background-color: #fff;
+}
+
+.cards.icon .cards-card-image {
+  line-height: 0;
+}
+
+/* large green line-art icon at the top, ~130px tall, left-aligned */
+.cards.icon .cards-card-image img {
+  width: auto;
+  height: 130px;
+  max-width: 100%;
+  aspect-ratio: auto;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* body grows so the yellow bar can sit at the card bottom */
+.cards.icon .cards-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.cards.icon .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0 0 24px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #373737;
+}
+
+/* short yellow bar pinned to the bottom of the card (aligns across cards
+   because the flex row stretches all cards to equal height) */
+.cards.icon .cards-card-body::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin-top: auto;
+  background-color: #fdc82f;
+}
+
+@media (width >= 576px) {
+  .cards.icon > ul > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .cards.icon > ul > li {
+    width: calc((100% - (2 * 32px)) / 3);
+  }
+}
+
+/* ================================================================== *
+ * Variant: cards feature
+ * Source: petrobras.com.br/quem-somos/tipos-de-fertilizantes
+ * Green filled rounded card (#008542, 16px radius, 24px padding). A
+ * white line-art icon sits on a subtle rounded green tile at the
+ * TOP-RIGHT of the card (source .media-title-container is row-reverse
+ * with an empty title, so the tile is right-aligned). Below it a white
+ * uppercase bold title and white body text.
+ * Columns: 1 -> 2 (>=576) -> 3 (>=992) -> 4 (>=1280).
+ * Measured at 1280/992/768/576/390 against the source.
+ * ================================================================== */
+.cards.feature > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  grid-template-columns: none;
+}
+
+.cards.feature > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 24px;
+  background-color: #008542;
+  color: #fff;
+}
+
+/* icon on a subtle rounded tile, right-aligned at the top of the card.
+   The tile colour (rgb(1 138 69), sampled from the icon PNG) is only a
+   hair lighter than the card — the icon artwork already carries this
+   soft green, so the tile reads as translucent rather than a hard block.
+   Small tile (72x52) up to desktop; full size (148x104) from 1280. */
+.cards.feature .cards-card-image {
+  align-self: flex-end;
+  width: 72px;
+  border-radius: 8px;
+  background-color: rgb(1 138 69);
+  line-height: 0;
+  overflow: hidden;
+}
+
+.cards.feature .cards-card-image img {
+  width: 72px;
+  height: 52px;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+.cards.feature .cards-card-body {
+  margin: 24px 0 0;
+  color: #fff;
+}
+
+/* uppercase bold white title (authored as bold text or a heading) */
+.cards.feature .cards-card-body strong,
+.cards.feature .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.cards.feature .cards-card-body p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #fff;
+}
+
+@media (width >= 576px) {
+  .cards.feature > ul > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .cards.feature > ul > li {
+    width: calc((100% - (2 * 32px)) / 3);
+  }
+
+  .cards.feature .cards-card-body strong,
+  .cards.feature .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+    font-size: 16px;
+  }
+
+  .cards.feature .cards-card-body p {
+    font-size: 16px;
+  }
+}
+
+@media (width >= 1280px) {
+  .cards.feature > ul > li {
+    width: calc((100% - (3 * 32px)) / 4);
+  }
+
+  .cards.feature .cards-card-image {
+    width: 148px;
+  }
+
+  .cards.feature .cards-card-image img {
+    width: 148px;
+    height: 104px;
+  }
+}
+
+/* ================================================================== *
+ * Variant: cards grid
+ * Source: petrobras.com.br/produtos-mais-sustentaveis
+ * White card, 1px #eee border, 16px radius, 24px padding. Bold dark
+ * title top-left with a short yellow bar beneath it, small rounded
+ * image top-right, body text, then a bold green link at the bottom.
+ * The block JS moves the title + image into a shared header row.
+ * 3 columns on desktop.
+ * ================================================================== */
+.cards.grid > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  grid-template-columns: none;
+}
+
+.cards.grid > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 24px;
+  background-color: #fff;
+}
+
+/* header row: title (left) + small rounded image (right) */
+.cards.grid .cards-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cards.grid .cards-card-title {
+  flex: 1 1 auto;
+}
+
+.cards.grid .cards-card-title :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #373737;
+}
+
+/* short yellow bar under the title */
+.cards.grid .cards-card-title :is(h1, h2, h3, h4, h5, h6)::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin-top: 16px;
+  background-color: #fdc82f;
+}
+
+/* small rounded image top-right: 72x52 on mobile, 148x104 from 768px
+   (measured on the source at 390/576/768/992/1280). */
+.cards.grid .cards-card-head .cards-card-image {
+  flex: 0 0 auto;
+  width: 72px;
+  line-height: 0;
+}
+
+.cards.grid .cards-card-head .cards-card-image img {
+  width: 72px;
+  height: 52px;
+  aspect-ratio: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.cards.grid .cards-card-body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* the heading also stays inside the body cell — shown in the head instead */
+.cards.grid .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  display: none;
+}
+
+.cards.grid .cards-card-body p {
+  margin: 20px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #373737;
+}
+
+/* bold green link at the bottom of the card */
+.cards.grid .cards-card-body p:last-child {
+  margin-top: 24px;
+}
+
+.cards.grid .cards-card-body a:any-link {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #008542;
+  text-decoration: underline;
+}
+
+@media (width >= 576px) {
+  .cards.grid > ul > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media (width >= 768px) {
+  /* full-size image and 16px body/link + 24px title from tablet up */
+  .cards.grid .cards-card-head .cards-card-image {
+    width: 148px;
+  }
+
+  .cards.grid .cards-card-head .cards-card-image img {
+    width: 148px;
+    height: 104px;
+  }
+
+  .cards.grid .cards-card-title :is(h1, h2, h3, h4, h5, h6) {
+    font-size: 24px;
+  }
+
+  .cards.grid .cards-card-body p {
+    font-size: 16px;
+  }
+
+  .cards.grid .cards-card-body a:any-link {
+    font-size: 16px;
+  }
+}
+
+@media (width >= 992px) {
+  .cards.grid > ul > li {
+    width: calc((100% - (2 * 32px)) / 3);
+  }
 }
