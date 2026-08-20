@@ -123,11 +123,16 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 .orgchart .orgchart-legend-dot.orgchart-color-cyan { background-color: var(--orgchart-cyan); }
 .orgchart .orgchart-legend-dot.orgchart-color-grey { background-color: var(--orgchart-grey); }
 
-/* Chart — single responsive column fallback (no grouping info) */
+/* Chart — single responsive column fallback (no grouping info).
+   width/min-width keep the horizontal branch slider bounded to the container
+   at mobile (where the body is a column with align-items:flex-start, which
+   would otherwise let the chart grow to its widest content and overflow). */
 .orgchart .orgchart-chart {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
 .orgchart .orgchart-node {
@@ -224,22 +229,24 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   gap: 16px;
   flex: 0 0 248px;
   width: 248px;
+  padding-left: 24px;
 }
 
-/* Vertical connector line linking a column's header to its sub-department
-   cards. The line runs the full height behind the cards; since cards have an
-   opaque white background it is only visible in the gaps between them. */
+/* Vertical trunk line down the left of each branch column (matches source):
+   the header card connects to its sub-department cards via a left trunk + a
+   short horizontal stub into each card — the same treatment as the spine, so
+   the whole chart reads consistently (no "some lined, some not"). */
 .orgchart .orgchart-column::before {
   content: "";
   position: absolute;
   top: 40px;
   bottom: 40px;
-  left: 40px;
+  left: 0;
   width: 1px;
   background-color: var(--orgchart-connector);
 }
 
-/* Single-card columns need no connector. */
+/* Single-card columns need no trunk. */
 .orgchart .orgchart-column:has(.orgchart-node:only-child)::before {
   content: none;
 }
@@ -247,6 +254,17 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 .orgchart .orgchart-column .orgchart-node {
   position: relative;
   z-index: 0;
+}
+
+/* Horizontal stub from the trunk to each branch card. */
+.orgchart .orgchart-column .orgchart-node::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  width: 24px;
+  height: 1px;
+  background-color: var(--orgchart-connector);
 }
 
 /* Prev/next slider controls, aligned to the right (as on the source).
@@ -300,21 +318,25 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   min-width: 0;
 }
 
-/* Tablet+ : spine and the branches area sit side by side. */
+/* Tablet+ : the spine (top-level trunk) stays stacked on top, and the branch
+   directorate slider sits BELOW it (matches the source; feedback confirmed the
+   below placement reads better than side-by-side). The spine keeps a bounded
+   width so its cards don't stretch full-bleed; the branches area spans full
+   width so the horizontal slider has room. */
 @media (width >= 768px) {
   .orgchart .orgchart-chart-tree {
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
     gap: 32px;
   }
 
   .orgchart .orgchart-chart-tree .orgchart-spine {
-    flex: 0 0 209px;
-    width: 209px;
+    width: 100%;
+    max-width: 360px;
   }
 
   .orgchart .orgchart-chart-tree .orgchart-branches-area {
-    flex: 1 1 auto;
+    width: 100%;
   }
 }
 
@@ -364,16 +386,46 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 .orgchart .orgchart-color-cyan .orgchart-card-area { color: var(--orgchart-cyan); }
 .orgchart .orgchart-color-grey .orgchart-card-area { color: var(--orgchart-grey); }
 
-/* Back face (responsible person + contact) shown when flipped */
+/* Flip behaviour (matches the source): clicking a card SWAPS the area label
+   for the responsible person's name — only one value shows at a time — via a
+   crossfade. The two faces overlap in the same spot and transition opacity, so
+   the animation is IDENTICAL in both directions (open and close both take the
+   same 0.3s — no fast/slow asymmetry). */
+.orgchart .orgchart-card.orgchart-flip .orgchart-card-area {
+  transition: opacity 0.3s ease;
+}
+
+.orgchart .orgchart-card.orgchart-flip.is-flipped .orgchart-card-area {
+  opacity: 0;
+}
+
+/* Back face (responsible person + contact) overlaps the area label and fades
+   in on flip. Absolutely positioned so it doesn't change the card height. */
 .orgchart .orgchart-card-back {
-  display: none;
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  right: 24px;
+  display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 
 .orgchart .orgchart-card.is-flipped .orgchart-card-back {
-  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orgchart .orgchart-card.orgchart-flip .orgchart-card-area,
+  .orgchart .orgchart-card-back {
+    transition: none;
+  }
 }
 
 .orgchart .orgchart-card-responsible {

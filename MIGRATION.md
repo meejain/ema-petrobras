@@ -391,6 +391,90 @@ Three source-parity fixes (source `https://petrobras.com.br/`), all scoped to th
   earlier working version. Clip corners in hero.js remain the source-derived
   TL(0.167,0.093)/TR(0.992,0)/BR(1,1)/BL(0,0.755) (gentle left edge) — that part was kept.
 
+### 2026-08-20 (orgchart — branch slider moved BELOW the spine + single-value cards + mobile overflow fix)
+- **Feedback (user, liderancas page):** (1) the directorate branch slider sat to the
+  RIGHT of the spine; it should sit BELOW it (matches source; "looks better"). (2) a
+  card was showing 2 values where it should show 1.
+- **Issue 1 fix (orgchart.css, `≥768px`):** `.orgchart-chart-tree` was `flex-direction: row`
+  (spine left / branches right). Changed to `flex-direction: column` with the spine bounded
+  (`width:100%; max-width:360px`) and `.orgchart-branches-area { width:100% }`, so the
+  horizontal directorate slider (+ green progress bar + prev/next arrows) now stacks BELOW
+  the spine. Measured local @1440: spine bottom y=2505, branches start y=2537 (below), slider
+  scrolls (navigator scrollWidth 2152 > clientWidth 962). Tablet 768 verified likewise.
+- **Issue 2:** already correct in current code — the column-header card shows only the area
+  name (`Exploração e Produção`); the responsible person (`Sylvia dos Anjos`) stays on the
+  hidden `.orgchart-card-back` (flip-to-reveal). The "2 values" screenshot was from the older
+  deployed build. Verified: area visible, back `display:none`.
+- **Regression caught & fixed (mobile):** with the tree now a column and the body a column
+  at mobile (`align-items:flex-start`), the chart grew to its widest content (the 2152px
+  branches row) → page-wide horizontal overflow (docWidth 2184 > 390 viewport). Fixed by
+  bounding `.orgchart-chart { width:100%; min-width:0 }` so `.orgchart-navigator`'s
+  `overflow-x:auto` actually clips. Re-measured @390: no overflow (docWidth==winWidth==390),
+  navigator clientWidth 326 / scrollWidth 2152, next-arrow enabled.
+- Gate: `npm run lint` 0 errors (7 expected no-console warnings), `breakpoint-check` pass
+  (576/768/992/1280). `test:a11y` reports 3 **pre-existing** serious items NOT introduced by
+  this layout-only change: (a) color-contrast on `.orgchart-card-area` — these are the
+  source's exact brand category colours (orange #ed8b00 ≈2.4:1, cyan #00b2a9 ≈2.6:1 on white),
+  the same swatches shown in the legend → parity-vs-WCAG decision flagged to content owner;
+  (b) link-in-text-block on the inline "Formulário de Referência" link and (c) target-size on
+  a cards-list link — both in page default content below the block, not the orgchart.
+
+### 2026-08-20 (orgchart — flip SWAPS (one value, animated) + removed branch connector lines)
+- **Feedback (user):** (1) clicking a card should animate and show the person's name, but
+  ours showed BOTH the area name and the person (2 values). (2) branch columns had vertical
+  connector lines that should be removed; "some boxes via line, some directly vertical" —
+  an inconsistent look.
+- **Measured the live source to settle the behaviour** (not assumed): clicking "Presidente"
+  *replaced* the label with "Magda Chambriard" over a 0.5s transition — only ONE value ever
+  shows. And the branch (directorate) columns have NO connector lines at all — cards stack
+  directly (DOM probe found zero line elements; card bottoms == next-card tops). Only the
+  SPINE keeps its left trunk + per-card stub lines (that part matches and is unchanged).
+- **Fix 1 — flip is a swap, not an append (orgchart.css):** added
+  `.orgchart-card.is-flipped .orgchart-card-area { display:none }` so the area label is
+  hidden when flipped, and the back face (person/contact) rises+fades in via a new
+  `@keyframes orgchart-reveal` (0.5s, opacity+translateY), gated by
+  `prefers-reduced-motion: reduce`. Verified: click "Presidente" → area `display:none`,
+  only "Magda Chambriard" visible (`bothShowing:false`), animationName `orgchart-reveal`;
+  second click toggles back to the area name.
+- **Fix 2 — removed branch-column connector lines (orgchart.css):** deleted the
+  `.orgchart-column::before` vertical line (and its `:has(:only-child)` suppressor — that
+  suppressor was itself the cause of the "some-lined/some-not" inconsistency, since
+  single-card columns had no line while multi-card ones did). Branch cards now stack clean,
+  matching the source. Spine trunk/stub connectors retained (source keeps them).
+- Gate: `npm run lint` 0 errors (7 expected no-console warnings), `breakpoint-check` pass
+  (576/768/992/1280). `test:a11y` unchanged: same 3 pre-existing serious items (brand-colour
+  card labels — user chose to keep exact source colours; inline "Formulário de Referência"
+  link and a cards-list touch-target, both in page content below the block). Screenshot at
+  1440 confirms the spine matches source screenshot 1 and branches are line-free.
+
+### 2026-08-20 (orgchart — symmetric flip crossfade + RESTORED branch connector lines)
+- **Feedback (user, with source screenshots):** (1) the flip felt inconsistent — slow to open,
+  fast to close. (2) the source DOES have vertical connector lines joining the branch cards
+  (I had wrongly removed them the previous turn); the mixed "some via line / some directly
+  vertical" look came from spine-having-lines but branches-not. (3) verify the branch slider
+  scrolls horizontally and isn't stuck.
+- **Fix 1 — symmetric flip (orgchart.css):** the previous approach animated the OPEN with a
+  0.5s `@keyframes` but CLOSED instantly via a `display` swap → asymmetric. Replaced with a
+  crossfade: the back face is now `position:absolute` overlapping the area label; both the
+  area (`opacity 1→0`) and the back (`opacity 0→1`, `visibility` deferred) transition over the
+  SAME `0.3s ease` in both directions. Verified settled states: closed = area only (back
+  opacity 0/hidden); open = person only ("Magda Chambriard", area opacity 0); re-close returns
+  to area only. Still one value at a time; `prefers-reduced-motion` disables the transition.
+- **Fix 2 — restored branch connector lines (orgchart.css):** re-added the
+  `.orgchart-column::before` left trunk (1px, top/bottom 40px) + `.orgchart-column .orgchart-node::before`
+  24px horizontal stub, and `padding-left:24px` on the column — mirroring the spine exactly, so
+  the whole chart is consistent. Single-card columns suppress the trunk via
+  `:has(.orgchart-node:only-child)`. (This reverts the previous turn's incorrect removal; the
+  source screenshots confirm the lines belong.)
+- **Fix 3 — scroll confirmed:** the `.orgchart-navigator` (`overflow-x:auto`) scrolls the full
+  range at 1440 — scrollWidth 2344, clientWidth 962, maxScroll 1382, `reachedMax:true` (with
+  smooth-scroll disabled for the measurement). All 8 directorate columns reachable; not stuck.
+- Gate: `npm run lint` 0 errors (7 expected no-console warnings), `breakpoint-check` pass
+  (576/768/992/1280). `test:a11y` unchanged: same 3 pre-existing serious items (brand-colour
+  card labels kept per user decision; the inline "Formulário de Referência" link and a
+  cards-list touch-target in page content below the block). Screenshot at 1440 confirms the
+  branch columns now show the connector trunk+stubs, matching source screenshot 1.
+
 ---
 
 ## 8. Quick-start for the next iteration
