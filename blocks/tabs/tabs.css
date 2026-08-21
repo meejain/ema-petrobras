@@ -1,0 +1,247 @@
+/*
+ * Tabs Block — three variants at parity with petrobras.com.br.
+ *  - content     petrobras.com.br/ouvidoria           (horizontal folder tabs)
+ *  - categories  petrobras.com.br/quem-somos/produtos (green icon/label pills)
+ *  - explorer    petrobras.com.br/sustentabilidade/biodiversidade (vertical tabs)
+ * Mobile-first; layout media queries use the source breakpoints (768 / 992).
+ */
+
+.tabs {
+  --tabs-text-color: #272833;
+  --tabs-active-border: #373737;
+  --tabs-inactive-border: #eee;
+  --tabs-folder-border: #d7d7d7;
+  --tabs-inactive-title: #525252;
+  --tabs-cat-bg: #00552a;
+  --tabs-cat-border: #008542;
+
+  display: block;
+}
+
+/* generic hidden panel + focus ring shared by all variants */
+.tabs .tabs-panel[hidden] {
+  display: none;
+}
+
+.tabs .tabs-tab {
+  margin: 0;
+  border: 0;
+  background: none;
+  color: var(--tabs-text-color);
+  font-family: var(--body-font-family);
+  cursor: pointer;
+}
+
+.tabs .tabs-tab:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.tabs .tabs-panel:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 4px;
+}
+
+/* ======================================================================
+   content variant — horizontal "folder" tabs (petrobras ouvidoria)
+   The tab strip shares a bottom border; the active tab is outlined on the
+   top + sides with rounded top corners and no bottom border, so it reads as
+   a continuous page with the panel below.
+   ====================================================================== */
+.tabs.content .tabs-tablist {
+  display: flex;
+  flex-flow: row nowrap;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--tabs-folder-border);
+}
+
+.tabs.content .tabs-tab {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.44;
+  white-space: nowrap;
+}
+
+.tabs.content .tabs-tab[aria-selected="true"] {
+  border-color: var(--tabs-folder-border);
+  font-weight: 700;
+
+  /* lift over the strip's bottom border so the tab merges into the panel */
+  margin-bottom: -1px;
+  background: var(--background-color);
+}
+
+.tabs.content .tabs-panel {
+  padding: 24px 0 0;
+}
+
+/* ======================================================================
+   categories variant — horizontal green icon/label pills (petrobras produtos)
+   ====================================================================== */
+.tabs.categories .tabs-tablist {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 0 24px;
+}
+
+.tabs.categories .tabs-tab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 148px;
+  min-height: 196px;
+  padding: 24px 12px;
+  border: 1px solid var(--tabs-cat-border);
+  border-radius: 16px;
+  background: var(--tabs-cat-bg);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.tabs.categories .tabs-tab[aria-selected="true"] {
+  border-color: #fff;
+}
+
+.tabs.categories .tabs-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+}
+
+.tabs.categories .tabs-tab-icon img {
+  max-width: 96px;
+  max-height: 96px;
+  object-fit: contain;
+}
+
+.tabs.categories .tabs-tab-label {
+  display: block;
+}
+
+/* the products grid inside a panel */
+.tabs.categories .tabs-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding-top: 8px;
+}
+
+/* ======================================================================
+   explorer variant — vertical icon + title tabs beside a panel
+   (petrobras biodiversidade). Mobile: panel on top, horizontally scrollable
+   tab strip below (matches source column-reverse).
+   ====================================================================== */
+.tabs.explorer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 16px;
+}
+
+.tabs.explorer .tabs-tablist {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.tabs.explorer .tabs-tab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 16px;
+  border: 1px solid var(--tabs-inactive-border);
+  border-radius: 8px;
+  background: var(--background-color);
+  text-align: left;
+}
+
+.tabs.explorer .tabs-tab[aria-selected="true"] {
+  border-color: var(--tabs-active-border);
+}
+
+.tabs.explorer .tabs-tab-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.tabs.explorer .tabs-tab-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tabs.explorer .tabs-tab-label {
+  color: var(--tabs-inactive-title);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+.tabs.explorer .tabs-tab[aria-selected="true"] .tabs-tab-label {
+  color: var(--tabs-active-border);
+}
+
+.tabs.explorer .tabs-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* ---- desktop layouts ------------------------------------------------- */
+@media (width >= 768px) {
+  .tabs.categories .tabs-panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width >= 992px) {
+  .tabs.categories .tabs-panel {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* explorer becomes a two-column layout: vertical tab rail + panel */
+  .tabs.explorer {
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  .tabs.explorer .tabs-tablist {
+    flex: 0 0 300px;
+    flex-direction: column;
+    overflow-x: visible;
+  }
+
+  .tabs.explorer .tabs-tab {
+    width: 100%;
+  }
+
+  .tabs.explorer .tabs-panel {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

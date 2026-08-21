@@ -1,0 +1,118 @@
+/*
+ * Web Story Block — portrait (~9:16) immersive story player at parity with
+ * petrobras.com.br web-stories. Facade (portrait poster + play button) is
+ * swapped for the story iframe on click.
+ * Mobile-first; layout media queries use the source breakpoints (768).
+ */
+
+.web-story {
+  --web-story-facade-bg: #0b2d2b;
+  --web-story-accent-dark: #007e79;
+
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.web-story .web-story-frame {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  overflow: hidden;
+  border-radius: 12px;
+  aspect-ratio: 9 / 16;
+  background: var(--web-story-facade-bg);
+}
+
+.web-story .web-story-facade {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.web-story .web-story-poster {
+  position: absolute;
+  inset: 0;
+}
+
+.web-story .web-story-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.web-story .web-story-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(to top, rgb(0 0 0 / 55%), rgb(0 0 0 / 0%) 60%);
+  text-align: center;
+}
+
+.web-story .web-story-title {
+  margin: 0;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-l);
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 50%);
+}
+
+.web-story .web-story-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--web-story-accent-dark);
+  color: #fff;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.web-story .web-story-open:hover {
+  background: #005c56;
+}
+
+.web-story .web-story-open:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.web-story .web-story-play-icon {
+  flex: 0 0 auto;
+}
+
+/* the real story player, injected on click */
+.web-story .web-story-embed {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (width >= 768px) {
+  .web-story .web-story-frame {
+    max-width: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .web-story .web-story-open {
+    transition: none;
+  }
+}

@@ -555,3 +555,276 @@ main > .section.hero-container {
     aspect-ratio: auto;
   }
 }
+
+/* ============================================================
+   Hero variant: slider  (source: petrobras.com.br/quem-somos/produtos → .banner-hero)
+   A full-bleed hero CAROUSEL. One image slide at a time (object-fit:cover),
+   with a heading (white) + body (dark) text block inset at the layout gutter,
+   and a bottom-left control cluster: play/pause + prev/next chevrons + dots.
+
+   Extracted source values:
+     slide height  mobile 560px / tablet 640px / desktop 600px
+     H1            white #fff, 700, 32px/38.4 (mobile) → 38px/45.6 (desktop)
+     body          #373737, 400, 16px/25.6 (mobile) → 20px/32 (desktop)
+     text inset    layout gutter (32px mobile → 72px desktop), title top ~188px
+     controls      transparent buttons, white icons, radius 100px, 40x48
+                   play/pause → nav gap 24px; prev↔next gap 72px (35 mobile)
+   ============================================================ */
+.hero.slider {
+  --hero-slider-height-mobile: 560px;
+  --hero-slider-height-tablet: 640px;
+  --hero-slider-height-desktop: 600px;
+
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* the section wrapper is full-bleed for the slider (matches source edge-to-edge) */
+.section.hero-container:has(.hero.slider) {
+  overflow: hidden;
+}
+
+.hero.slider .hero-slider-track {
+  position: relative;
+  width: 100%;
+  height: var(--hero-slider-height-mobile);
+}
+
+/* each slide stacks in the same box; only the active one is shown (cross-fade) */
+.hero.slider .hero-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease;
+}
+
+.hero.slider .hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* full-bleed background image */
+.hero.slider .hero-slide-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero.slider .hero-slide-image picture,
+.hero.slider .hero-slide-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/* text block: inset at the layout gutter, pushed down from the top */
+.hero.slider .hero-slide-content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100% - (2 * var(--layout-gutter)), 964px);
+  margin-left: var(--layout-gutter);
+  padding-top: 62px;
+}
+
+.hero.slider .hero-slide-content h1,
+.hero.slider .hero-slide-content h2 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero.slider .hero-slide-content p {
+  margin: 0;
+  color: #373737;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* optional CTA: green pill (reuses the default hero's button styling) */
+.hero.slider .hero-cta-wrapper {
+  margin: 0;
+  display: inline;
+}
+
+.hero.slider .hero-slide-content a.hero-cta:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  width: fit-content;
+  height: 56px;
+  margin: 0;
+  padding: 0 32px;
+  border: none;
+  border-radius: 500px;
+  background-color: rgb(0 133 66);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.hero.slider .hero-slide-content a.hero-cta:hover {
+  background-color: rgb(0 110 54);
+  text-decoration: none;
+}
+
+/* ---------- controls (bottom-left cluster) ---------- */
+.hero.slider .hero-slider-controls {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.hero.slider .hero-slider-nav {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.hero.slider .hero-slider-playpause,
+.hero.slider .hero-slider-prev,
+.hero.slider .hero-slider-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hero.slider .hero-slider-playpause:hover,
+.hero.slider .hero-slider-prev:hover,
+.hero.slider .hero-slider-next:hover {
+  background-color: rgb(255 255 255 / 20%);
+}
+
+.hero.slider .hero-slider-playpause:focus-visible,
+.hero.slider .hero-slider-prev:focus-visible,
+.hero.slider .hero-slider-next:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.hero.slider .hero-slider-playpause svg,
+.hero.slider .hero-slider-prev svg,
+.hero.slider .hero-slider-next svg {
+  display: block;
+}
+
+/* pagination dots */
+.hero.slider .hero-slider-dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+/* 24x24 hit target (WCAG target-size) with a 10px visible dot centred inside */
+.hero.slider .hero-slider-dots button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hero.slider .hero-slider-dots button::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.hero.slider .hero-slider-dots button[aria-current="true"]::before {
+  background: #fff;
+}
+
+.hero.slider .hero-slider-dots button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+/* respect reduced motion: no cross-fade animation */
+@media (prefers-reduced-motion: reduce) {
+  .hero.slider .hero-slide {
+    transition: none;
+  }
+}
+
+/* ---------- tablet ---------- */
+@media (width >= 768px) {
+  .hero.slider .hero-slider-track {
+    height: var(--hero-slider-height-tablet);
+  }
+
+  .hero.slider .hero-slide-content {
+    margin-left: var(--space-big);
+    padding-top: 188px;
+  }
+
+  .hero.slider .hero-slide-content h1,
+  .hero.slider .hero-slide-content h2 {
+    font-size: 38px;
+  }
+
+  .hero.slider .hero-slide-content p {
+    font-size: 20px;
+  }
+
+  .hero.slider .hero-slider-controls {
+    left: var(--space-big);
+    bottom: 24px;
+  }
+
+  .hero.slider .hero-slider-nav {
+    gap: 72px;
+  }
+
+  .hero.slider .hero-slider-playpause,
+  .hero.slider .hero-slider-prev,
+  .hero.slider .hero-slider-next {
+    height: 48px;
+  }
+}
+
+/* ---------- desktop ---------- */
+@media (width >= 992px) {
+  .hero.slider .hero-slider-track {
+    height: var(--hero-slider-height-desktop);
+  }
+}

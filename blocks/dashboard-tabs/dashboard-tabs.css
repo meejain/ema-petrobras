@@ -1,0 +1,176 @@
+/*
+ * Dashboard Tabs Block — parity with petrobras.com.br/sustentabilidade/dados-abertos.
+ * The source dashboard is a full-width embedded backend app (~1050px tall, no
+ * radius). Here we render a parity tab strip switching facade panels; each
+ * panel lazy-loads the external dashboard iframe on click.
+ * Mobile-first; layout media queries use the source breakpoints (768 / 992).
+ */
+
+.dashboard-tabs {
+  --dashboard-tabs-accent: #00a19a;
+  --dashboard-tabs-accent-dark: #007e79;
+  --dashboard-tabs-border: #d7d7d7;
+  --dashboard-tabs-inactive: #525252;
+  --dashboard-tabs-facade-bg: #0b2d2b;
+
+  display: block;
+}
+
+/* --- tab strip: horizontal, scrollable, underline-selected -------------- */
+.dashboard-tabs .dashboard-tabs-tablist {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--dashboard-tabs-border);
+}
+
+.dashboard-tabs .dashboard-tabs-tab {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--dashboard-tabs-inactive);
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dashboard-tabs .dashboard-tabs-tab[aria-selected="true"] {
+  border-bottom-color: var(--dashboard-tabs-accent);
+  color: var(--dashboard-tabs-accent-dark);
+  font-weight: 700;
+}
+
+.dashboard-tabs .dashboard-tabs-tab:hover {
+  color: var(--dashboard-tabs-accent-dark);
+}
+
+.dashboard-tabs .dashboard-tabs-tab:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: -2px;
+}
+
+/* --- panels ------------------------------------------------------------- */
+.dashboard-tabs .dashboard-tabs-panel {
+  margin-top: 16px;
+}
+
+.dashboard-tabs .dashboard-tabs-panel[hidden] {
+  display: none;
+}
+
+.dashboard-tabs .dashboard-tabs-panel:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 4px;
+}
+
+/* --- facade: poster + open button, replaced by the iframe on click ------ */
+.dashboard-tabs .dashboard-tabs-facade {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 480px;
+  overflow: hidden;
+  background: var(--dashboard-tabs-facade-bg);
+}
+
+.dashboard-tabs .dashboard-tabs-poster {
+  position: absolute;
+  inset: 0;
+}
+
+.dashboard-tabs .dashboard-tabs-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+.dashboard-tabs .dashboard-tabs-overlay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 520px;
+  padding: 24px;
+  text-align: center;
+}
+
+.dashboard-tabs .dashboard-tabs-caption {
+  margin: 0;
+  color: #fff;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);
+  line-height: 1.6;
+}
+
+.dashboard-tabs .dashboard-tabs-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--dashboard-tabs-accent-dark);
+  color: #fff;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.dashboard-tabs .dashboard-tabs-open:hover {
+  background: #005c56;
+}
+
+.dashboard-tabs .dashboard-tabs-open:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.dashboard-tabs .dashboard-tabs-launch-icon {
+  flex: 0 0 auto;
+}
+
+/* --- the real embed, injected on click ---------------------------------- */
+.dashboard-tabs .dashboard-tabs-embed {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  border: 0;
+}
+
+@media (width >= 768px) {
+  .dashboard-tabs .dashboard-tabs-tab {
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+
+  .dashboard-tabs .dashboard-tabs-facade,
+  .dashboard-tabs .dashboard-tabs-embed {
+    min-height: 720px;
+  }
+}
+
+@media (width >= 992px) {
+  .dashboard-tabs .dashboard-tabs-facade,
+  .dashboard-tabs .dashboard-tabs-embed {
+    min-height: 1050px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-tabs .dashboard-tabs-open {
+    transition: none;
+  }
+}

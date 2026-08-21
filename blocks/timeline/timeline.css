@@ -1,0 +1,230 @@
+/*
+ * Timeline (milestone timeline) block — styles.
+ * Values measured from the source widget (.petro-timeline) on
+ * petrobras.com.br/bolivia at 390 / 768 / 1440.
+ *
+ * Layout: mobile-first single column (year title stacked over the content
+ * sections); at >=992px the year becomes a fixed left column beside the
+ * sections, and the marker strip / controls align under that content column.
+ */
+
+.timeline {
+  --timeline-green: #008542;          /* rgb(0,133,66) — axis, dots, labels */
+  --timeline-ink: #525252;            /* rgb(82,82,82) — headings + body text */
+  --timeline-year-col: 400px;         /* left year column width (desktop) */
+
+  color: var(--timeline-ink);
+  font-family: var(--body-font-family);
+}
+
+/* --- Content panels ---------------------------------------------------- */
+.timeline .timeline-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 235px;
+  padding: 0 25px;
+}
+
+.timeline .timeline-panel[hidden] {
+  display: none;
+}
+
+.timeline .timeline-year {
+  margin: 0 0 24px;
+  color: var(--timeline-ink);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.timeline .timeline-sections {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timeline .timeline-subtitle {
+  margin: 0 0 24px;
+  color: var(--timeline-ink);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.timeline .timeline-description,
+.timeline .timeline-description p {
+  margin: 0;
+  color: var(--timeline-ink);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.timeline .timeline-description > * + * {
+  margin-top: 12px;
+}
+
+.timeline .timeline-description img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Marker strip (tablist) -------------------------------------------- */
+.timeline .timeline-track-viewport {
+  margin: 32px 0;
+  overflow: auto hidden;
+  scrollbar-width: none;              /* the arrow controls drive navigation */
+}
+
+.timeline .timeline-track-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline .timeline-track {
+  display: flex;
+  flex-direction: row;
+  min-height: 74px;
+}
+
+.timeline .timeline-marker {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--timeline-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.timeline .timeline-marker-label {
+  margin: 0 0 8px;
+  color: var(--timeline-ink);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: color 0.2s ease;
+}
+
+.timeline .timeline-marker.is-active .timeline-marker-label {
+  color: var(--timeline-green);
+}
+
+/* The green horizontal axis: a top border on each marker's axis row joins
+   into one continuous line; the dots hang below it. */
+.timeline .timeline-marker-axis {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-height: 35px;
+  padding: 4px 25px 4px 0;
+  border-top: 2px solid var(--timeline-green);
+}
+
+.timeline .timeline-marker-dot {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--timeline-green);
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.timeline .timeline-marker.is-active .timeline-marker-dot {
+  background-color: var(--timeline-green);
+}
+
+.timeline .timeline-marker:focus-visible {
+  outline: 2px solid var(--timeline-green);
+  outline-offset: 2px;
+}
+
+/* --- Panel focus ring -------------------------------------------------- */
+.timeline .timeline-panel:focus-visible {
+  outline: 2px solid var(--timeline-green);
+  outline-offset: 2px;
+}
+
+/* --- Controls (prev/next + first/last) --------------------------------- */
+.timeline .timeline-controls {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 25px;
+}
+
+.timeline .timeline-controls-group {
+  display: flex;
+  gap: 8px;
+}
+
+.timeline .timeline-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--timeline-green);
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--timeline-green);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.timeline .timeline-control:disabled {
+  border-color: var(--timeline-ink);
+  color: var(--timeline-ink);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.timeline .timeline-control:focus-visible {
+  outline: 2px solid var(--timeline-green);
+  outline-offset: 2px;
+}
+
+.timeline .timeline-control:not(:disabled):hover {
+  background-color: var(--timeline-green);
+  color: #fff;
+}
+
+/* --- Desktop: year becomes a left column ------------------------------- */
+@media (width >= 992px) {
+  .timeline .timeline-panel {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .timeline .timeline-year {
+    flex: 0 0 var(--timeline-year-col);
+    margin: 0;
+    font-size: 38px;
+  }
+
+  .timeline .timeline-marker-label {
+    font-size: 22px;
+  }
+
+  /* Align the marker strip + controls under the content column. */
+  .timeline .timeline-track-viewport,
+  .timeline .timeline-controls {
+    margin-left: var(--timeline-year-col);
+    padding: 0;
+  }
+}
+
+/* --- Reduced motion ---------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .timeline .timeline-marker-label,
+  .timeline .timeline-marker-dot,
+  .timeline .timeline-control {
+    transition: none;
+  }
+}

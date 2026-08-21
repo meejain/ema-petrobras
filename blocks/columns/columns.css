@@ -31,3 +31,123 @@
     order: unset;
   }
 }
+
+/* ==========================================================================
+   Variant: columns (feature) — icon + heading + text feature columns
+   Source: petrobras.com.br sustentabilidade/biodiversidade + transicao-energetica
+   (environmental-responsibility / pillar columns). Each column (cell) is:
+     <picture>…icon…</picture>
+     <h3>Heading</h3>
+     <p>Supporting copy.</p>
+   1 column on mobile, 2 from 576px, 3 from 992px. (Content stacks by normal
+   block flow, so no per-cell display override is needed.)
+   ========================================================================== */
+.columns.feature > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.columns.feature picture img {
+  width: auto;
+  max-width: 96px;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.columns.feature h2,
+.columns.feature h3,
+.columns.feature h4 {
+  margin: 0 0 8px;
+  color: #373737;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.columns.feature p {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  line-height: 1.6;
+}
+
+@media (width >= 576px) {
+  .columns.feature > div {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 40px;
+  }
+}
+
+@media (width >= 992px) {
+  .columns.feature > div {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 48px;
+  }
+
+  .columns.feature h2,
+  .columns.feature h3,
+  .columns.feature h4 {
+    font-size: 24px;
+  }
+}
+
+/* ==========================================================================
+   Variant: columns (stats) — KPI / big-number banner
+   Source: petrobras.com.br/en/transicao-energetica (Investments big-numbers).
+   Dark #104C6D banner, white text. Each column (cell) is one KPI authored as:
+     <p>US$</p>
+     <p><strong>4,3</strong> billion</p>   (strong = the big number)
+     <p>in emissions mitigation</p>        (label)
+   2 columns on mobile/tablet, 4 from desktop.
+   ========================================================================== */
+.columns.stats {
+  box-sizing: border-box;
+  padding: 32px;
+  background-color: #104c6d;
+  color: var(--background-color);
+}
+
+.columns.stats > div {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.columns.stats p {
+  margin: 0 0 8px;
+  color: var(--background-color);
+  font-size: var(--body-font-size-m);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* the big number line (paragraph that contains the <strong> number) */
+.columns.stats p:has(strong) {
+  line-height: 1.2;
+}
+
+.columns.stats p:last-child {
+  margin-bottom: 0;
+}
+
+.columns.stats strong {
+  font-size: 40px;
+  font-weight: 300;
+}
+
+@media (width >= 992px) {
+  .columns.stats {
+    padding: 48px 40px;
+  }
+
+  .columns.stats > div {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+  }
+
+  .columns.stats strong {
+    font-size: 64px;
+  }
+}

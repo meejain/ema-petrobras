@@ -150,6 +150,11 @@ function buildCard(cells) {
         toggle();
       }
     });
+  } else {
+    // Plain card (no link, no responsible/contact to reveal) — the source still
+    // shows the exchange icon on these cards (e.g. "Desenvolvimento de Negócios"),
+    // so render it as a decorative badge for visual parity.
+    card.append(buildIconButton('exchange'));
   }
 
   container.append(card);
@@ -223,10 +228,38 @@ export default function decorate(block) {
   const hasTree = spineRows.length > 0 && columnGroups.length > 0;
 
   if (hasTree) {
-    // Spine (vertical trunk of top-level nodes).
+    // Spine (vertical trunk of top-level nodes). The spine is itself a small
+    // two-level tree: "parent" nodes sit on the trunk and their subordinate
+    // nodes hang off an indented sub-trunk with rounded elbow connectors
+    // (matches the source). A spine node begins a NEW parent section when it
+    // is a top-level role — detected as either a dark-blue node (e.g.
+    // "Presidente") or a node that links out (the two "Conselho" cards);
+    // every following non-parent node is a child of that section.
     const spine = document.createElement('div');
     spine.className = 'orgchart-spine';
-    spineRows.forEach(({ cells }) => spine.append(buildCard(cells)));
+    let currentGroup = null;
+    spineRows.forEach(({ cells }) => {
+      const color = normalizeColor(textOf(cells[0]));
+      const hasLink = !!(firstLink(cells[4]) || firstLink(cells[1]));
+      const isParent = color === 'dark-blue' || hasLink;
+      const node = buildCard(cells);
+      if (isParent || !currentGroup) {
+        currentGroup = document.createElement('div');
+        currentGroup.className = 'orgchart-spine-group';
+        node.classList.add('orgchart-spine-parent');
+        currentGroup.append(node);
+        spine.append(currentGroup);
+      } else {
+        let kids = currentGroup.querySelector(':scope > .orgchart-spine-children');
+        if (!kids) {
+          kids = document.createElement('div');
+          kids.className = 'orgchart-spine-children';
+          currentGroup.append(kids);
+          currentGroup.classList.add('has-children');
+        }
+        kids.append(node);
+      }
+    });
     chart.append(spine);
 
     // Branches area: navigator + progress bar + controls stacked together,
@@ -314,13 +347,50 @@ export default function decorate(block) {
     navigator.addEventListener('scroll', updateArrows, { passive: true });
     window.addEventListener('resize', updateArrows);
 
+    // Anchor each column's vertical trunk to end at its LAST sub-card's centre.
+    // The trunk is a CSS `::before` whose `bottom` reads `--orgchart-col-trunk-
+    // bottom`; we set it per column to (column height − last sub-card centre) so
+    // a tall multi-line last card doesn't leave the trunk overflowing past it.
+    const alignColumnTrunks = () => {
+      branches.querySelectorAll('.orgchart-column').forEach((col) => {
+        const cards = col.querySelectorAll('.orgchart-node');
+        if (cards.length < 2) return; // single-card columns have no trunk
+        const last = cards[cards.length - 1];
+        const colH = col.getBoundingClientRect().height;
+        const lastCentre = last.offsetTop + last.offsetHeight / 2;
+        col.style.setProperty('--orgchart-col-trunk-bottom', `${Math.round(colH - lastCentre)}px`);
+      });
+    };
+
+    // Make the branch slider's scrollable VIEWPORT span the full block band so
+    // the down panel extends left→right (source parity). We measure the block's
+    // width and the horizontal shift from the chart column's left back to the
+    // block's left, then expose them as custom properties the CSS consumes.
+    // Only applies on desktop (≥768px) where the legend sits beside the chart.
+    const sizeBranchesBand = () => {
+      const chartEl = branchesArea.closest('.orgchart-chart');
+      if (!chartEl) return;
+      const blockRect = block.getBoundingClientRect();
+      const shift = Math.round(chartEl.getBoundingClientRect().left - blockRect.left);
+      const isDesktop = window.matchMedia('(width >= 768px)').matches;
+      if (isDesktop && shift > 0) {
+        branchesArea.style.setProperty('--orgchart-branches-shift', `${shift}px`);
+        branchesArea.style.setProperty('--orgchart-branches-w', `${Math.round(blockRect.width)}px`);
+      } else {
+        branchesArea.style.removeProperty('--orgchart-branches-shift');
+        branchesArea.style.removeProperty('--orgchart-branches-w');
+      }
+    };
+
     controls.append(prev, next);
     branchesArea.append(controls);
     // Compute initial arrow state once layout has settled. A single rAF can
     // fire before the responsive grid applies, so re-check after paint too.
-    requestAnimationFrame(updateArrows);
-    setTimeout(updateArrows, 200);
-    window.addEventListener('load', updateArrows);
+    const relayout = () => { sizeBranchesBand(); updateArrows(); alignColumnTrunks(); };
+    requestAnimationFrame(relayout);
+    setTimeout(relayout, 200);
+    window.addEventListener('resize', relayout);
+    window.addEventListener('load', relayout);
   } else {
     // No grouping info — render all cards in a single responsive column.
     nodeRows.forEach(({ cells }) => chart.append(buildCard(cells)));

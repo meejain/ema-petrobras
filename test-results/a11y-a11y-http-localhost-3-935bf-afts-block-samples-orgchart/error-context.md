@@ -1,0 +1,445 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner:
+    - navigation "Main navigation" [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - text: "Você está em:"
+          - generic [ref=e7]: SITE PETROBRAS
+        - generic [ref=e8]:
+          - generic [ref=e9]: "Acesse também:"
+          - link "ACESSO À INFORMAÇÃO" [ref=e10] [cursor=pointer]:
+            - /url: https://transparencia.petrobras.com.br/
+          - link "INVESTIDORES" [ref=e11] [cursor=pointer]:
+            - /url: https://www.investidorpetrobras.com.br/
+          - link "IMPRENSA" [ref=e12] [cursor=pointer]:
+            - /url: https://agencia.petrobras.com.br/
+          - link "FORNECEDORES" [ref=e13] [cursor=pointer]:
+            - /url: https://canalfornecedor.petrobras.com.br/
+          - link "CLIENTES" [ref=e14] [cursor=pointer]:
+            - /url: https://canalcliente.petrobras.com.br/s/
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - button "Diminuir tamanho da fonte" [ref=e17] [cursor=pointer]: A-
+            - generic [ref=e18]: 100%
+            - button "Aumentar tamanho da fonte" [ref=e19] [cursor=pointer]: A+
+          - button "Ativar alto contraste" [ref=e20] [cursor=pointer]
+          - group "Alterar idioma" [ref=e21]:
+            - button "Alterar idioma para português" [ref=e22] [cursor=pointer]: pt
+            - button "Alterar idioma para inglês" [ref=e23] [cursor=pointer]: en
+      - generic [ref=e25]:
+        - link "Página inicial Petrobras" [ref=e26] [cursor=pointer]:
+          - /url: https://petrobras.com.br
+          - img "Petrobras" [ref=e27] [cursor=pointer]
+        - list [ref=e28]:
+          - listitem [ref=e29]:
+            - link "Transição Energética" [ref=e30] [cursor=pointer]:
+              - /url: https://petrobras.com.br/transicao-energetica
+          - listitem [ref=e31]:
+            - button "Sustentabilidade" [ref=e32] [cursor=pointer]:
+              - generic [ref=e33] [cursor=pointer]: Sustentabilidade
+          - listitem [ref=e34]:
+            - button "Inovação e Tecnologia" [ref=e35] [cursor=pointer]:
+              - generic [ref=e36] [cursor=pointer]: Inovação e Tecnologia
+          - listitem [ref=e37]:
+            - link "Negócios" [ref=e38] [cursor=pointer]:
+              - /url: https://petrobras.com.br/negocios
+          - listitem [ref=e39]:
+            - button "Quem Somos" [ref=e40] [cursor=pointer]:
+              - generic [ref=e41] [cursor=pointer]: Quem Somos
+          - listitem [ref=e42]:
+            - link "Carreiras" [ref=e43] [cursor=pointer]:
+              - /url: https://petrobras.com.br/quem-somos/carreiras
+        - button "Abrir barra de pesquisa" [ref=e45] [cursor=pointer]
+  - main [ref=e46]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Orgchart (Organograma)" [level=1] [ref=e52]
+        - paragraph [ref=e53]: "Orgchart block: a colour-coded organizational hierarchy. A vertical spine of top-level nodes with a horizontal, scrollable slider of executive-directorate branch columns below it. Cards flip on click to reveal the responsible person; a bordered legend maps the role-category colours. Author each node as: color | area | responsible | contact | link | group (group = \"spine\" or \"col-N\")."
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - heading "Organograma" [level=2] [ref=e59]
+          - paragraph [ref=e60]: Conheça a Estrutura Geral, Atribuições e Responsabilidades de cada área da empresa por meio do documento Plano Básico de Organização.
+          - link "Acesse" [ref=e61] [cursor=pointer]:
+            - /url: /documents/2677942/2678123/plano-b-sico-de-organiza-o-nov25-pdf/9e729f09-7f49-2ad0-cd48-0024a04887c3
+        - generic [ref=e62]:
+          - list [ref=e63]:
+            - listitem [ref=e64]:
+              - generic [ref=e66]: Presidente e Diretor Executivo
+            - listitem [ref=e67]:
+              - generic [ref=e69]: Gerente Executivo
+            - listitem [ref=e70]:
+              - generic [ref=e72]: Gerente Geral
+            - listitem [ref=e73]:
+              - generic [ref=e75]: Funções Específicas
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Conselho Fiscal
+                - link "Conselho Fiscal" [ref=e82] [cursor=pointer]:
+                  - /url: https://www.investidorpetrobras.com.br/esg-meio-ambiente-social-e-governanca/administracao/
+                  - img [ref=e84] [cursor=pointer]
+              - generic [ref=e86]:
+                - generic [ref=e88]:
+                  - generic [ref=e89]: Conselho de Administração
+                  - link "Conselho de Administração" [ref=e90] [cursor=pointer]:
+                    - /url: https://www.investidorpetrobras.com.br/esg-meio-ambiente-social-e-governanca/administracao/
+                    - img [ref=e92] [cursor=pointer]
+                - generic [ref=e94]:
+                  - button "Secretaria-Geral da Petrobras" [ref=e96] [cursor=pointer]:
+                    - generic [ref=e97] [cursor=pointer]: Secretaria-Geral da Petrobras
+                    - img [ref=e99] [cursor=pointer]
+                  - button "Ouvidoria Geral" [ref=e102] [cursor=pointer]:
+                    - generic [ref=e103] [cursor=pointer]: Ouvidoria Geral
+                    - img [ref=e105] [cursor=pointer]
+                  - button "Auditoria Interna" [ref=e108] [cursor=pointer]:
+                    - generic [ref=e109] [cursor=pointer]: Auditoria Interna
+                    - img [ref=e111] [cursor=pointer]
+              - generic [ref=e113]:
+                - button "Presidente" [ref=e115] [cursor=pointer]:
+                  - generic [ref=e116] [cursor=pointer]: Presidente
+                  - img [ref=e118] [cursor=pointer]
+                - generic [ref=e120]:
+                  - button "Gabinete da Presidência" [ref=e122] [cursor=pointer]:
+                    - generic [ref=e123] [cursor=pointer]: Gabinete da Presidência
+                    - img [ref=e125] [cursor=pointer]
+                  - button "Jurídico" [ref=e128] [cursor=pointer]:
+                    - generic [ref=e129] [cursor=pointer]: Jurídico
+                    - img [ref=e131] [cursor=pointer]
+                  - button "Estratégia e Planejamento" [ref=e134] [cursor=pointer]:
+                    - generic [ref=e135] [cursor=pointer]: Estratégia e Planejamento
+                    - img [ref=e137] [cursor=pointer]
+                  - button "Responsabilidade Social" [ref=e140] [cursor=pointer]:
+                    - generic [ref=e141] [cursor=pointer]: Responsabilidade Social
+                    - img [ref=e143] [cursor=pointer]
+                  - button "Relações Institucionais" [ref=e146] [cursor=pointer]:
+                    - generic [ref=e147] [cursor=pointer]: Relações Institucionais
+                    - img [ref=e149] [cursor=pointer]
+                  - button "Comunicação" [ref=e152] [cursor=pointer]:
+                    - generic [ref=e153] [cursor=pointer]: Comunicação
+                    - img [ref=e155] [cursor=pointer]
+                  - button "Gestão de Programas Estruturantes" [ref=e158] [cursor=pointer]:
+                    - generic [ref=e159] [cursor=pointer]: Gestão de Programas Estruturantes
+                    - img [ref=e161] [cursor=pointer]
+                  - generic [ref=e164]:
+                    - generic [ref=e165]: Desenvolvimento de Negócios
+                    - img [ref=e167]
+            - generic [ref=e169]:
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - button "Exploração e Produção" [ref=e174] [cursor=pointer]:
+                    - generic [ref=e175] [cursor=pointer]: Exploração e Produção
+                    - img [ref=e177] [cursor=pointer]
+                  - button "Exploração" [ref=e180] [cursor=pointer]:
+                    - generic [ref=e181] [cursor=pointer]: Exploração
+                    - img [ref=e183] [cursor=pointer]
+                  - button "Reservatórios" [ref=e186] [cursor=pointer]:
+                    - generic [ref=e187] [cursor=pointer]: Reservatórios
+                    - img [ref=e189] [cursor=pointer]
+                  - button "Terra e Águas Rasas" [ref=e192] [cursor=pointer]:
+                    - generic [ref=e193] [cursor=pointer]: Terra e Águas Rasas
+                    - img [ref=e195] [cursor=pointer]
+                  - button "Águas Profundas" [ref=e198] [cursor=pointer]:
+                    - generic [ref=e199] [cursor=pointer]: Águas Profundas
+                    - img [ref=e201] [cursor=pointer]
+                  - button "Águas Ultra Profundas" [ref=e204] [cursor=pointer]:
+                    - generic [ref=e205] [cursor=pointer]: Águas Ultra Profundas
+                    - img [ref=e207] [cursor=pointer]
+                  - button "Libra" [ref=e210] [cursor=pointer]:
+                    - generic [ref=e211] [cursor=pointer]: Libra
+                    - img [ref=e213] [cursor=pointer]
+                  - button "Búzios" [ref=e216] [cursor=pointer]:
+                    - generic [ref=e217] [cursor=pointer]: Búzios
+                    - img [ref=e219] [cursor=pointer]
+                  - button "Gestão de Parcerias e Processos de E&P" [ref=e222] [cursor=pointer]:
+                    - generic [ref=e223] [cursor=pointer]: Gestão de Parcerias e Processos de E&P
+                    - img [ref=e225] [cursor=pointer]
+                - generic [ref=e227]:
+                  - button "Engenharia, Tecnologia e Inovação" [ref=e229] [cursor=pointer]:
+                    - generic [ref=e230] [cursor=pointer]: Engenharia, Tecnologia e Inovação
+                    - img [ref=e232] [cursor=pointer]
+                  - button "Projetos de DP" [ref=e235] [cursor=pointer]:
+                    - generic [ref=e236] [cursor=pointer]: Projetos de DP
+                    - img [ref=e238] [cursor=pointer]
+                  - button "Poços" [ref=e241] [cursor=pointer]:
+                    - generic [ref=e242] [cursor=pointer]: Poços
+                    - img [ref=e244] [cursor=pointer]
+                  - button "Sistemas Submarinos" [ref=e247] [cursor=pointer]:
+                    - generic [ref=e248] [cursor=pointer]: Sistemas Submarinos
+                    - img [ref=e250] [cursor=pointer]
+                  - button "Sistemas de Superfície, Refino, Gás e Energia" [ref=e253] [cursor=pointer]:
+                    - generic [ref=e254] [cursor=pointer]: Sistemas de Superfície, Refino, Gás e Energia
+                    - img [ref=e256] [cursor=pointer]
+                  - button "CENPES" [ref=e259] [cursor=pointer]:
+                    - generic [ref=e260] [cursor=pointer]: CENPES
+                    - img [ref=e262] [cursor=pointer]
+                  - button "Gestão integrada de Recursos e Projetos" [ref=e265] [cursor=pointer]:
+                    - generic [ref=e266] [cursor=pointer]: Gestão integrada de Recursos e Projetos
+                    - img [ref=e268] [cursor=pointer]
+                - generic [ref=e270]:
+                  - button "Processos Industriais e Produtos" [ref=e272] [cursor=pointer]:
+                    - generic [ref=e273] [cursor=pointer]: Processos Industriais e Produtos
+                    - img [ref=e275] [cursor=pointer]
+                  - button "Refino" [ref=e278] [cursor=pointer]:
+                    - generic [ref=e279] [cursor=pointer]: Refino
+                    - img [ref=e281] [cursor=pointer]
+                  - button "Tecnologia de Refino e Gestão de Ativos" [ref=e284] [cursor=pointer]:
+                    - generic [ref=e285] [cursor=pointer]: Tecnologia de Refino e Gestão de Ativos
+                    - img [ref=e287] [cursor=pointer]
+                  - button "Processamento de Gás Natural" [ref=e290] [cursor=pointer]:
+                    - generic [ref=e291] [cursor=pointer]: Processamento de Gás Natural
+                    - img [ref=e293] [cursor=pointer]
+                  - button "Integração de Negócios e Participações" [ref=e296] [cursor=pointer]:
+                    - generic [ref=e297] [cursor=pointer]: Integração de Negócios e Participações
+                    - img [ref=e299] [cursor=pointer]
+                - generic [ref=e301]:
+                  - button "Logística, Comercialização e Mercados" [ref=e303] [cursor=pointer]:
+                    - generic [ref=e304] [cursor=pointer]: Logística, Comercialização e Mercados
+                    - img [ref=e306] [cursor=pointer]
+                  - button "Logística de E&P" [ref=e309] [cursor=pointer]:
+                    - generic [ref=e310] [cursor=pointer]: Logística de E&P
+                    - img [ref=e312] [cursor=pointer]
+                  - generic [ref=e315]:
+                    - generic [ref=e316]: Logística
+                    - img [ref=e318]
+                  - button "Comercialização no Mercado Interno" [ref=e321] [cursor=pointer]:
+                    - generic [ref=e322] [cursor=pointer]: Comercialização no Mercado Interno
+                    - img [ref=e324] [cursor=pointer]
+                  - button "Comercialização no Mercado Externo" [ref=e327] [cursor=pointer]:
+                    - generic [ref=e328] [cursor=pointer]: Comercialização no Mercado Externo
+                    - img [ref=e330] [cursor=pointer]
+                  - button "Cadeia de Materiais, Gestão de Armazéns e Destinação Sustentável" [ref=e333] [cursor=pointer]:
+                    - generic [ref=e334] [cursor=pointer]: Cadeia de Materiais, Gestão de Armazéns e Destinação Sustentável
+                    - img [ref=e336] [cursor=pointer]
+                  - button "Desenvolvimento de Negócios de Logística" [ref=e339] [cursor=pointer]:
+                    - generic [ref=e340] [cursor=pointer]: Desenvolvimento de Negócios de Logística
+                    - img [ref=e342] [cursor=pointer]
+                - generic [ref=e344]:
+                  - button "Transição Energética e Sustentabilidade" [ref=e346] [cursor=pointer]:
+                    - generic [ref=e347] [cursor=pointer]: Transição Energética e Sustentabilidade
+                    - img [ref=e349] [cursor=pointer]
+                  - button "Gás e Energia" [ref=e352] [cursor=pointer]:
+                    - generic [ref=e353] [cursor=pointer]: Gás e Energia
+                    - img [ref=e355] [cursor=pointer]
+                  - button "Mudança Climática e Descabonização" [ref=e358] [cursor=pointer]:
+                    - generic [ref=e359] [cursor=pointer]: Mudança Climática e Descabonização
+                    - img [ref=e361] [cursor=pointer]
+                  - button "Energia Renovável" [ref=e364] [cursor=pointer]:
+                    - generic [ref=e365] [cursor=pointer]: Energia Renovável
+                    - img [ref=e367] [cursor=pointer]
+                  - button "Gestão Integrada de Transição Energética" [ref=e370] [cursor=pointer]:
+                    - generic [ref=e371] [cursor=pointer]: Gestão Integrada de Transição Energética
+                    - img [ref=e373] [cursor=pointer]
+                - generic [ref=e375]:
+                  - button "Financeiro e de Relacionamento com Investidores" [ref=e377] [cursor=pointer]:
+                    - generic [ref=e378] [cursor=pointer]: Financeiro e de Relacionamento com Investidores
+                    - img [ref=e380] [cursor=pointer]
+                  - button "Contabilidade" [ref=e383] [cursor=pointer]:
+                    - generic [ref=e384] [cursor=pointer]: Contabilidade
+                    - img [ref=e386] [cursor=pointer]
+                  - button "Tributário" [ref=e389] [cursor=pointer]:
+                    - generic [ref=e390] [cursor=pointer]: Tributário
+                    - img [ref=e392] [cursor=pointer]
+                  - button "Desempenho Empresarial" [ref=e395] [cursor=pointer]:
+                    - generic [ref=e396] [cursor=pointer]: Desempenho Empresarial
+                    - img [ref=e398] [cursor=pointer]
+                  - button "Finanças" [ref=e401] [cursor=pointer]:
+                    - generic [ref=e402] [cursor=pointer]: Finanças
+                    - img [ref=e404] [cursor=pointer]
+                  - button "Relacionamentos com Investidores" [ref=e407] [cursor=pointer]:
+                    - generic [ref=e408] [cursor=pointer]: Relacionamentos com Investidores
+                    - img [ref=e410] [cursor=pointer]
+                  - button "Riscos Empresariais" [ref=e413] [cursor=pointer]:
+                    - generic [ref=e414] [cursor=pointer]: Riscos Empresariais
+                    - img [ref=e416] [cursor=pointer]
+                  - button "Suprimentos" [ref=e419] [cursor=pointer]:
+                    - generic [ref=e420] [cursor=pointer]: Suprimentos
+                    - img [ref=e422] [cursor=pointer]
+                  - generic [ref=e425]:
+                    - generic [ref=e426]: Supervisão de Planos de Previdência, Operações e Gestão Financeira
+                    - img [ref=e428]
+                - generic [ref=e430]:
+                  - button "Assuntos Corporativos" [ref=e432] [cursor=pointer]:
+                    - generic [ref=e433] [cursor=pointer]: Assuntos Corporativos
+                    - img [ref=e435] [cursor=pointer]
+                  - button "Recursos Humanos" [ref=e438] [cursor=pointer]:
+                    - generic [ref=e439] [cursor=pointer]: Recursos Humanos
+                    - img [ref=e441] [cursor=pointer]
+                  - button "Segurança, Meio Ambiente e Saúde" [ref=e444] [cursor=pointer]:
+                    - generic [ref=e445] [cursor=pointer]: Segurança, Meio Ambiente e Saúde
+                    - img [ref=e447] [cursor=pointer]
+                  - button "Inteligência e Segurança Corporativa" [ref=e450] [cursor=pointer]:
+                    - generic [ref=e451] [cursor=pointer]: Inteligência e Segurança Corporativa
+                    - img [ref=e453] [cursor=pointer]
+                  - button "Serviços Compartilhados" [ref=e456] [cursor=pointer]:
+                    - generic [ref=e457] [cursor=pointer]: Serviços Compartilhados
+                    - img [ref=e459] [cursor=pointer]
+                  - button "Tecnologia da Informação e Telecomunicações" [ref=e462] [cursor=pointer]:
+                    - generic [ref=e463] [cursor=pointer]: Tecnologia da Informação e Telecomunicações
+                    - img [ref=e465] [cursor=pointer]
+                  - button "Segurança da Informação" [ref=e468] [cursor=pointer]:
+                    - generic [ref=e469] [cursor=pointer]: Segurança da Informação
+                    - img [ref=e471] [cursor=pointer]
+                - generic [ref=e473]:
+                  - button "Governança e Conformidade" [ref=e475] [cursor=pointer]:
+                    - generic [ref=e476] [cursor=pointer]: Governança e Conformidade
+                    - img [ref=e478] [cursor=pointer]
+                  - button "Governança" [ref=e481] [cursor=pointer]:
+                    - generic [ref=e482] [cursor=pointer]: Governança
+                    - img [ref=e484] [cursor=pointer]
+                  - button "Conformidade" [ref=e487] [cursor=pointer]:
+                    - generic [ref=e488] [cursor=pointer]: Conformidade
+                    - img [ref=e490] [cursor=pointer]
+                  - button "Corregedoria-Geral da Petrobras" [ref=e493] [cursor=pointer]:
+                    - generic [ref=e494] [cursor=pointer]: Corregedoria-Geral da Petrobras
+                    - img [ref=e496] [cursor=pointer]
+                  - button "Informações Estratégicas e Monitoramento do Sistema de Integridade" [ref=e499] [cursor=pointer]:
+                    - generic [ref=e500] [cursor=pointer]: Informações Estratégicas e Monitoramento do Sistema de Integridade
+                    - img [ref=e502] [cursor=pointer]
+                  - button "Privacidade" [ref=e505] [cursor=pointer]:
+                    - generic [ref=e506] [cursor=pointer]: Privacidade
+                    - img [ref=e508] [cursor=pointer]
+              - generic [ref=e512]:
+                - button "Anterior" [disabled] [ref=e513]:
+                  - img [ref=e514]
+                - button "Próximo" [ref=e516] [cursor=pointer]:
+                  - img [ref=e517] [cursor=pointer]
+  - contentinfo [ref=e521]:
+    - generic [ref=e523]:
+      - generic [ref=e525]:
+        - generic [ref=e526]:
+          - paragraph [ref=e527]:
+            - link "Logo da Petrobras" [ref=e528] [cursor=pointer]:
+              - /url: https://petrobras.com.br
+              - img "Logo da Petrobras" [ref=e529] [cursor=pointer]
+          - list [ref=e530]:
+            - listitem [ref=e531]:
+              - link "Página da Petrobras no Bluesky" [ref=e532] [cursor=pointer]:
+                - /url: https://bsky.app/profile/petrobras.com.br
+                - img "Página da Petrobras no Bluesky" [ref=e533] [cursor=pointer]
+            - listitem [ref=e534]:
+              - link "Página da Petrobras no Threads" [ref=e535] [cursor=pointer]:
+                - /url: https://www.threads.net/@petrobras
+                - img "Página da Petrobras no Threads" [ref=e536] [cursor=pointer]
+            - listitem [ref=e537]:
+              - link "Página da Petrobras no Facebook" [ref=e538] [cursor=pointer]:
+                - /url: https://www.facebook.com/petrobras
+                - img "Página da Petrobras no Facebook" [ref=e539] [cursor=pointer]
+            - listitem [ref=e540]:
+              - link "Página da Petrobras no Instagram" [ref=e541] [cursor=pointer]:
+                - /url: https://instagram.com/petrobras
+                - img "Página da Petrobras no Instagram" [ref=e542] [cursor=pointer]
+            - listitem [ref=e543]:
+              - link "Página da Petrobras no Youtube" [ref=e544] [cursor=pointer]:
+                - /url: https://www.youtube.com/petrobras
+                - img "Página da Petrobras no Youtube" [ref=e545] [cursor=pointer]
+            - listitem [ref=e546]:
+              - link "Página da Petrobras no TikTok" [ref=e547] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@petrobras
+                - img "Página da Petrobras no TikTok" [ref=e548] [cursor=pointer]
+            - listitem [ref=e549]:
+              - link "Página da Petrobras no Linkedin" [ref=e550] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/petrobras
+                - img "Página da Petrobras no Linkedin" [ref=e551] [cursor=pointer]
+        - generic [ref=e552]:
+          - paragraph [ref=e553]: Utilize nossa busca para encontrar o que procura
+          - search [ref=e554]:
+            - searchbox "Campo de pesquisa" [ref=e555]
+            - button "Buscar" [ref=e556] [cursor=pointer]
+        - generic [ref=e557]:
+          - generic [ref=e558]:
+            - img "Imagem representando um telefone remetendo ao SAC" [ref=e559]
+            - generic [ref=e560]:
+              - paragraph [ref=e561]: SAC Petrobras
+              - paragraph [ref=e562]:
+                - strong [ref=e563]: 0800 728 9001
+          - generic [ref=e564]:
+            - img "Logo informação" [ref=e565]
+            - generic [ref=e566]:
+              - paragraph [ref=e567]: Acesso à Informação
+              - link "Portal da Transparência" [ref=e568] [cursor=pointer]:
+                - /url: https://transparencia.petrobras.com.br/
+      - generic [ref=e570]:
+        - generic [ref=e571]:
+          - button "Conheça mais sobre a Petrobras" [ref=e572]
+          - list [ref=e573]:
+            - listitem [ref=e574]:
+              - link "Carreiras" [ref=e575] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/carreiras
+            - listitem [ref=e576]:
+              - link "Estratégia" [ref=e577] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/estrategia
+            - listitem [ref=e578]:
+              - link "Negócios" [ref=e579] [cursor=pointer]:
+                - /url: https://petrobras.com.br/negocios
+            - listitem [ref=e580]:
+              - link "Produtos" [ref=e581] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/produtos
+            - listitem [ref=e582]:
+              - link "Patrocínios" [ref=e583] [cursor=pointer]:
+                - /url: https://petrobras.com.br/sustentabilidade/patrocinios
+        - generic [ref=e584]:
+          - button "Destaques" [ref=e585]
+          - list [ref=e586]:
+            - listitem [ref=e587]:
+              - link "Web Stories" [ref=e588] [cursor=pointer]:
+                - /url: https://petrobras.com.br/web-stories
+            - listitem [ref=e589]:
+              - link "Inovação e Tecnologia" [ref=e590] [cursor=pointer]:
+                - /url: https://petrobras.com.br/inovacao-e-tecnologia
+            - listitem [ref=e591]:
+              - link "Jornada da Energia" [ref=e592] [cursor=pointer]:
+                - /url: https://petrobras.com.br/jornada-da-energia
+            - listitem [ref=e593]:
+              - link "Trajetória" [ref=e594] [cursor=pointer]:
+                - /url: https://petrobras.com.br/quem-somos/trajetoria
+        - generic [ref=e595]:
+          - button "Canais de Contato" [ref=e596]
+          - list [ref=e597]:
+            - listitem [ref=e598]:
+              - link "Fale Conosco" [ref=e599] [cursor=pointer]:
+                - /url: https://petrobras.com.br/fale-conosco
+            - listitem [ref=e600]:
+              - link "Canal de Denúncias" [ref=e601] [cursor=pointer]:
+                - /url: https://www.contatoseguro.com.br/petrobras
+            - listitem [ref=e602]:
+              - link "Ouvidoria" [ref=e603] [cursor=pointer]:
+                - /url: https://petrobras.com.br/ouvidoria
+            - listitem [ref=e604]:
+              - link "Portal do ex-Empregado e Aposentado" [ref=e605] [cursor=pointer]:
+                - /url: https://petrobras.service-now.com/familiapetrobras
+        - generic [ref=e606]:
+          - button "Outros sites Petrobras" [ref=e607]
+          - list [ref=e608]:
+            - listitem [ref=e609]:
+              - link "Preço de combustíveis" [ref=e610] [cursor=pointer]:
+                - /url: https://precos.petrobras.com.br
+            - listitem [ref=e611]:
+              - link "Nossa Energia" [ref=e612] [cursor=pointer]:
+                - /url: https://nossaenergia.petrobras.com.br/
+            - listitem [ref=e613]:
+              - link "Canal Cliente" [ref=e614] [cursor=pointer]:
+                - /url: https://www.canalcliente.petrobras.com.br/s/
+            - listitem [ref=e615]:
+              - link "Canal Fornecedor" [ref=e616] [cursor=pointer]:
+                - /url: https://www.canalfornecedor.petrobras.com.br
+            - listitem [ref=e617]:
+              - link "Imprensa" [ref=e618] [cursor=pointer]:
+                - /url: https://agencia.petrobras.com.br
+            - listitem [ref=e619]:
+              - link "Relações com Investidores" [ref=e620] [cursor=pointer]:
+                - /url: https://www.investidorpetrobras.com.br
+      - generic [ref=e622]:
+        - generic [ref=e623]:
+          - link "Definições de Cookies" [ref=e624] [cursor=pointer]:
+            - /url: /privacidade-protecao-de-dados
+          - link "Privacidade e Dados Pessoais" [ref=e625] [cursor=pointer]:
+            - /url: /privacidade-protecao-de-dados
+          - link "Acessibilidade" [ref=e626] [cursor=pointer]:
+            - /url: /acessibilidade
+          - link "Sitemap" [ref=e627] [cursor=pointer]:
+            - /url: /sitemap
+        - paragraph [ref=e628]: © Copyright Petrobras 2025. Todos os direitos reservados.
+```

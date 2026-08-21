@@ -1,28 +1,50 @@
 {
   "variantName": "accordion",
   "baseBlock": "accordion",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "created": "2026-08-20T00:00:00.000Z",
+  "updated": "2026-08-20T00:00:00.000Z",
   "sourceContext": {
-    "originUrl": "https://petrobras.com.br/produtos-mais-sustentaveis",
-    "originPage": "Sustainable products landing page",
-    "blockPosition": "bottom"
+    "originUrl": "https://petrobras.com.br/transicao-energetica",
+    "originPage": "Transição Energética Justa (Perguntas frequentes)",
+    "blockPosition": "bottom",
+    "variantSources": {
+      "accordion": "https://petrobras.com.br/transicao-energetica",
+      "downloads": "https://petrobras.com.br/quem-somos/gasolina-podium",
+      "table-docs": "https://petrobras.com.br/quem-somos/concursos"
+    }
   },
   "visualCharacteristics": {
     "colorScheme": "light",
-    "density": "compact",
+    "density": "comfortable",
     "purpose": "faq",
     "imagePattern": "noimg"
   },
   "contentPattern": {
-    "structure": "question label + answer body per row",
+    "structure": "one row per item: label cell (question/title) + body cell (answer)",
     "buttonCount": 0,
     "imageCount": 0
   },
+  "variants": [
+    {
+      "name": "accordion",
+      "description": "Base FAQ. Two-column grid at 992px, single-open, rotating chevron. 1px #eee top divider per item; label 20px/700 (18px mobile); body 16px."
+    },
+    {
+      "name": "downloads",
+      "description": "Body is a list of document/download links styled as green (#008542) bold underlined links, single column, multi-open."
+    },
+    {
+      "name": "table-docs",
+      "description": "Body contains a specs table (th 50% bold + td value, 1px #eee row dividers) plus document links; larger 24px label on desktop, single column, multi-open."
+    }
+  ],
   "reuseGuidance": {
     "suitableFor": [
       "FAQ sections",
       "expandable question and answer lists",
+      "document/download link groups",
+      "specification tables with supporting documents",
       "progressive disclosure of long-form content"
     ],
     "notSuitableFor": [
@@ -31,7 +53,7 @@
     ]
   },
   "usage": {
-    "pagesUsing": ["/produtos-mais-sustentaveis"],
+    "pagesUsing": ["/content/drafts/block-samples/accordion"],
     "reuseCount": 1,
     "lastUsed": "2026-08-20T00:00:00.000Z"
   }

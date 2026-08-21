@@ -15,6 +15,14 @@
   --orgchart-label: #373737;
   --orgchart-arrow: #008542;
 
+  /* Desktop layout: legend column OUTER width (border-box, incl. its 24px
+     padding + 1px borders) + the gap between legend and chart. The branch
+     slider's scrollable VIEWPORT escapes the chart column by (width + gap) to
+     span the full content band (source: navigator x=72→1368), so its columns
+     can slide all the way to the extreme left like the source. */
+  --orgchart-legend-w: 311px;
+  --orgchart-legend-gap: 40px;
+
   display: block;
   color: var(--orgchart-label);
 }
@@ -70,18 +78,62 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 @media (width >= 768px) {
   .orgchart .orgchart-body {
     flex-direction: row;
-    gap: 40px;
+    gap: var(--orgchart-legend-gap);
   }
 
   .orgchart .orgchart-body .orgchart-legend {
-    position: sticky;
-    top: 24px;
-    flex: 0 0 auto;
+    /* Static (not sticky): the source legend scrolls away naturally with the
+       page instead of "sticking" as you scroll up. Fixed border-box width so
+       the branches slider below can escape the chart column back to the full
+       band width by exactly (legend width + gap). */
+    box-sizing: border-box;
+    flex: 0 0 var(--orgchart-legend-w);
+    width: var(--orgchart-legend-w);
   }
 
   .orgchart .orgchart-body .orgchart-chart {
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  /* The directorate branch slider's scrollable VIEWPORT spans the FULL block
+     band (source: navigator x=72→1368), so the panel extends left→right and its
+     columns CAN slide all the way across. It escapes the chart column leftward
+     to the block's left edge and widens to the FULL block width — both driven by
+     JS-measured custom properties (`--orgchart-branches-shift` = distance from
+     the chart column's left back to the block's left; `--orgchart-branches-w` =
+     the block width) so it's exact regardless of the legend's rendered width. */
+  .orgchart .orgchart-chart-tree .orgchart-branches-area {
+    margin-left: calc(-1 * var(--orgchart-branches-shift, 0px));
+    width: var(--orgchart-branches-w, 100%);
+
+    /* Don't let the column-flex parent shrink it back to the chart width. */
+    flex-shrink: 0;
+  }
+
+  /* BUT by DEFAULT (unscrolled) the first column starts UNDER the spine
+     (aligned with "Desenvolvimento de Negócios"), not at the extreme left — so
+     the branch row is padded left by the shift amount (back to the chart
+     column's left = the spine's x). Sliding the viewport reveals that left
+     space. Matches the source's default rest state. */
+  .orgchart .orgchart-chart-tree .orgchart-branches {
+    padding-left: var(--orgchart-branches-shift, 0);
+  }
+
+  /* The scrollbar/controls stay aligned under the spine (shifted right by the
+     escape amount); their width shrinks by that same amount so they don't run
+     past the band's right edge and cause page overflow. */
+  .orgchart .orgchart-chart-tree .orgchart-progress,
+  .orgchart .orgchart-chart-tree .orgchart-controls {
+    margin-left: var(--orgchart-branches-shift, 0);
+    width: calc(100% - var(--orgchart-branches-shift, 0px));
+  }
+
+  /* Keep the spine→branch connector pinned to the SPINE trunk x (24px inside
+     the first column's default position), not dragged to the escaped left edge.
+     Offset = shift back to the spine + the 24px trunk inset. */
+  .orgchart .orgchart-chart-tree .orgchart-branches-area::before {
+    left: calc(var(--orgchart-branches-shift, 0px) + 24px);
   }
 }
 
@@ -148,41 +200,76 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   gap: 24px;
 }
 
-/* Spine: the vertical trunk of top-level nodes, stacked with a connector. */
+/* Spine: ONE continuous vertical trunk that runs THROUGH the parent cards
+   (matches the source). The trunk sits at a fixed x that is 24px inside the
+   parent cards' left edge, so it is hidden behind each opaque parent card and
+   only shows in the gaps between them — i.e. the line "crosses through"
+   Conselho Fiscal / Conselho de Administração / Presidente. Subordinate cards
+   indent to the RIGHT of that same trunk and branch off it with rounded elbows.
+   (Source `.connection`: a 24px box with a single border drawing the trunk.) */
 .orgchart .orgchart-spine {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-left: 24px;
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
 }
 
-/* Vertical trunk line running down the left of the spine. */
+/* The single trunk line, 24px in from the spine's left edge — i.e. inside the
+   flush-left parent cards. Sits BEHIND the cards (they cover it; it shows in
+   the gaps and in the indented children's gutter). */
 .orgchart .orgchart-spine::before {
   content: "";
   position: absolute;
   top: 40px;
   bottom: 40px;
-  left: 0;
+  left: 24px;
   width: 1px;
   background-color: var(--orgchart-connector);
+  z-index: 0;
 }
 
+/* Each parent section stacks: the parent card, then its indented children. */
+.orgchart .orgchart-spine-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Cards sit ABOVE the trunk so the trunk is hidden behind the parent cards
+   (visible only in the gaps → the "line through the cards" look). */
 .orgchart .orgchart-spine .orgchart-node {
   position: relative;
+  z-index: 1;
 }
 
-/* Horizontal stub branch from the trunk to each spine card. */
-.orgchart .orgchart-spine .orgchart-node::before {
+/* Parent cards are flush-left and carry NO connector of their own — the trunk
+   simply runs behind them, joining them vertically edge-to-edge. */
+
+/* Children: indented to the right so their left edge clears the trunk; each
+   branches off the single trunk with a small rounded elbow. */
+.orgchart .orgchart-spine-children {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-left: 33px;
+}
+
+/* Rounded elbow from the trunk into each child card at mid-height. The elbow's
+   left edge aligns with the trunk (spine x=24; child left is at x=33, so the
+   elbow spans the 9px between them) and its border curves up into the trunk. */
+.orgchart .orgchart-spine-children .orgchart-node::before {
   content: "";
   position: absolute;
-  top: 50%;
-  left: -24px;
-  width: 24px;
-  height: 1px;
-  background-color: var(--orgchart-connector);
+  top: calc(50% - 10px);
+  left: -9px;
+  width: 9px;
+  height: 10px;
+  border-left: 1px solid var(--orgchart-connector);
+  border-bottom: 1px solid var(--orgchart-connector);
+  border-bottom-left-radius: 8px;
 }
 
 /* Navigator: the horizontally-scrollable viewport for the branch columns.
@@ -214,36 +301,75 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   transition: transform 0.15s ease;
 }
 
-/* Branches: the executive-directorate columns laid in a horizontal row. */
+/* Branches: the executive-directorate columns laid in a horizontal row. The
+   FIRST column is flush-left, aligned with the spine's parent cards (extreme
+   left, matching the source) — no left padding, so its header and trunk line
+   up vertically with the spine above it. */
 .orgchart .orgchart-branches {
+  position: relative;
   display: flex;
   flex-direction: row;
   gap: 24px;
   width: max-content;
+
+  /* Trailing gutter so the LAST column isn't flush against the scroll-clip edge
+     when the slider is scrolled fully right (source keeps a right gutter). */
+  padding-right: 24px;
 }
 
+/* Continue the single trunk STRAIGHT DOWN from the spine into the first branch
+   column header (the "side branch" in the source). This lives on the
+   branches-AREA, NOT on .orgchart-branches, because the latter sits inside the
+   navigator's `overflow-x: auto` which would clip an above-the-top pseudo.
+   It starts BEHIND the last spine card's centre (top:-73px reaches ~41px — half
+   a card — above that card's bottom, so it continues the spine trunk with no
+   floating stub) and runs down to the first branch header's centre. z-index:0
+   keeps it behind the opaque cards, so only the connecting run in the gap is
+   visible — reading as one unbroken line from the spine into "Exploração e
+   Produção". */
+.orgchart .orgchart-branches-area::before {
+  content: "";
+  position: absolute;
+  top: -73px;
+  left: 24px;
+  width: 1px;
+  height: 114px;
+  background-color: var(--orgchart-connector);
+  z-index: 0;
+}
+
+/* Branch column: same trunk-through-cards model as the spine. The column
+   header card is flush-left; the trunk runs at a fixed x (24px in) BEHIND it,
+   and the sub-department cards indent to the right and branch off with elbows. */
 .orgchart .orgchart-column {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 0 0 248px;
-  width: 248px;
-  padding-left: 24px;
+  flex: 0 0 272px;
+  width: 272px;
+
+  /* Only as tall as its own cards — do NOT stretch to the tallest column.
+     Otherwise the trunk (bottom:40px) would extend far below the last card
+     into the stretched empty space, leaving a "hanging" vertical line. */
+  align-self: flex-start;
 }
 
-/* Vertical trunk line down the left of each branch column (matches source):
-   the header card connects to its sub-department cards via a left trunk + a
-   short horizontal stub into each card — the same treatment as the spine, so
-   the whole chart reads consistently (no "some lined, some not"). */
+/* Single continuous trunk, 24px in from the column's left edge — behind the
+   header card, running down to the last sub-card. `bottom` is anchored to the
+   LAST sub-card's centre via a JS-set custom property (`--orgchart-col-trunk-
+   bottom`) so a tall multi-line last card doesn't leave the trunk overflowing
+   past it (fixed `40px` only works for single-line 80px cards). Falls back to
+   40px if the property isn't set. */
 .orgchart .orgchart-column::before {
   content: "";
   position: absolute;
   top: 40px;
-  bottom: 40px;
-  left: 0;
+  bottom: var(--orgchart-col-trunk-bottom, 40px);
+  left: 24px;
   width: 1px;
   background-color: var(--orgchart-connector);
+  z-index: 0;
 }
 
 /* Single-card columns need no trunk. */
@@ -251,20 +377,29 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   content: none;
 }
 
+/* Header card is flush-left and sits above the trunk (hides it); sub-cards
+   indent right so their left edge clears the trunk gutter. */
 .orgchart .orgchart-column .orgchart-node {
   position: relative;
-  z-index: 0;
+  z-index: 1;
 }
 
-/* Horizontal stub from the trunk to each branch card. */
-.orgchart .orgchart-column .orgchart-node::before {
+.orgchart .orgchart-column .orgchart-node:not(.orgchart-column-header) {
+  margin-left: 33px;
+}
+
+/* Small rounded elbow from the trunk into each sub-department card at its
+   mid-height (trunk at x=24, sub-card left at x=33 → 9px elbow). */
+.orgchart .orgchart-column .orgchart-node:not(.orgchart-column-header)::before {
   content: "";
   position: absolute;
-  top: 50%;
-  left: -24px;
-  width: 24px;
-  height: 1px;
-  background-color: var(--orgchart-connector);
+  top: calc(50% - 10px);
+  left: -9px;
+  width: 9px;
+  height: 10px;
+  border-left: 1px solid var(--orgchart-connector);
+  border-bottom: 1px solid var(--orgchart-connector);
+  border-bottom-left-radius: 8px;
 }
 
 /* Prev/next slider controls, aligned to the right (as on the source).
@@ -312,6 +447,7 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 /* Branches area: navigator + scrollbar + arrows stacked with a tight 16px gap,
    so the scrollbar/arrows stay directly under the columns (matches source). */
 .orgchart .orgchart-branches-area {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -335,8 +471,11 @@ main .orgchart a.orgchart-doc-button:any-link::after {
     max-width: 360px;
   }
 
+  /* Branch slider viewport spans the FULL block band (see the escape rule near
+     the top of this file). This later rule must ALSO use the band width, else it
+     would override that escape back to the chart-column width. */
   .orgchart .orgchart-chart-tree .orgchart-branches-area {
-    width: 100%;
+    width: var(--orgchart-branches-w, 100%);
   }
 }
 

@@ -1,0 +1,73 @@
+/*
+ * Downloads Block — "downloads (list)" variant.
+ * A single-column list of downloadable documents. Each item is an icon + a bold
+ * green underlined link, with an optional descriptive label above it.
+ * Source parity: petrobras.com.br/bolivia
+ *   - row:   display:flex; align-items:center; gap:12px; padding:5px 4px
+ *   - icon:  24 x 24, green (#008542)
+ *   - link:  #008542, 16px, 700, underline, line-height 1.2
+ *   - label: 14px, 400, #373737, line-height 1.6
+ *   - no dividers / borders / background
+ */
+
+.downloads {
+  --downloads-green: #008542;
+  --downloads-label-color: #373737;
+}
+
+.downloads .downloads-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.downloads .downloads-item {
+  margin: 0;
+}
+
+.downloads .downloads-item + .downloads-item {
+  margin-top: 8px;
+}
+
+/* optional descriptive label above the affordance */
+.downloads .downloads-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--downloads-label-color);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* icon + link row */
+.downloads .downloads-affordance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 4px;
+}
+
+.downloads .downloads-icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: var(--downloads-green);
+}
+
+.downloads .downloads-link.downloads-link {
+  color: var(--downloads-green);
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: underline;
+}
+
+.downloads .downloads-link.downloads-link:hover {
+  text-decoration: none;
+}
+
+.downloads .downloads-link:focus-visible {
+  outline: 2px solid var(--downloads-green);
+  outline-offset: 2px;
+}

@@ -188,7 +188,205 @@ function decorateDiagonalSplit(block) {
   row.remove();
 }
 
+/**
+ * Hero "slider" variant — a full-bleed hero CAROUSEL (source: the banner at the
+ * top of petrobras.com.br/quem-somos/produtos, `.banner-hero`).
+ *
+ * Authored as "Hero (slider)" (block classes: `hero slider`). Each row = ONE
+ * slide, with two cells:
+ *   cell 1 (media):   a <picture>/<img> full-bleed background (descriptive alt).
+ *   cell 2 (content): an <h1>/<h2> heading, a body <p>, and an optional CTA link.
+ *
+ * Rendered structure:
+ *   .hero.slider [role=region, aria-roledescription=carousel]
+ *     .hero-slider-track [aria-live]
+ *       .hero-slide[.is-active] [role=group, aria-roledescription=slide] * N
+ *         .hero-slide-image  (absolute, object-fit:cover)
+ *         .hero-slide-content (heading + body + optional green pill CTA)
+ *     .hero-slider-controls           (only when N > 1)
+ *       button.hero-slider-playpause  (pause/play, white icon)
+ *       .hero-slider-nav
+ *         button.hero-slider-prev / .hero-slider-next  (white chevrons)
+ *       .hero-slider-dots
+ *         button[aria-current] * N
+ *
+ * Behaviour: autoplay (paused on hover/focus, and NOT started when the user
+ * prefers reduced motion), prev/next + dot navigation, arrow-key operable.
+ */
+const HERO_AUTOPLAY_MS = 6000;
+
+// Static, trusted inline SVGs (white strokes) mirroring the source controls.
+const HERO_ICON_PAUSE = '<svg viewBox="0 0 14 16" fill="none" aria-hidden="true" focusable="false" width="14" height="16"><path d="M12.625 1.125H9.8125C9.4673 1.125 9.1875 1.4048 9.1875 1.75V14.25C9.1875 14.5952 9.4673 14.875 9.8125 14.875H12.625C12.9702 14.875 13.25 14.5952 13.25 14.25V1.75C13.25 1.4048 12.9702 1.125 12.625 1.125Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.1875 1.125H1.375C1.0298 1.125 0.75 1.4048 0.75 1.75V14.25C0.75 14.5952 1.0298 14.875 1.375 14.875H4.1875C4.5327 14.875 4.8125 14.5952 4.8125 14.25V1.75C4.8125 1.4048 4.5327 1.125 4.1875 1.125Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const HERO_ICON_PLAY = '<svg viewBox="0 0 18 20" fill="none" aria-hidden="true" focusable="false" width="18" height="20"><path d="M16.3844 9.3625 2.8938 1.1125C2.7802 1.0425 2.65 1.004 2.5166 1.001 2.3832 0.998 2.2514 1.0308 2.1349 1.0957 2.0183 1.1607 1.9212 1.2556 1.8535 1.3706 1.7859 1.4856 1.7502 1.6166 1.75 1.75V18.25C1.7502 18.3835 1.7859 18.5144 1.8535 18.6295 1.9212 18.7445 2.0183 18.8393 2.1349 18.9043 2.2514 18.9693 2.3832 19.002 2.5166 18.999 2.65 18.9961 2.7802 18.9576 2.8938 18.8875L16.3844 10.6375C16.4952 10.572 16.5869 10.4788 16.6507 10.367 16.7145 10.2552 16.748 10.1287 16.748 10 16.748 9.8714 16.7145 9.7449 16.6507 9.6331 16.5869 9.5213 16.4952 9.4281 16.3844 9.3625Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const HERO_ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" width="24" height="24"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const HERO_ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" width="24" height="24"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function decorateSlider(block) {
+  const rows = [...block.querySelectorAll(':scope > div')];
+  if (!rows.length) return;
+
+  block.setAttribute('role', 'region');
+  block.setAttribute('aria-roledescription', 'carousel');
+  if (!block.hasAttribute('aria-label')) block.setAttribute('aria-label', 'Destaques');
+
+  const track = document.createElement('div');
+  track.className = 'hero-slider-track';
+
+  const slides = rows.map((row, i) => {
+    const cells = [...row.children];
+    const imageCell = cells.find((c) => c.querySelector('picture, img')) || cells[0];
+    const contentCell = cells.find((c) => c !== imageCell) || cells[1] || cells[0];
+
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide';
+    slide.setAttribute('role', 'group');
+    slide.setAttribute('aria-roledescription', 'slide');
+    slide.setAttribute('aria-label', `${i + 1} de ${rows.length}`);
+
+    if (imageCell) {
+      imageCell.className = 'hero-slide-image';
+      slide.append(imageCell);
+    }
+    if (contentCell && contentCell !== imageCell) {
+      contentCell.className = 'hero-slide-content';
+      // decorate an optional CTA link (a standalone <p><a>) as the green pill.
+      const cta = contentCell.querySelector('p:last-of-type a');
+      if (cta && cta.closest('p').textContent.trim() === cta.textContent.trim()) {
+        cta.classList.add('hero-cta');
+        cta.closest('p').classList.add('hero-cta-wrapper');
+      }
+      slide.append(contentCell);
+    }
+    track.append(slide);
+    return slide;
+  });
+
+  block.textContent = '';
+  block.append(track);
+
+  const total = slides.length;
+  let current = 0;
+  let timer = null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const setActive = (idx) => {
+    current = (idx + total) % total;
+    slides.forEach((s, i) => {
+      const active = i === current;
+      s.classList.toggle('is-active', active);
+      s.setAttribute('aria-hidden', active ? 'false' : 'true');
+      if (active) s.removeAttribute('inert');
+      else s.setAttribute('inert', '');
+    });
+    block.querySelectorAll('.hero-slider-dots button').forEach((dot, i) => {
+      if (i === current) dot.setAttribute('aria-current', 'true');
+      else dot.removeAttribute('aria-current');
+    });
+  };
+
+  // Single slide: no controls, no autoplay — just show it.
+  if (total <= 1) {
+    setActive(0);
+    return;
+  }
+
+  // ---- controls ----
+  const controls = document.createElement('div');
+  controls.className = 'hero-slider-controls';
+
+  let playing = false;
+  const playPause = document.createElement('button');
+  playPause.type = 'button';
+  playPause.className = 'hero-slider-playpause';
+
+  const stop = () => {
+    if (timer) { clearInterval(timer); timer = null; }
+    playing = false;
+    playPause.innerHTML = HERO_ICON_PLAY;
+    playPause.setAttribute('aria-label', 'Reproduzir apresentação');
+    playPause.setAttribute('aria-pressed', 'false');
+    track.setAttribute('aria-live', 'polite');
+  };
+  const start = () => {
+    if (reduceMotion.matches) return;
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => setActive(current + 1), HERO_AUTOPLAY_MS);
+    playing = true;
+    playPause.innerHTML = HERO_ICON_PAUSE;
+    playPause.setAttribute('aria-label', 'Pausar apresentação');
+    playPause.setAttribute('aria-pressed', 'true');
+    track.setAttribute('aria-live', 'off');
+  };
+
+  playPause.addEventListener('click', () => (playing ? stop() : start()));
+
+  const nav = document.createElement('div');
+  nav.className = 'hero-slider-nav';
+  const prev = document.createElement('button');
+  prev.type = 'button';
+  prev.className = 'hero-slider-prev';
+  prev.setAttribute('aria-label', 'Slide anterior');
+  prev.innerHTML = HERO_ICON_PREV;
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.className = 'hero-slider-next';
+  next.setAttribute('aria-label', 'Próximo slide');
+  next.innerHTML = HERO_ICON_NEXT;
+  prev.addEventListener('click', () => setActive(current - 1));
+  next.addEventListener('click', () => setActive(current + 1));
+  nav.append(prev, next);
+
+  const dots = document.createElement('div');
+  dots.className = 'hero-slider-dots';
+  dots.setAttribute('role', 'group');
+  dots.setAttribute('aria-label', 'Selecionar slide');
+  slides.forEach((s, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', `Ir para o slide ${i + 1}`);
+    dot.addEventListener('click', () => setActive(i));
+    dots.append(dot);
+  });
+
+  controls.append(playPause, nav, dots);
+  block.append(controls);
+
+  // keyboard: arrow keys advance/retreat when focus is within the carousel.
+  block.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      setActive(current - 1);
+      e.preventDefault();
+    } else if (e.key === 'ArrowRight') {
+      setActive(current + 1);
+      e.preventDefault();
+    }
+  });
+
+  // pause on hover/focus, resume when leaving (only if it was autoplaying).
+  const pauseIfPlaying = () => {
+    if (playing && timer) { clearInterval(timer); timer = null; }
+  };
+  const resumeIfPlaying = () => {
+    if (playing && !timer && !reduceMotion.matches) {
+      timer = setInterval(() => setActive(current + 1), HERO_AUTOPLAY_MS);
+    }
+  };
+  block.addEventListener('mouseenter', pauseIfPlaying);
+  block.addEventListener('mouseleave', resumeIfPlaying);
+  block.addEventListener('focusin', pauseIfPlaying);
+  block.addEventListener('focusout', resumeIfPlaying);
+
+  setActive(0);
+  // respect reduced motion: leave paused; otherwise autoplay.
+  if (reduceMotion.matches) stop();
+  else start();
+}
+
 export default async function decorate(block) {
+  if (block.classList.contains('slider')) {
+    decorateSlider(block);
+    return;
+  }
   if (block.classList.contains('diagonal-split')) {
     decorateDiagonalSplit(block);
     return;

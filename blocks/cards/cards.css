@@ -421,3 +421,260 @@
     width: calc((100% - (2 * 32px)) / 3);
   }
 }
+
+/* ================================================================== *
+ * Variant: cards overlay
+ * Source: petrobras.com.br/sustentabilidade ("Você pode se interessar por")
+ * Full-bleed image navigation tiles: a near-square image (source 300x302,
+ * ~1:1) with a 16px radius and a brand-tint scrim (green .2 + yellow .3).
+ * A white 22px/700 heading sits at the bottom-left with 24px padding. The
+ * whole tile is a link (stretched-link overlay). Hover lifts the card with
+ * a soft drop-shadow (0 4px 16px rgba(0,0,0,.16)). Columns: 1 -> 2 (>=576)
+ * -> 4 (>=992). Gap 32px (source slider gap). Measured 1440/768/390.
+ * ================================================================== */
+.cards.overlay > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  grid-template-columns: none;
+}
+
+.cards.overlay > ul > li {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 300 / 302;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: var(--text-color);
+  transition: box-shadow 0.2s ease;
+}
+
+.cards.overlay > ul > li:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
+}
+
+/* full-bleed cover image */
+.cards.overlay .cards-card-image {
+  position: absolute;
+  inset: 0;
+  line-height: 0;
+}
+
+.cards.overlay .cards-card-image img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* brand-tint scrim over the image (source: green .2 over yellow .3), plus a
+   dark bottom gradient so the white heading stays legible on any photo */
+.cards.overlay .cards-card-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 0%) 55%),
+    linear-gradient(0deg, rgb(0 133 66 / 20%), rgb(0 133 66 / 20%)),
+    linear-gradient(0deg, rgb(253 200 47 / 30%), rgb(253 200 47 / 30%));
+}
+
+/* heading (and any body copy) overlaid bottom-left */
+.cards.overlay .cards-card-body {
+  position: absolute;
+  inset: auto 24px 24px;
+  margin: 0;
+  z-index: 1;
+}
+
+.cards.overlay .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.32;
+  color: #fff;
+}
+
+.cards.overlay .cards-card-body p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+/* whole-tile stretched link (empty, sits above the scrim) */
+.cards.overlay .cards-overlay-link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  font-size: 0;
+}
+
+.cards.overlay .cards-overlay-link:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -3px;
+}
+
+@media (width >= 576px) {
+  .cards.overlay > ul > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .cards.overlay > ul > li {
+    width: calc((100% - (3 * 32px)) / 4);
+  }
+}
+
+/* ================================================================== *
+ * Variant: cards audio
+ * Source: petrobras.com.br/sustentabilidade/biodiversidade ("Ouça os sons")
+ * White card (1px #eee border, 16px radius, 24px padding). A megaphone icon
+ * (32x32) sits above a species name, then an italic scientific name + short
+ * description, then a bordered audio player row (1px #d7d7d7, 16px radius,
+ * 16px padding, 24px gap): play/pause toggle (32x32), a seek slider, and a
+ * time readout. Columns: 1 -> 2 (>=768) -> 3 (>=992). Gap 24px. Player is
+ * a functional, accessible custom control (see cards.js).
+ * ================================================================== */
+.cards.audio > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  grid-template-columns: none;
+}
+
+.cards.audio > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 24px;
+  background-color: #fff;
+}
+
+/* megaphone icon on its own row (source 32x32) */
+.cards.audio .cards-card-image {
+  align-self: flex-start;
+  margin: 0 0 8px;
+  line-height: 0;
+}
+
+.cards.audio .cards-card-image img {
+  width: 32px;
+  height: 32px;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.cards.audio .cards-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* species name (source 16px semibold dark) */
+.cards.audio .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #373737;
+}
+
+.cards.audio .cards-card-body p {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #373737;
+}
+
+.cards.audio .cards-card-body em {
+  font-style: italic;
+}
+
+/* audio player row */
+.cards.audio .cards-audio-player {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  border: 1px solid #d7d7d7;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.cards.audio .cards-audio-player audio {
+  display: none;
+}
+
+.cards.audio .cards-audio-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: #008542;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cards.audio .cards-audio-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.cards.audio .cards-audio-toggle:hover {
+  background-color: #00612f;
+}
+
+.cards.audio .cards-audio-toggle:focus-visible {
+  outline: 2px solid #008542;
+  outline-offset: 2px;
+}
+
+/* seek slider fills the remaining width */
+.cards.audio .cards-audio-seek {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 4px;
+  margin: 0;
+  accent-color: #008542;
+  cursor: pointer;
+}
+
+.cards.audio .cards-audio-seek:focus-visible {
+  outline: 2px solid #008542;
+  outline-offset: 4px;
+}
+
+.cards.audio .cards-audio-time {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: #505050;
+}
+
+@media (width >= 768px) {
+  .cards.audio > ul > li {
+    width: calc((100% - 24px) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .cards.audio > ul > li {
+    width: calc((100% - (2 * 24px)) / 3);
+  }
+}

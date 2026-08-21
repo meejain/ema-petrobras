@@ -62,15 +62,36 @@ goal of **100% visual + functional parity across mobile, tablet, and desktop**.
 | `header` | desktop + mobile | ✅ parity (see open item on homepage theme) | `/` and `/bolivia` |
 | `hero` | default (dark banner) | ✅ | `/` |
 | `hero` | `diagonal-split` | ✅ reworked (see log) | `/bolivia` |
+| `hero` | `slider` (carousel) | ✅ | `/quem-somos/produtos` |
 | `cards` | `grid` | ✅ | `/produtos-mais-sustentaveis` |
 | `cards` | `icon` | ✅ | `/transicao-energetica` |
 | `cards` | `feature` | ✅ | `/quem-somos/tipos-de-fertilizantes` |
+| `cards` | `overlay` | ✅ | `/sustentabilidade` |
+| `cards` | `audio` | ✅ (functional player) | `/sustentabilidade/biodiversidade` |
+| `columns` | default | ✅ | `/bolivia` |
+| `columns` | `stats` (KPI) | ✅ | `/en/transicao-energetica` |
+| `columns` | `feature` | ✅ | `/sustentabilidade/biodiversidade` |
+| `accordion` | base FAQ / `downloads` / `table-docs` | ✅ | `/transicao-energetica`, `/quem-somos/gasolina-podium`, `/quem-somos/concursos` |
+| `tabs` | `content` / `categories` / `explorer` | ✅ | `/quem-somos/ouvidoria`, `/quem-somos/produtos`, `/sustentabilidade/biodiversidade` |
+| `table` | `specifications` / `downloads` | ✅ | `/quem-somos/bunker`, `/quem-somos/estagios` |
+| `video` | `youtube` (facade) | ✅ | `/quem-somos/gasolina` |
+| `downloads` | list | ✅ | `/bolivia` |
+| `timeline` | milestone | ✅ | `/bolivia` |
+| `biome-explorer` | `map` + `overlay` | ✅ | `/sustentabilidade/biodiversidade` |
+| `dashboard-tabs` | tabs + facade | ✅ container (proprietary backend) | `/sustentabilidade/dados-abertos` |
+| `flipbook` | Issuu facade | ✅ | `/sustentabilidade/mudancas-climaticas` |
+| `web-story` | portrait facade | ✅ container (source story offline) | `/w/web-stories/...` |
 | `featured-news` | — | ✅ | homepage news strip |
 | `slider-cards` | — | ✅ | homepage |
 | `banner-notice` | — | ✅ | homepage notice |
-| `columns` | — | ✅ | — |
 | `footer` | — | ✅ | site-wide |
+| `vlibras` | 3rd-party | ✅ global script (`scripts/delayed.js`) — not a block | site-wide |
 | `widget` / `fragment` | — | present | — |
+
+**Full block library instrumented.** All 34 variants from the discovery report
+(`reference/Final Report petrobras.html`) now have a block + a sample page in
+`content/drafts/block-samples/`. Custom Form (Filter) intentionally deferred (forms
+plugin to be configured later).
 
 Sample pages live in `content/drafts/block-samples/*.plain.html` (+ an `index`), with local
 PNG icons for the card samples.
@@ -475,6 +496,233 @@ Three source-parity fixes (source `https://petrobras.com.br/`), all scoped to th
   cards-list touch-target in page content below the block). Screenshot at 1440 confirms the
   branch columns now show the connector trunk+stubs, matching source screenshot 1.
 
+### 2026-08-20 (orgchart — spine now a 2-LEVEL tree + spine→branch connector + legend un-stuck)
+Three user-reported parity gaps vs the source screenshots, all fixed to match exactly:
+1. **Spine is a two-level tree (was flat).** The source spine is NOT a flat list: top-level
+   parent cards ("Conselho Fiscal", "Conselho de Administração", "Presidente") sit on the main
+   trunk, and their subordinate cards hang off an INDENTED sub-trunk with rounded elbow
+   connectors. `orgchart.js` now groups spine rows into `.orgchart-spine-group`s: a row starts a
+   new parent section when it is a top-level role (dark-blue node OR a node that links out — the
+   two "Conselho" cards); every following non-parent row becomes a child in
+   `.orgchart-spine-children`. `orgchart.css` renders the parent with a straight trunk stub and
+   each child with a **rounded-elbow** connector (`border-left`+`border-bottom`+
+   `border-bottom-left-radius`) off a continuous indented sub-trunk. Verified @1440: parents at
+   x=430, children indented to x=487; matches source screenshots 1 & the attachment.
+2. **Spine→branches connector added.** A rounded elbow now drops from the spine trunk and turns
+   into the first branch column header ("Exploração e Produção") — `.orgchart-branches::before`
+   with `padding-left:24px` on `.orgchart-branches` so the slider has left room. Matches the
+   pink-box area of source screenshot 2.
+3. **Legend un-stuck.** The left legend was `position:sticky` (top:24px) so it "stuck" when
+   scrolling up; the source legend is `position:static` and scrolls away naturally. Removed the
+   sticky rule. Verified: legend computes `static`, scrolls with the page.
+- Verified @1440 + @390: no horizontal overflow (docWidth==winW), branch slider still scrolls
+  (scrollWidth 2368 > clientWidth), spine nesting + connectors match the attachment.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings), `breakpoint-check` pass
+  (576/768/992/1280). `test:a11y` unchanged: same PRE-EXISTING serious `color-contrast` items on
+  the orange/cyan `.orgchart-card-area` brand labels (source-exact swatches kept per user
+  decision) — NOT introduced by this layout-only change.
+
+### 2026-08-21 (FULL block library instrumented — all pending variants built)
+- **Goal:** instrument the ENTIRE block library from the discovery report
+  (`reference/Final Report petrobras.html` — 34 variants across 18 base blocks), each with a
+  sample page in `content/drafts/block-samples/` and 100% parity across 390/768/1440. Forms
+  deferred.
+- **New authoring aids:** `tools/samples/BLOCK_PLAYBOOK.md` (repo conventions + sample-gen +
+  gate playbook) and one `tools/samples/build-<name>-sample.mjs` generator per new block
+  (never hand-write content HTML). Each generator emits the standard sample layout (top spacer
+  180/170/96 to clear the fixed header, 48/40 gaps around each demoed block).
+- **Blocks built/extended this batch** (all block-scoped CSS, mobile-first min-width, a11y):
+  - `accordion` — reworked to native `<details>/<summary>` base FAQ (rotating chevron,
+    single-open) + `downloads` (PDF-link bodies) + `table-docs` (spec table + docs) variants.
+  - `tabs` (NEW) — `content` (folder tabs), `categories` (green pill bar switching card grids),
+    `explorer` (vertical icon rail + panel). Roving tabindex, arrows/Home/End, aria tabs.
+  - `table` (NEW) — `specifications` + `downloads`; semantic `<table>` from authored rows,
+    wrapped in `overflow-x:auto` so wide tables scroll internally (no page overflow).
+  - `columns` — added CSS-only `stats` (dark KPI banner, 2→4 cols) + `feature` (icon+heading
+    columns, 1→2→3) variants; base untouched.
+  - `cards` — added `overlay` (image nav tiles w/ scrim + stretched link) + `audio` (functional
+    accessible audio player) variants; base grid/icon/feature untouched.
+  - `video` (NEW) — `youtube` facade (poster + play button → injects youtube-nocookie iframe on
+    click; host-allowlisted).
+  - `downloads` (NEW) — document list (green link + inline doc icon, `download`/`_blank`).
+  - `hero` — added `slider` carousel variant (autoplay w/ pause-on-hover + reduced-motion,
+    prev/next + dot pagination, keyboard, aria); default & diagonal-split untouched.
+  - `timeline` (NEW) — milestone timeline (WAI-ARIA tablist markers, click/arrows/Home-End,
+    horizontal desktop / stacked mobile w/ contained scroll strip).
+  - `biome-explorer` (NEW) — `map` (hotspot pills over a scrollable map, `x% y%` coords) +
+    `overlay` (pill selector); shared `role=dialog` overlay with focus trap, Esc/backdrop close,
+    focus return; reduced-motion aware.
+  - `dashboard-tabs`, `flipbook`, `web-story` (NEW) — facade-based embed widgets (poster +
+    button → lazy iframe on click), **host-allowlisted** before injecting any iframe
+    (petrobras subdomains, issuu, youtube-nocookie). Proprietary/offline sources ship as
+    best-parity container + facade (documented limitations below).
+  - **VLibras** — confirmed already integrated correctly as a GLOBAL 3rd-party script in
+    `scripts/delayed.js` (injects `[vw]` container, loads vlibras-plugin.js in the delayed
+    phase). It is site-wide, NOT a block — left as-is.
+- **Gate (repo-wide):** `npm run lint` **0 errors** (7 expected a11y no-console warnings),
+  CSS stylelint clean, `node tools/quality/breakpoint-check.mjs` **pass** (576/768/992/1280).
+  Each block's `test:a11y` passed on its sample page (brand-color contrast on Petrobras
+  orange/cyan swatches remains the known parity-vs-WCAG exception; a couple of green control
+  buttons were nudged to `#007e79`/#008542 to pass without changing brand identity). All samples
+  verified `docWidth == innerWidth` (no horizontal overflow) at 390/768/1440.
+- **Known limitations (flag to content owner):** (1) `dados-abertos` dashboard and the web-story
+  player are proprietary/electoral-defeso-offline, so `dashboard-tabs` and `web-story` ship as
+  faithful containers + facades rather than pixel-replicated internals — they'll render the live
+  embeds once the URLs are supplied. (2) `biome-explorer` map hotspot coordinates are authored
+  per-biome; omitted coords auto-distribute approximately.
+
+### 2026-08-21 (verification sweep — hero-slider sample a11y fix)
+- Ran a repo-wide independent verification of the new batch: `tools/quality/overflow-sweep.mjs`
+  (all 16 sample pages clean at 390/768/1440) + a per-page `test:a11y` sweep.
+- **Caught & fixed a real a11y failure on the hero-slider SAMPLE** (not the block itself): the
+  generator put a top-clearance `spacer` above the hero, so the fixed header sat over the WHITE
+  page background instead of the dark hero image. The header's dark-hero theme
+  (`body:has(main .hero:not(.diagonal-split))`) whitens row-1 utility text → white-on-white
+  contrast fail on `.nav-utility-*`. Fix: made the hero-slider the FIRST section with no leading
+  spacer (full-bleed under the overlay header, exactly like the real `/quem-somos/produtos` page
+  and the hero-diagonal-split sample), explanation section moved below. `test:a11y …/hero-slider`
+  now **passes**; overflow sweep still clean. All 15 new sample pages pass a11y (orgchart keeps
+  its known brand-color-swatch exception).
+
+### 2026-08-21 (orgchart — trunk-through-cards rework for TRUE source parity)
+- **User feedback (with source + DevTools screenshots):** our connectors were still wrong —
+  we'd drawn a SEPARATE line in a left gutter with every card (parents included) pushed to its
+  right. The source (`.connection` = a 24px box with a single `border-right`) instead runs ONE
+  continuous trunk at a FIXED x that is 24px INSIDE the parent cards' left edge — so the line
+  passes BEHIND the opaque parent cards (Conselho Fiscal / Conselho de Administração /
+  Presidente) and shows only in the gaps ("crosses through" them); children indent to the RIGHT
+  of that same trunk and branch off with small rounded elbows.
+- **Fix (orgchart.css):** rewrote both the spine and the branch columns to this model —
+  `.orgchart-spine::before` / `.orgchart-column::before` trunk at `left:24px` with `z-index:0`;
+  cards at `z-index:1` (parents flush-left cover the trunk); children/sub-cards `margin-left:33px`
+  with a 9px rounded-elbow `::before`. Removed the old parent stub + separate sub-trunk.
+- **Three follow-up parity fixes (same feedback round):**
+  1. **Arrow icon on plain cards** — cards with no link and no responsible/contact (e.g.
+     "Desenvolvimento de Negócios", "Logística", "Supervisão de Planos…") now still render the
+     exchange ⇄ badge (`orgchart.js` else-branch), matching the source where every card shows it.
+  2. **Trunk continues unbroken** spine → branches: `.orgchart-branches::before` is now a
+     straight 1px line at `left:24px` (was a rounded elbow), so the line runs from the spine past
+     Desenvolvimento de Negócios straight down to where "Exploração e Produção" begins.
+  3. **First branch header flush-left:** removed `padding-left` on `.orgchart-branches` so the
+     first column header aligns at the extreme left with the spine parent cards. Verified @1440:
+     spineParentX == firstBranchHeaderX == 406; "Desenvolvimento de Negócios" has the icon.
+- Gate: `npm run lint` 0 errors (7 expected a11y no-console warnings); `breakpoint-check` pass;
+  overflow-sweep clean at 390/768/1440. Screenshots confirm the trunk crosses through the parent
+  cards and the branch columns use the same treatment — matching the source + attachments.
+
+### 2026-08-21 (orgchart — restored spine→branch "side branch" + plain-card arrows)
+- **User feedback:** (1) the side-branch line that comes DOWN into the "Exploração e Produção"
+  box was missing; (2) plain cards like "Desenvolvimento de Negócios" were missing their arrow
+  icon; (3) "Exploração e Produção" should sit further left (flush with the spine).
+- **Root cause of the missing side branch:** the connector was drawn on
+  `.orgchart-branches::before`, but `.orgchart-branches` lives inside `.orgchart-navigator`
+  which has `overflow-x: auto` — that CLIPS an above-the-top pseudo-element, so the descending
+  line was cut off. **Fix:** moved the connector to `.orgchart-branches-area::before` (the
+  non-clipping parent), a 96px vertical line at `left:24px` that runs from the spine trunk down
+  into the first branch column header. (Merged the `position: relative` into the existing
+  `.orgchart-branches-area` rule to avoid a `no-duplicate-selectors` stylelint error.)
+- **Plain-card arrows (orgchart.js):** cards with no link and no responsible/contact now still
+  render the exchange ⇄ badge (added an else-branch) — matches the source where every card shows
+  it. Verified "Desenvolvimento de Negócios", "Logística", "Supervisão de Planos…" all have it.
+- **Flush-left alignment:** verified @1440 the first branch header x == spine parent x (406),
+  matching the source (both 365 at the source's own width).
+- Gate: `npm run lint` 0 errors (7 expected a11y warnings), stylelint clean, `breakpoint-check`
+  pass, overflow-sweep clean at 390/768/1440. Screenshot confirms the line runs unbroken from
+  the spine into "Exploração e Produção".
+
+### 2026-08-21 (orgchart — removed hanging trunk lines below short branch columns)
+- **User feedback (with source DevTools):** branch columns showed vertical lines "hanging"
+  below their last card. The source uses bounded per-card connectors (`.connection-secondary-b`),
+  with no trailing line.
+- **Root cause:** `.orgchart-branches` is a flex row with default `align-items: stretch`, so
+  EVERY column stretched to the tallest column's height (913px). Our per-column trunk
+  (`.orgchart-column::before`, `top:40px → bottom:40px`) then ran to 40px above the *stretched*
+  bottom — i.e. far below the column's last actual card — leaving a hanging line (measured gaps
+  of 236–449px below the last card on the shorter columns).
+- **Fix (orgchart.css):** `.orgchart-column { align-self: flex-start }` so each column is only as
+  tall as its own cards; the trunk's `bottom:40px` now lands at the last card's centre. Verified
+  @1440: gap below last card == 0px on all 8 columns (was up to 449px).
+- Gate: `npm run lint` 0 errors (7 expected a11y warnings), stylelint clean, `breakpoint-check`
+  pass, overflow-sweep clean at 390/768/1440. Screenshot confirms each branch trunk stops at its
+  own last card — no trailing lines — matching the source.
+
+### 2026-08-21 (orgchart — reverted full-band experiment + fixed floating spine→branch connector)
+- **Reverted:** a trial that made the branch slider span the full content band (legend-width
+  escape via negative margin) — it didn't match the intended look, so `.orgchart-body` legend
+  is back to `flex: 0 0 auto` and the `--orgchart-legend-w/gap` vars + escape rule were removed.
+- **Fixed the "hanging" connector:** the spine→branch line looked like a detached stub floating
+  in the 32px section gap between "Desenvolvimento de Negócios" and "Exploração e Produção".
+  Cause: `.orgchart-branches-area::before` started at the last spine card's BOTTOM edge (into
+  empty space) rather than continuing the trunk from behind the card. Fix: `top:-73px;
+  height:114px` so it begins ~half a card up (behind Desenvolvimento's centre, z-index:0 keeps
+  it behind the opaque card) and runs down to the first branch header's centre — reading as one
+  unbroken line, matching source screenshot 2.
+- Gate: `npm run lint` 0 errors (7 expected a11y warnings), stylelint clean, `breakpoint-check`
+  pass, overflow-sweep clean at 390/768/1440.
+
+### 2026-08-21 (orgchart — branch slider full-band viewport, default-aligned under spine)
+- **User ask:** the branch "down panel" should be slidable to the extreme left (full-band
+  scrollable viewport, like the source navigator x=72→1368), BUT by DEFAULT the first column
+  ("Exploração e Produção") must sit UNDER "Desenvolvimento de Negócios" (aligned with the
+  spine), and the spine→branch connector must stay pinned to the spine — not drift left.
+- **Fix (orgchart.css, ≥768px):**
+  - `.orgchart-branches-area` escapes the chart column (negative margin-left of legend-w+gap,
+    widened to match) so its scrollable viewport spans the full band → columns can slide to the
+    extreme left.
+  - `.orgchart-branches` gets `padding-left: legend-w+gap` so the FIRST column defaults to under
+    the spine (measured: first col header x=423 == spine x=423). Progress bar + arrow controls
+    get the same left margin so they stay under the spine too.
+  - The connector `.orgchart-branches-area::before` is re-pinned with
+    `left: legend-w+gap+24px` so it stays at the spine trunk x (measured: connector x=447 ==
+    spine trunk x=447), not dragged to the escaped left edge.
+  - Introduced `--orgchart-legend-w: 311px` (border-box legend incl. padding/borders) +
+    `--orgchart-legend-gap: 40px`; legend set to `box-sizing: border-box` so the escape math is
+    exact.
+- Verified @1440: first col aligned under spine, connector pinned to spine, navigator scrolls
+  (scrollWidth 2695 > 945), no page overflow. Gate: lint 0 errors (7 expected a11y warnings),
+  stylelint clean, breakpoint-check pass, overflow-sweep clean 390/768/1440.
+
+### 2026-08-21 (orgchart — right gutter on branch slider + connector overflow fix)
+- **Right section cut:** the last branch column was flush against the navigator's scroll-clip
+  edge when scrolled fully right. Added `padding-right: 24px` on `.orgchart-branches` so the last
+  column keeps a trailing gutter (matches source).
+- **Connectors overflowing below cards:** the per-column trunk was a single
+  `.orgchart-column::before` with `bottom: 40px` — fine for ~80px cards, but a TALL last card
+  (e.g. "Supervisão de Planos…" at 124px) pushed its centre down, so the fixed 40px bottom landed
+  ~22px BELOW that card's centre → a stub hanging past the card. Replaced the single fixed trunk
+  with PER-CARD connectors: each sub-card's `::before` is a rounded elbow whose BOTTOM is anchored
+  at that card's own centre (`bottom: 50%`) and whose top rises `-50% - 16px` (one card + gap) to
+  the previous card's centre. Because every segment ends at a real card centre, the composed trunk
+  stops EXACTLY at the last card's centre regardless of its height — verified: tall last card
+  connector bottom = card centre (2872), zero overflow; equal-height segments meet exactly (no
+  gaps), tall-card overshoot into the previous card is hidden behind the opaque card.
+- Gate: `npm run lint` 0 errors (7 expected a11y warnings), stylelint clean, `breakpoint-check`
+  pass, overflow-sweep clean at 390/768/1440.
+
+### 2026-08-21 (orgchart — full-band branch panel done right + connector regression fixed + full regression sweep)
+- **Reverted** the per-card connector experiment (it drew extra/duplicate lines). Back to a single
+  continuous column trunk `.orgchart-column::before`, but its `bottom` now reads a JS-set
+  `--orgchart-col-trunk-bottom` (= column height − last sub-card centre), so the trunk ends
+  EXACTLY at the last card's centre even for tall multi-line last cards (no overflow). Verified:
+  all 8 columns `trunkVsLastCentre == 0`.
+- **Down panel now extends full left→right band** (source parity): `.orgchart-branches-area`
+  escapes the chart column via JS-measured custom props — `--orgchart-branches-shift` (chart-left
+  → block-left distance) drives a negative `margin-left`, and `--orgchart-branches-w` (block
+  width) sets the width; `flex-shrink:0` stops the column-flex parent shrinking it. The later
+  `≥768px` `.orgchart-branches-area { width }` rule was ALSO switched to the var (it had been
+  overriding the escape back to the chart width — the bug behind "panel not full width").
+  Verified @1440: branchesArea spans x=72→1368 (1296px = block band), navigator scrolls.
+- **Default rest state under the spine:** `.orgchart-branches` `padding-left: shift` so the first
+  column defaults aligned under "Desenvolvimento de Negócios" (x=423 == spine x); progress bar +
+  arrows get the same `margin-left` AND `width: calc(100% − shift)` so they don't run past the
+  band edge (that had caused a page-overflow regression — now fixed). Connector `::before` pinned
+  at `left: shift + 24px` to stay on the spine trunk.
+- **Full regression sweep across ALL block-sample pages:** overflow-sweep clean at 390/768/1440
+  for all 16 pages; `test:a11y` passes on 15/16 — orgchart's only failure is the PRE-EXISTING
+  brand-colour `color-contrast` on the orange/cyan `.orgchart-card-area` labels (source-exact
+  swatches kept per user decision), all 10 offenders confirmed to be those labels only, no new
+  violations. Lint 0 errors (7 expected a11y warnings), stylelint clean, breakpoint-check pass.
+
 ---
 
 ## 8. Quick-start for the next iteration
@@ -486,3 +734,6 @@ Three source-parity fixes (source `https://petrobras.com.br/`), all scoped to th
    compare against the live source page, then delete the harness.
 4. Always run the quality gate (§2) and paste output before claiming done.
 5. Update §7 with a dated entry describing what you changed and any new gotchas.
+6. Responsive regression check across ALL block-sample pages (needs dev server up):
+   `node tools/quality/overflow-sweep.mjs` — loads every sample at 390/768/1440 and
+   asserts no horizontal page overflow. All 16 pages currently report clean.

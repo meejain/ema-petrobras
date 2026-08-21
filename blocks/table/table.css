@@ -1,0 +1,125 @@
+/* Table block (Petrobras migration).
+   Two variants: specifications (default) and downloads.
+   Values extracted from petrobras.com.br/quem-somos/bunker (specs) and
+   /quem-somos/estagios (downloads). */
+
+.table {
+  --table-text: #373737;
+  --table-spec-border: #d7d7d7;
+  --table-spec-head-bg: #f8f8f8;
+  --table-download-border: #eee;
+  --table-download-link: #008542;
+}
+
+/* Horizontal-scroll container: a wide table scrolls inside this box instead
+   of forcing the whole page to scroll sideways. */
+.table .table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--table-text);
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s); /* 16px */
+  line-height: 1.6;
+}
+
+/* In-cell links are underlined so they are distinguished from surrounding
+   text without relying on colour alone (matches the source, satisfies a11y). */
+main .table td a:any-link {
+  text-decoration: underline;
+}
+
+/* ---------- Specifications variant (default look) ---------- */
+
+.table th,
+.table td {
+  padding: 1px 12px;
+  border: 1px solid var(--table-spec-border);
+  text-align: left;
+  vertical-align: middle;
+  font-weight: 400;
+}
+
+.table thead th,
+.table tbody th {
+  font-weight: 700;
+}
+
+.table thead th {
+  background-color: var(--table-spec-head-bg);
+}
+
+/* ---------- Downloads variant ---------- */
+
+.table.downloads table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table.downloads th,
+.table.downloads td {
+  padding: 16px 12px;
+  border: none;
+  border-bottom: 1px solid var(--table-download-border);
+  border-right: 1px solid var(--table-download-border);
+  font-weight: 700;
+}
+
+.table.downloads thead th {
+  padding: 24px 12px;
+  background-color: var(--background-color);
+}
+
+.table.downloads th:last-child,
+.table.downloads td:last-child {
+  border-right: none;
+}
+
+.table.downloads td p {
+  margin: 0 0 8px;
+}
+
+.table.downloads td p:last-child {
+  margin-bottom: 0;
+}
+
+/* Green document-download links with an inline icon. */
+main .table.downloads a.table-download-link:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--table-download-link);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+main .table.downloads a.table-download-link:hover {
+  text-decoration: none;
+}
+
+.table.downloads .table-download-icon {
+  flex: 0 0 auto;
+}
+
+/* ---------- Tablet and up ---------- */
+
+@media (width >= 768px) {
+  .table th,
+  .table td {
+    padding: 1px 32px;
+  }
+
+  .table.downloads th,
+  .table.downloads td {
+    padding: 16px 24px;
+  }
+
+  .table.downloads thead th {
+    padding: 24px;
+  }
+}

@@ -1,0 +1,103 @@
+/*
+ * Video Block — variant: video (youtube)
+ * Source parity: petrobras.com.br/quem-somos/gasolina.
+ *  - 16:9 responsive container (aspect-ratio), 4px rounded corners, clipped.
+ *  - fills the content column width; centered.
+ *  - lightweight facade (poster + play button) swapped for the iframe on click.
+ */
+
+.video {
+  margin: 0;
+}
+
+.video .video-figure {
+  margin: 0;
+}
+
+/* heading / caption above the player */
+.video .video-caption {
+  margin: 0 0 24px;
+  color: #373737;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);
+  line-height: 1.6;
+}
+
+.video .video-caption > *:first-child {
+  margin-top: 0;
+}
+
+.video .video-caption > *:last-child {
+  margin-bottom: 0;
+}
+
+.video .video-caption h1,
+.video .video-caption h2,
+.video .video-caption h3,
+.video .video-caption h4 {
+  margin: 0 0 8px;
+}
+
+/* 16:9 frame */
+.video .video-frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+/* facade button fills the frame */
+.video .video-play {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.video .video-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video .video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 68px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.video .video-play-icon .video-play-bg {
+  fill: #212121;
+  fill-opacity: 0.8;
+}
+
+.video .video-play:hover .video-play-icon .video-play-bg,
+.video .video-play:focus-visible .video-play-icon .video-play-bg {
+  fill: #c8102e;
+  fill-opacity: 1;
+}
+
+.video .video-play:focus-visible {
+  outline: 3px solid var(--link-color);
+  outline-offset: 3px;
+}
+
+/* the real player, injected on click */
+.video .video-embed {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
