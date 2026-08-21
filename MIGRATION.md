@@ -723,6 +723,30 @@ Three user-reported parity gaps vs the source screenshots, all fixed to match ex
   swatches kept per user decision), all 10 offenders confirmed to be those labels only, no new
   violations. Lint 0 errors (7 expected a11y warnings), stylelint clean, breakpoint-check pass.
 
+### 2026-08-21 (dashboard-tabs — auto-load the dashboard, drop the click facade)
+- **User feedback:** the block showed a green facade with an "Abrir painel interativo" button; the
+  dashboard should load/play automatically.
+- **Verified the source dashboard IS embeddable:** `https://emissoes.petrobras.com.br/` returns 200
+  with no `X-Frame-Options`/CSP `frame-ancestors` restriction, so it can be iframed directly.
+- **Fix (dashboard-tabs.js):** removed the click-to-load facade (poster + open button). Each panel
+  now stores its allowlist-validated embed URL in a data attribute; an `ensureEmbed()` helper
+  injects the `<iframe>` once. The FIRST tab's dashboard loads immediately on decorate; the other
+  tabs load lazily the first time they're selected (so hidden panels stay off the network). Removed
+  the now-dead facade CSS (poster/overlay/open-button/launch-icon); kept the embed sizing
+  (min-height 480/720/1050 across breakpoints). Also dropped the redundant `allowfullscreen`
+  attribute (the `allow="fullscreen"` covers it; silences a console warning). Regenerated the
+  sample + updated its description.
+- **Full regression sweep (all 16 sample pages, 390/768/1440):** lint 0 errors (7 expected a11y
+  warnings), stylelint clean, breakpoint-check pass, overflow-sweep ALL CLEAN. `test:a11y`: 13/16
+  fully pass; the two exceptions are BOTH external/parity, not our code:
+  - **orgchart** — brand-colour `color-contrast` on the orange/cyan `.orgchart-card-area` labels
+    (source-exact swatches, kept per user decision).
+  - **dashboard-tabs** — NEW consequence of auto-loading: axe now traverses the embedded Petrobras
+    emissions dashboard and reports ITS third-party widget issues (`noUi-*` sliders, `ss-content`
+    listboxes, `play-button`, unit `<span>`s). Every violation target is inside the vendor iframe;
+    none are from our block's own tabs/panels (those remain a clean WAI-ARIA tablist). This is the
+    embedded third-party app's a11y debt, which we don't own — flagged, not "fixable" on our side.
+
 ---
 
 ## 8. Quick-start for the next iteration

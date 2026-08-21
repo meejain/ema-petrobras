@@ -60,71 +60,17 @@ export function safeEmbedUrl(raw) {
   return url.href;
 }
 
-// Play/launch glyph shown on the facade open button.
-const LAUNCH_ICON = '<svg class="dashboard-tabs-launch-icon" aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
-
-function buildFacade(url, posterCell, label, panelId) {
-  const facade = document.createElement('div');
-  facade.className = 'dashboard-tabs-facade';
-
-  // Optional poster image (moved from the authored cell, never re-injected).
-  const posterImg = posterCell?.querySelector('picture, img');
-  if (posterImg) {
-    const posterWrap = document.createElement('div');
-    posterWrap.className = 'dashboard-tabs-poster';
-    posterWrap.setAttribute('aria-hidden', 'true');
-    posterWrap.append(posterImg.closest('picture') || posterImg);
-    facade.append(posterWrap);
-  }
-
-  const overlay = document.createElement('div');
-  overlay.className = 'dashboard-tabs-overlay';
-
-  // Optional caption text from the poster cell (text nodes only).
-  const captionText = posterCell
-    ? [...posterCell.childNodes]
-      .filter((n) => n.nodeType === Node.TEXT_NODE
-        || (n.nodeType === Node.ELEMENT_NODE && !n.matches('picture, img, a')))
-      .map((n) => n.textContent.trim())
-      .filter(Boolean)
-      .join(' ')
-    : '';
-  if (captionText) {
-    const caption = document.createElement('p');
-    caption.className = 'dashboard-tabs-caption';
-    caption.textContent = captionText;
-    overlay.append(caption);
-  }
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'dashboard-tabs-open';
-  button.setAttribute('aria-label', `Carregar painel: ${label}`);
-  button.insertAdjacentHTML('afterbegin', LAUNCH_ICON);
-  const btnLabel = document.createElement('span');
-  btnLabel.className = 'dashboard-tabs-open-label';
-  btnLabel.textContent = 'Abrir painel interativo';
-  button.append(btnLabel);
-  overlay.append(button);
-
-  facade.append(overlay);
-
-  button.addEventListener('click', () => {
-    const iframe = document.createElement('iframe');
-    iframe.className = 'dashboard-tabs-embed';
-    iframe.src = url;
-    iframe.title = label;
-    iframe.loading = 'lazy';
-    iframe.setAttribute('allow', 'fullscreen');
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.referrerPolicy = 'no-referrer-when-downgrade';
-    facade.replaceWith(iframe);
-    // Move focus into the newly loaded region for keyboard users.
-    const panel = document.getElementById(panelId);
-    if (panel) panel.focus();
-  }, { once: true });
-
-  return facade;
+// Build the dashboard <iframe> for a panel. Host is already allowlist-validated
+// by safeEmbedUrl before this is called.
+function buildEmbed(url, label) {
+  const iframe = document.createElement('iframe');
+  iframe.className = 'dashboard-tabs-embed';
+  iframe.src = url;
+  iframe.title = label;
+  iframe.loading = 'lazy';
+  iframe.setAttribute('allow', 'fullscreen');
+  iframe.referrerPolicy = 'no-referrer-when-downgrade';
+  return iframe;
 }
 
 export default function decorate(block) {
@@ -178,7 +124,12 @@ export default function decorate(block) {
       || safeEmbedUrl(urlCell?.textContent);
 
     if (url) {
-      panel.append(buildFacade(url, cells[2], label, panelId));
+      // Stash the validated URL + label; the iframe is injected lazily the first
+      // time this panel becomes active (the first tab loads immediately). This
+      // auto-loads the dashboard — no manual "open" click — while still keeping
+      // hidden panels' iframes off the network until their tab is selected.
+      panel.dataset.embedUrl = url;
+      panel.dataset.embedLabel = label;
     } else if (urlCell) {
       // No valid embed URL — degrade gracefully by keeping authored content.
       panel.append(...urlCell.childNodes);
@@ -190,13 +141,23 @@ export default function decorate(block) {
     panels.push(panel);
   });
 
+  // Inject a panel's dashboard iframe once (idempotent).
+  function ensureEmbed(panel) {
+    const { embedUrl, embedLabel } = panel.dataset;
+    if (!embedUrl || panel.querySelector('.dashboard-tabs-embed')) return;
+    panel.append(buildEmbed(embedUrl, embedLabel));
+  }
+
   function select(index, focus = true) {
     tabs.forEach((tab, i) => {
       const selected = i === index;
       tab.setAttribute('aria-selected', selected ? 'true' : 'false');
       tab.tabIndex = selected ? 0 : -1;
       panels[i].hidden = !selected;
-      if (selected && focus) tab.focus();
+      if (selected) {
+        ensureEmbed(panels[i]);
+        if (focus) tab.focus();
+      }
     });
   }
 
@@ -216,5 +177,9 @@ export default function decorate(block) {
   });
 
   block.textContent = '';
-  if (tabs.length) block.append(tablist, panelsWrap);
+  if (tabs.length) {
+    block.append(tablist, panelsWrap);
+    // Auto-load the first (active) panel's dashboard immediately.
+    ensureEmbed(panels[0]);
+  }
 }

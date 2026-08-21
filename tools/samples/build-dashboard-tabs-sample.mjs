@@ -3,10 +3,11 @@
  *
  * The dashboard-tabs block replicates the tabbed data-dashboard container from
  * petrobras.com.br/sustentabilidade/dados-abertos. The real dashboard lives in a
- * proprietary backend app (emissoes.petrobras.com.br); each tab here switches a
- * facade panel that lazy-loads that external dashboard iframe on click (host
- * allowlisted). Authored as a table, one row per tab:
- *   | Tab label | Embed URL | Optional poster/caption |
+ * backend app (emissoes.petrobras.com.br); each tab auto-loads that external
+ * dashboard iframe when it becomes active (the first tab loads immediately; the
+ * others load lazily the first time they're selected). Hosts are allowlisted.
+ * Authored as a table, one row per tab:
+ *   | Tab label | Embed URL | Optional caption |
  *
  * Idempotent: re-running overwrites the sample.
  * Run: node tools/samples/build-dashboard-tabs-sample.mjs
@@ -49,7 +50,7 @@ ${TOP}
 </div>
 <div>
   <h1>Dashboard Tabs (Dados Abertos)</h1>
-  <p>Dashboard Tabs block: an accessible tabbed container (role=tablist/tab/tabpanel, roving tabindex) mirroring the Dados Abertos dashboard. Each tab reveals a facade that lazy-loads the external, host-allowlisted dashboard iframe only on click (keep-it-100). Author one row per tab: label, embed URL, and an optional caption/poster.</p>
+  <p>Dashboard Tabs block: an accessible tabbed container (role=tablist/tab/tabpanel, roving tabindex) mirroring the Dados Abertos dashboard. Each tab auto-loads the external, host-allowlisted dashboard iframe when it becomes active (first tab immediately; others lazily on first selection). Author one row per tab: label, embed URL, and an optional caption.</p>
 ${GAP}
 ${block}
 ${GAP}
