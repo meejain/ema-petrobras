@@ -59,6 +59,15 @@ body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .
   color: #fff;
 }
 
+/* hero-slider pages: the source top menu is a ".translucid" glass bar — a subtle
+   translucent DARK tint (var(--color-opacity-dark-level-02)) plus an 8px backdrop
+   blur, NOT the taller dark→transparent fade the default hero uses and NOT fully
+   transparent. Reproduce the frosted-glass look (keeps the white 12px/700 text). */
+body:has(main .hero.slider) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility {
+  background: rgb(0 0 0 / 20%);
+  backdrop-filter: blur(8px);
+}
+
 header .nav-utility-inner {
   display: flex;
   align-items: center;
@@ -1445,6 +1454,13 @@ body.nav-mobile-open {
 
   body:has(main .hero:not(.diagonal-split)) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility {
     background: rgb(0 0 0 / 32%);
+  }
+
+  /* hero-slider pages: source top menu is a ".translucid" glass bar — subtle
+     dark tint + 8px backdrop blur (not the default hero's dark band). */
+  body:has(main .hero.slider) header .nav-wrapper:not(.is-compact, .is-open) .nav-utility {
+    background: rgb(0 0 0 / 20%);
+    backdrop-filter: blur(8px);
   }
 
   header .nav-utility-inner {

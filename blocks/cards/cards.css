@@ -678,3 +678,103 @@
     width: calc((100% - (2 * 24px)) / 3);
   }
 }
+
+/* ================================================================== *
+ * Variant: cards product
+ * Source: petrobras.com.br/transicao-energetica
+ *   ("combustíveis mais sustentáveis" — CAP Pro / Diesel R / SAF / Biobunker)
+ * White vertical cards on a green page band: a full-width photo on top with
+ * rounded top corners (245px tall, object-fit:cover), then a padded body with
+ * a dark bold title (#373737 24px/700), a yellow accent bar, a description
+ * (#373737 16px/1.6), and a green underlined link (#008542 14px/700).
+ * Columns: 1 -> 2 (>=576) -> 4 (>=992). Gap 32px. Measured 1440/768/390.
+ * ================================================================== */
+.cards.product > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  grid-template-columns: none;
+}
+
+.cards.product > ul > li {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* full-width photo on top, rounded top corners (via the card's overflow) */
+.cards.product .cards-card-image {
+  line-height: 0;
+}
+
+.cards.product .cards-card-image img {
+  width: 100%;
+  height: 245px;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* padded body holding title + yellow bar + description + link */
+.cards.product .cards-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px;
+}
+
+.cards.product .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  color: #373737;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* yellow accent bar under the title (source: 40x4 gold) */
+.cards.product .cards-card-body :is(h1, h2, h3, h4, h5, h6)::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 20px;
+  background-color: rgb(253 200 47);
+}
+
+.cards.product .cards-card-body p {
+  margin: 24px 0 0;
+  color: #373737;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* green underlined link, pushed to the bottom of the card */
+.cards.product .cards-card-body p:last-child {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.cards.product .cards-card-body a:any-link {
+  color: rgb(0 133 66);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: underline;
+}
+
+@media (width >= 576px) {
+  .cards.product > ul > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .cards.product > ul > li {
+    width: calc((100% - (3 * 32px)) / 4);
+  }
+}

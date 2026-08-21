@@ -30,28 +30,29 @@ const spacer = (desktop, tablet, mobile) => {
 
 const GAP = spacer('48px', null, '40px'); // breathing room around the sample
 
-// Each slide = one authored row: [ image cell ][ heading + description + CTA ].
+// Each slide = one authored row: [ image cell ][ heading + description ].
+// The source produtos banner has NO CTA button in the hero — just a heading,
+// a yellow accent bar, and the description — so the sample omits the CTA to
+// match the source exactly. (The block JS still decorates an optional CTA when
+// a slide provides one, so the variant remains reusable on pages that need it.)
 const slides = [
   {
     img: 'https://petrobras.com.br/documents/2677942/38145008/produtos-banner-petrobras.webp/f4cb8cd2-c235-ab3a-d560-ecca431bd475?version=1.0&t=1752588235000',
     alt: 'Foto aérea de diversas autoestradas com carros, representando o uso de produtos da Petrobras.',
     heading: 'Desenvolvemos produtos para variados públicos',
     body: 'Nossos produtos são desenvolvidos com tecnologia e qualidade, com diferentes aplicações, para atender às demandas diversas da sociedade.',
-    cta: { label: 'Conheça nossos produtos', href: '/quem-somos/produtos' },
   },
   {
     img: 'https://petrobras.com.br/documents/2677942/41758384/operacoes-bolivia.jpg/9ff552b8-9bdf-cd1f-7207-d873571428fc?version=1.0&t=1760710441000',
     alt: 'Vista aérea de instalações industriais da Petrobras em meio à paisagem árida.',
     heading: 'Energia que move o país',
     body: 'O nosso trabalho e a nossa tecnologia estão em todos os lugares: nas estradas, nos oceanos, nos céus, nas indústrias e nos postos.',
-    cta: { label: 'Nossa energia', href: '/transicao-energetica' },
   },
   {
     img: 'https://petrobras.com.br/documents/2677942/38145008/produtos-banner-petrobras.webp/f4cb8cd2-c235-ab3a-d560-ecca431bd475?version=1.0&t=1752588235000',
     alt: 'Foto aérea de autoestradas movimentadas, ilustrando a presença dos combustíveis Petrobras.',
     heading: 'Tecnologia e qualidade em cada produto',
     body: 'Da aviação à navegação, dos fertilizantes aos combustíveis mais sustentáveis, entregamos soluções para diferentes setores.',
-    cta: { label: 'Produtos mais sustentáveis', href: '/produtos-mais-sustentaveis' },
   },
 ];
 
@@ -60,13 +61,19 @@ const slideRow = (s) => `    <div>
       <div>
         <h1>${s.heading}</h1>
         <p>${s.body}</p>
-        <p><a href="${s.cta.href}">${s.cta.label}</a></p>
       </div>
     </div>`;
 
-const block = `  <div class="hero slider">
+// The block MUST be wrapped in a section <div> — in EDS .plain.html a bare
+// top-level <div> is a SECTION, so an unwrapped `<div class="hero slider">`
+// would BECOME the section (class "hero slider section") and never get
+// decorated as a block. Wrapping it (as the diagonal-split sample does) keeps
+// it a block inside the first section.
+const block = `<div>
+  <div class="hero slider">
 ${slides.map(slideRow).join('\n')}
-  </div>`;
+  </div>
+</div>`;
 
 // The hero slider is a FULL-BLEED banner that sits at the very top of the page,
 // UNDER the transparent/overlay header — exactly like the source product page and
@@ -78,7 +85,7 @@ const page = `${block}
 <div>
 ${GAP}
   <h2>Hero (slider)</h2>
-  <p>Hero variant rendered as a full-bleed carousel: image slides with a white heading, a description, and an optional green pill CTA, plus a bottom-left control cluster (play/pause, previous/next arrows, and dot pagination). Autoplays, pauses on hover/focus, respects reduced motion, and is keyboard operable. Author the block as <strong>Hero (slider)</strong> with one row per slide.</p>
+  <p>Hero variant rendered as a full-bleed carousel: image slides with a white heading, a yellow accent bar, and a description, plus a bottom-left control cluster (play/pause and previous/next arrows). Autoplays, pauses on hover/focus, respects reduced motion, and is keyboard operable. Author the block as <strong>Hero (slider)</strong> with one row per slide.</p>
   <p>Source: <a href="https://petrobras.com.br/quem-somos/produtos">https://petrobras.com.br/quem-somos/produtos</a></p>
 ${GAP}
 </div>

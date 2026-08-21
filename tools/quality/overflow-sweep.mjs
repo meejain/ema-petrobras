@@ -6,7 +6,7 @@
 import { chromium } from 'playwright';
 
 const pages = ['accordion', 'tabs', 'table', 'columns-stats', 'columns-feature',
-  'cards-overlay', 'cards-audio', 'video', 'downloads', 'hero-slider', 'timeline',
+  'cards-overlay', 'cards-audio', 'cards-product', 'video', 'downloads', 'hero-slider', 'timeline',
   'biome-explorer', 'dashboard-tabs', 'flipbook', 'web-story', 'orgchart'];
 const widths = [390, 768, 1440];
 const base = 'http://localhost:3000/content/drafts/block-samples/';

@@ -372,3 +372,41 @@ main .section.highlight {
   margin: 0;
   padding: 40px 0;
 }
+
+/* section style: green — full-bleed dark-green band (source: petrobras.com.br/
+   transicao-energetica "combustíveis mais sustentáveis"). White heading with a
+   yellow accent bar + white body copy; contained blocks (e.g. cards.product)
+   keep their own white-card styling. Authored via Section Metadata: style=green. */
+main .section.green {
+  background-color: #00552a;
+  margin: 0;
+  padding: 48px 0;
+}
+
+/* heading + body copy in the band are white. Scoped to default content so a
+   contained block's own text (e.g. white product cards) is not affected. */
+main .section.green .default-content-wrapper :is(h1, h2, h3, h4, h5, h6),
+main .section.green .default-content-wrapper p {
+  color: #fff;
+}
+
+/* yellow accent bar under each default-content heading (source: 24x3 gold) */
+main .section.green .default-content-wrapper :is(h1, h2, h3, h4, h5, h6)::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin-top: 16px;
+  background-color: rgb(253 200 47);
+}
+
+/* generous breathing room inside the band (source: ~big gap heading→cards and
+   cards→note). The intro heading sits well above the cards; the trailing note
+   sits well below them. Scoped to the green section only. */
+main .section.green .default-content-wrapper:first-child :is(h1, h2, h3, h4, h5, h6) {
+  margin-bottom: 56px;
+}
+
+main .section.green .default-content-wrapper:last-child {
+  margin-top: 48px;
+}

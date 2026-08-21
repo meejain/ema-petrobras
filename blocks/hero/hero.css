@@ -646,6 +646,18 @@ main > .section.hero-container {
   line-height: 1.2;
 }
 
+/* yellow accent bar under the heading (source: short gold bar between the
+   heading and the body copy) — matches the default/diagonal-split hero bar. */
+.hero.slider .hero-slide-content h1::after,
+.hero.slider .hero-slide-content h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin-top: 26px;
+  background-color: rgb(253 200 47);
+}
+
 .hero.slider .hero-slide-content p {
   margin: 0;
   color: #373737;
@@ -736,47 +748,6 @@ main > .section.hero-container {
 .hero.slider .hero-slider-prev svg,
 .hero.slider .hero-slider-next svg {
   display: block;
-}
-
-/* pagination dots */
-.hero.slider .hero-slider-dots {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 8px;
-}
-
-/* 24x24 hit target (WCAG target-size) with a 10px visible dot centred inside */
-.hero.slider .hero-slider-dots button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.hero.slider .hero-slider-dots button::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border: 1px solid #fff;
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 0.2s ease;
-}
-
-.hero.slider .hero-slider-dots button[aria-current="true"]::before {
-  background: #fff;
-}
-
-.hero.slider .hero-slider-dots button:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-  border-radius: 50%;
 }
 
 /* respect reduced motion: no cross-fade animation */

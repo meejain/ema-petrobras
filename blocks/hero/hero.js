@@ -218,8 +218,10 @@ const HERO_AUTOPLAY_MS = 6000;
 // Static, trusted inline SVGs (white strokes) mirroring the source controls.
 const HERO_ICON_PAUSE = '<svg viewBox="0 0 14 16" fill="none" aria-hidden="true" focusable="false" width="14" height="16"><path d="M12.625 1.125H9.8125C9.4673 1.125 9.1875 1.4048 9.1875 1.75V14.25C9.1875 14.5952 9.4673 14.875 9.8125 14.875H12.625C12.9702 14.875 13.25 14.5952 13.25 14.25V1.75C13.25 1.4048 12.9702 1.125 12.625 1.125Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.1875 1.125H1.375C1.0298 1.125 0.75 1.4048 0.75 1.75V14.25C0.75 14.5952 1.0298 14.875 1.375 14.875H4.1875C4.5327 14.875 4.8125 14.5952 4.8125 14.25V1.75C4.8125 1.4048 4.5327 1.125 4.1875 1.125Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const HERO_ICON_PLAY = '<svg viewBox="0 0 18 20" fill="none" aria-hidden="true" focusable="false" width="18" height="20"><path d="M16.3844 9.3625 2.8938 1.1125C2.7802 1.0425 2.65 1.004 2.5166 1.001 2.3832 0.998 2.2514 1.0308 2.1349 1.0957 2.0183 1.1607 1.9212 1.2556 1.8535 1.3706 1.7859 1.4856 1.7502 1.6166 1.75 1.75V18.25C1.7502 18.3835 1.7859 18.5144 1.8535 18.6295 1.9212 18.7445 2.0183 18.8393 2.1349 18.9043 2.2514 18.9693 2.3832 19.002 2.5166 18.999 2.65 18.9961 2.7802 18.9576 2.8938 18.8875L16.3844 10.6375C16.4952 10.572 16.5869 10.4788 16.6507 10.367 16.7145 10.2552 16.748 10.1287 16.748 10 16.748 9.8714 16.7145 9.7449 16.6507 9.6331 16.5869 9.5213 16.4952 9.4281 16.3844 9.3625Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const HERO_ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" width="24" height="24"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const HERO_ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" width="24" height="24"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// Long arrows WITH a shaft (source uses ← / → , not bare chevrons): a full-width
+// horizontal line plus an arrowhead at the leading edge.
+const HERO_ICON_PREV = '<svg viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false" width="28" height="24"><path d="M26 12H2m0 0l9-9m-9 9l9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const HERO_ICON_NEXT = '<svg viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false" width="28" height="24"><path d="M2 12h24m0 0l-9-9m9 9l-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function decorateSlider(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
@@ -278,10 +280,6 @@ function decorateSlider(block) {
       if (active) s.removeAttribute('inert');
       else s.setAttribute('inert', '');
     });
-    block.querySelectorAll('.hero-slider-dots button').forEach((dot, i) => {
-      if (i === current) dot.setAttribute('aria-current', 'true');
-      else dot.removeAttribute('aria-current');
-    });
   };
 
   // Single slide: no controls, no autoplay — just show it.
@@ -336,19 +334,8 @@ function decorateSlider(block) {
   next.addEventListener('click', () => setActive(current + 1));
   nav.append(prev, next);
 
-  const dots = document.createElement('div');
-  dots.className = 'hero-slider-dots';
-  dots.setAttribute('role', 'group');
-  dots.setAttribute('aria-label', 'Selecionar slide');
-  slides.forEach((s, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.setAttribute('aria-label', `Ir para o slide ${i + 1}`);
-    dot.addEventListener('click', () => setActive(i));
-    dots.append(dot);
-  });
-
-  controls.append(playPause, nav, dots);
+  // Source controls are play/pause + prev/next only — no dot pagination.
+  controls.append(playPause, nav);
   block.append(controls);
 
   // keyboard: arrow keys advance/retreat when focus is within the carousel.
