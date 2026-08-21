@@ -384,13 +384,30 @@ export default function decorate(block) {
 
     controls.append(prev, next);
     branchesArea.append(controls);
-    // Compute initial arrow state once layout has settled. A single rAF can
-    // fire before the responsive grid applies, so re-check after paint too.
-    const relayout = () => { sizeBranchesBand(); updateArrows(); alignColumnTrunks(); };
+    // Relayout order matters: size the band FIRST (it reflows column widths, so
+    // card text rewraps and heights change), THEN — on the NEXT frame, once that
+    // reflow has settled — recompute the per-column trunk anchors and arrows.
+    // Doing them in the same frame would measure stale (pre-reflow) heights and
+    // leave the last card's connector "hanging" above a now-taller column.
+    const relayout = () => {
+      sizeBranchesBand();
+      requestAnimationFrame(() => {
+        updateArrows();
+        alignColumnTrunks();
+      });
+    };
     requestAnimationFrame(relayout);
     setTimeout(relayout, 200);
     window.addEventListener('resize', relayout);
     window.addEventListener('load', relayout);
+
+    // Recompute trunk anchors whenever a column actually changes size (late font
+    // loads, image reflows, zoom) so the trunk always ends at the real last-card
+    // centre — no stale value leaving a hanging connector.
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => alignColumnTrunks());
+      branches.querySelectorAll('.orgchart-column').forEach((col) => ro.observe(col));
+    }
   } else {
     // No grouping info — render all cards in a single responsive column.
     nodeRows.forEach(({ cells }) => chart.append(buildCard(cells)));

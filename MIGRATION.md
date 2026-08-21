@@ -747,6 +747,21 @@ Three user-reported parity gaps vs the source screenshots, all fixed to match ex
     none are from our block's own tabs/panels (those remain a clean WAI-ARIA tablist). This is the
     embedded third-party app's a11y debt, which we don't own — flagged, not "fixable" on our side.
 
+### 2026-08-21 (orgchart — fixed hanging last-card connectors after full-band reflow)
+- **Symptom (user screenshot):** the LAST sub-card in several branch columns (e.g. "Segurança da
+  Informação", "Privacidade") showed its elbow connector floating/detached — the column trunk
+  ended a few px above the last card's centre.
+- **Root cause:** the per-column trunk end is JS-anchored via `--orgchart-col-trunk-bottom`
+  (= column height − last-card centre). That was computed in the SAME frame as `sizeBranchesBand()`,
+  which widens the branch band → reflows the columns → rewraps multi-line card text → changes
+  heights. So the trunk value was measured against STALE (pre-reflow) heights and ended short.
+- **Fix (orgchart.js):** in `relayout()`, size the band first, then recompute arrows + trunk
+  anchors on the NEXT `requestAnimationFrame` (after the reflow settles). Added a `ResizeObserver`
+  on every `.orgchart-column` so the trunk re-anchors whenever a column's size actually changes
+  (late font loads, zoom, resize) — no stale value can leave a hanging connector.
+- Verified @1440: all 8 columns `gap == 0` between trunk-end and last-card centre. Gate: lint 0
+  errors (7 expected a11y warnings), stylelint clean, breakpoint-check pass, overflow-sweep clean.
+
 ---
 
 ## 8. Quick-start for the next iteration

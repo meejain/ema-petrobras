@@ -257,19 +257,19 @@ main .orgchart a.orgchart-doc-button:any-link::after {
   margin-left: 33px;
 }
 
-/* Rounded elbow from the trunk into each child card at mid-height. The elbow's
-   left edge aligns with the trunk (spine x=24; child left is at x=33, so the
-   elbow spans the 9px between them) and its border curves up into the trunk. */
+/* Rounded elbow from the trunk into each child card at mid-height. A perfect
+   9×9 square with a 9px corner radius = one clean quarter-arc (no straight
+   leftover). Left edge aligns with the trunk (spine x=24; child left at x=33). */
 .orgchart .orgchart-spine-children .orgchart-node::before {
   content: "";
   position: absolute;
-  top: calc(50% - 10px);
+  top: calc(50% - 9px);
   left: -9px;
   width: 9px;
-  height: 10px;
+  height: 9px;
   border-left: 1px solid var(--orgchart-connector);
   border-bottom: 1px solid var(--orgchart-connector);
-  border-bottom-left-radius: 8px;
+  border-bottom-left-radius: 9px;
 }
 
 /* Navigator: the horizontally-scrollable viewport for the branch columns.
@@ -389,17 +389,19 @@ main .orgchart a.orgchart-doc-button:any-link::after {
 }
 
 /* Small rounded elbow from the trunk into each sub-department card at its
-   mid-height (trunk at x=24, sub-card left at x=33 → 9px elbow). */
+   mid-height (trunk at x=24, sub-card left at x=33 → 9px elbow). The box is a
+   perfect 9×9 square with a 9px corner radius, so the whole corner is ONE clean
+   quarter-arc — no straight leftover sticking up past where the curve starts. */
 .orgchart .orgchart-column .orgchart-node:not(.orgchart-column-header)::before {
   content: "";
   position: absolute;
-  top: calc(50% - 10px);
+  top: calc(50% - 9px);
   left: -9px;
   width: 9px;
-  height: 10px;
+  height: 9px;
   border-left: 1px solid var(--orgchart-connector);
   border-bottom: 1px solid var(--orgchart-connector);
-  border-bottom-left-radius: 8px;
+  border-bottom-left-radius: 9px;
 }
 
 /* Prev/next slider controls, aligned to the right (as on the source).
