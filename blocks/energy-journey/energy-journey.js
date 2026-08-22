@@ -1,45 +1,34 @@
 /*
- * Energy Journey — the pinned scrollytelling centerpiece of
- * petrobras.com.br/en/jornada-da-energia ("The Journey of Energy").
+ * Energy Journey — the pinned line-drawing scrollytelling centerpiece of
+ * petrobras.com.br/en/jornada-da-energia (source ".section-slider-green").
  *
- * A full-height block whose FIRST authored row is the pinned background (a
- * looping muted video that stays fixed while the stages scroll over it), and
- * whose remaining rows are STAGES. Each stage reveals as it enters the viewport
- * (IntersectionObserver + CSS transition — no scroll library, no-build), and a
- * decorative yellow progress line fills as you advance through the journey.
+ * Behavior (reverse-engineered from the source, reproduced WITHOUT Swiper/GSAP
+ * per the No-Build rule):
+ *  - An opening title with a white dot; when the section reaches the top of the
+ *    viewport, a vertical line draws UP then corners and turns RIGHT
+ *    (the "inherit-line", pure CSS transition toggled by an `is-active` class).
+ *  - The section then PINS (desktop ≥992px): it sticks for a tall scroll
+ *    "track", and scrolling advances an internal STEP index. Each step reveals
+ *    one stage — a white line-drawn Lottie illustration on the left (played once
+ *    on reveal), a horizontal "grow-line" that travels toward it, and a white
+ *    content card on the right (eyebrow + heading + body + gold "Did you know?"
+ *    callout). A left dot-rail tracks the current step (active dot gold).
+ *  - On the last step, the pin releases and the page scrolls to the next
+ *    section. Below 992px the section does NOT pin: stages flow vertically and
+ *    reveal on scroll (IntersectionObserver) — matching the source's mobile
+ *    branch.
  *
  * Authored structure (one row per part):
- *   row 0 (background): [ media cell: a link to the .mp4 (host-allowlisted),
- *                         optional poster <img> ]  [ (optional) empty ]
- *   row 1..n (stages):  [ media cell: a Lottie JSON link OR a <picture> ]
- *                       [ content cell: eyebrow (first <p>/<strong>), an
- *                         <h3> heading, body <p>s, and an optional "Did you
- *                         know?" callout authored as an <h4> + following <p> ]
+ *   row 0 (intro): [ an <h2> title + optional <p> ]  (the opening statement)
+ *   row 1..n (stages): [ media cell: a Lottie JSON link OR a <picture> ]
+ *                      [ content cell: eyebrow (leading short <p>/<strong>),
+ *                        an <h3> heading, body, optional "Did you know?"
+ *                        callout as an <h4> + following <p> ]
  *
- * Rendered structure:
- *   .energy-journey
- *     .energy-journey-bg           (sticky/fixed video or poster)
- *     .energy-journey-line         (animated yellow progress line)
- *     .energy-journey-stages
- *       .energy-journey-stage[.is-active] * n
- *         .energy-journey-stage-media   (lottie slot or picture)
- *         .energy-journey-stage-content (eyebrow + h3 + body + callout)
- *
- * Lottie: if a stage media cell links to a *.json file, we render it with a
- * LOCALLY VENDORED lottie player (blocks/energy-journey/lottie_light.min.js) —
- * NOT an external CDN — to honour the No-Build / no-runtime-dependency rule.
- * If the player or JSON is absent, the stage still works (text reveal only).
+ * Lottie is rendered with the LOCALLY VENDORED player
+ * (blocks/energy-journey/lottie_light.min.js) — no external CDN. If the player
+ * or a JSON is missing, the stage still works (text only).
  */
-
-const VIDEO_HOSTS = ['petrobras.com.br', 'www.petrobras.com.br'];
-
-function isAllowedHost(url) {
-  try {
-    return VIDEO_HOSTS.includes(new URL(url, window.location.href).hostname);
-  } catch (e) {
-    return false;
-  }
-}
 
 /* ---- Lottie: load the locally vendored player once, lazily ---- */
 let lottieLoader = null;
@@ -48,7 +37,6 @@ function loadLottie() {
   if (lottieLoader) return lottieLoader;
   lottieLoader = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    // vendored locally in the block folder (no external CDN)
     s.src = `${window.hlx.codeBasePath}/blocks/energy-journey/lottie_light.min.js`;
     s.async = true;
     s.onload = () => resolve(window.lottie);
@@ -59,35 +47,81 @@ function loadLottie() {
 }
 
 /**
- * Render a Lottie animation from a local JSON URL into a container, lazily
- * (only when it first scrolls near the viewport). Falls back silently if the
- * player or the JSON can't load — the stage text still reveals.
- * @param {Element} container the .energy-journey-stage-media element
- * @param {string} jsonUrl absolute/relative path to the animation JSON
+ * Prepare a Lottie animation in a container from a local JSON URL. Returns a
+ * handle with play(); loads the player + JSON on first call and caches the
+ * animation so it plays from the start each time the step is revealed.
+ * @param {Element} container the .energy-journey-anim element
+ * @param {string} jsonUrl path to the animation JSON
+ * @returns {{ play: () => void }}
  */
-function mountLottie(container, jsonUrl) {
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach(async (entry) => {
-      if (!entry.isIntersecting) return;
-      obs.disconnect();
-      const lottie = await loadLottie();
-      if (!lottie) return;
-      let animationData = null;
-      try {
-        const res = await fetch(jsonUrl);
-        if (res.ok) animationData = await res.json();
-      } catch (e) { /* leave as text-only */ }
-      if (!animationData) return;
-      lottie.loadAnimation({
-        container,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData,
-      });
+function createLottieHandle(container, jsonUrl) {
+  let anim = null;
+  let building = false;
+  const build = async () => {
+    if (anim || building) return;
+    building = true;
+    const lottie = await loadLottie();
+    if (!lottie) return;
+    let animationData = null;
+    try {
+      const res = await fetch(jsonUrl);
+      if (res.ok) animationData = await res.json();
+    } catch (e) { /* text-only fallback */ }
+    if (!animationData) return;
+    anim = lottie.loadAnimation({
+      container,
+      renderer: 'svg',
+      loop: false,
+      autoplay: false,
+      animationData,
     });
-  }, { rootMargin: '200px' });
-  io.observe(container);
+  };
+  return {
+    async play() {
+      await build();
+      if (anim) { anim.goToAndStop(0, true); anim.play(); }
+    },
+  };
+}
+
+/** Extract eyebrow/heading/body/callout from an authored content cell. */
+function decorateContent(contentCell, newEnergy) {
+  contentCell.classList.add('energy-journey-content');
+  // eyebrow = a leading short paragraph before the heading
+  const heading = contentCell.querySelector('h1, h2, h3, h4, h5, h6');
+  if (heading) {
+    const prev = heading.previousElementSibling;
+    if (prev && prev.tagName === 'P' && prev.textContent.trim().length < 60) {
+      prev.classList.add('energy-journey-eyebrow');
+    }
+    if (heading.tagName !== 'H3') {
+      const h3 = document.createElement('h3');
+      h3.innerHTML = heading.innerHTML;
+      heading.replaceWith(h3);
+    }
+  }
+  if (newEnergy) {
+    // the .new-energy stages are statement pairs joined by a "What makes it
+    // possible for us…" chip — style that paragraph as a connector.
+    [...contentCell.querySelectorAll('p')].forEach((p) => {
+      if (/what makes .*possible for us/i.test(p.textContent)) {
+        p.classList.add('energy-journey-connector');
+      }
+    });
+    return contentCell;
+  }
+  // callout: the last <h4> (a "Did you know?" marker) + its following paragraph
+  const h4 = [...contentCell.querySelectorAll('h4')].pop();
+  if (h4) {
+    const callout = document.createElement('div');
+    callout.className = 'energy-journey-callout';
+    const after = h4.nextElementSibling;
+    h4.classList.add('energy-journey-callout-title');
+    callout.append(h4);
+    if (after && after.tagName === 'P') callout.append(after);
+    contentCell.append(callout);
+  }
+  return contentCell;
 }
 
 export default function decorate(block) {
@@ -98,56 +132,44 @@ export default function decorate(block) {
   block.setAttribute('aria-roledescription', 'Interactive journey');
   if (!block.hasAttribute('aria-label')) block.setAttribute('aria-label', 'The Journey of Energy');
 
-  const [bgRow, ...stageRows] = rows;
+  const isNewEnergy = block.classList.contains('new-energy');
 
-  // ---- background (pinned video / poster) ----
-  const bg = document.createElement('div');
-  bg.className = 'energy-journey-bg';
-  const bgCell = bgRow ? bgRow.querySelector(':scope > div') : null;
-  const bgLink = bgCell && bgCell.querySelector('a[href]');
-  const bgPoster = bgCell && bgCell.querySelector('img');
-  const bgSrc = bgLink ? bgLink.getAttribute('href') : null;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (bgSrc && isAllowedHost(bgSrc)) {
-    const video = document.createElement('video');
-    video.className = 'energy-journey-bg-video';
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('aria-hidden', 'true');
-    video.preload = 'metadata';
-    if (bgPoster) video.poster = bgPoster.src;
-    const source = document.createElement('source');
-    source.src = bgSrc;
-    source.type = 'video/mp4';
-    video.append(source);
-    bg.append(video);
-    if (!reduceMotion.matches) {
-      const play = () => { const p = video.play(); if (p && p.catch) p.catch(() => {}); };
-      if (video.readyState >= 2) play();
-      else video.addEventListener('loadeddata', play, { once: true });
+  const [introRow, ...stageRows] = rows;
+
+  // ---- opening title (step 0) ----
+  const intro = document.createElement('div');
+  intro.className = 'energy-journey-intro';
+  const introCell = introRow ? introRow.querySelector(':scope > div') || introRow : null;
+  const introHandles = [];
+  if (introCell) {
+    // the .new-energy variant shows a Lottie (the wind turbine) atop the intro,
+    // authored as a leading JSON link in the intro cell.
+    const introJson = introCell.querySelector('a[href$=".json"], a[href*=".json?"]');
+    if (introJson) {
+      const anim = document.createElement('div');
+      anim.className = 'energy-journey-intro-anim';
+      anim.setAttribute('aria-hidden', 'true');
+      introHandles.push(createLottieHandle(anim, introJson.getAttribute('href')));
+      introJson.closest('p')?.remove();
+      introJson.remove();
+      intro.append(anim);
     }
-  } else if (bgPoster) {
-    bg.append(bgPoster.closest('picture') || bgPoster);
+    [...introCell.childNodes].forEach((n) => intro.append(n));
   }
-
-  // dark overlay so the white stage text stays legible over the video
-  const bgOverlay = document.createElement('div');
-  bgOverlay.className = 'energy-journey-bg-overlay';
-  bg.append(bgOverlay);
-
-  // ---- animated progress line ----
-  const line = document.createElement('div');
-  line.className = 'energy-journey-line';
-  const lineFill = document.createElement('span');
-  lineFill.className = 'energy-journey-line-fill';
-  line.append(lineFill);
+  // white dot + inherit-line (draws up, turns right)
+  const dot = document.createElement('div');
+  dot.className = 'energy-journey-dot';
+  dot.setAttribute('aria-hidden', 'true');
+  const inheritLine = document.createElement('div');
+  inheritLine.className = 'energy-journey-inherit-line';
+  dot.append(inheritLine);
+  intro.append(dot);
 
   // ---- stages ----
   const stagesWrap = document.createElement('div');
   stagesWrap.className = 'energy-journey-stages';
 
+  const lottieHandles = [];
   const stages = stageRows.map((row) => {
     const cells = [...row.children];
     const mediaCell = cells.find((c) => c.querySelector('a[href], picture, img')) || cells[0];
@@ -156,67 +178,173 @@ export default function decorate(block) {
     const stage = document.createElement('div');
     stage.className = 'energy-journey-stage';
 
-    // media: lottie JSON link → lottie slot; picture → image
+    // media: lottie JSON link → anim slot; picture → image. plus a grow-line.
+    const image = document.createElement('div');
+    image.className = 'energy-journey-image';
     if (mediaCell) {
-      const media = document.createElement('div');
-      media.className = 'energy-journey-stage-media';
       const jsonLink = mediaCell.querySelector('a[href$=".json"], a[href*=".json?"]');
       const pic = mediaCell.querySelector('picture, img');
       if (jsonLink) {
-        mountLottie(media, jsonLink.getAttribute('href'));
+        const anim = document.createElement('div');
+        anim.className = 'energy-journey-anim';
+        anim.setAttribute('aria-hidden', 'true');
+        image.append(anim);
+        lottieHandles.push(createLottieHandle(anim, jsonLink.getAttribute('href')));
       } else if (pic) {
-        media.append(pic.closest('picture') || pic);
+        const wrap = document.createElement('div');
+        wrap.className = 'energy-journey-anim';
+        wrap.append(pic.closest('picture') || pic);
+        image.append(wrap);
+        lottieHandles.push(null);
+      } else {
+        lottieHandles.push(null);
       }
-      stage.append(media);
+    } else {
+      lottieHandles.push(null);
     }
+    const growLine = document.createElement('div');
+    growLine.className = 'energy-journey-grow-line';
+    growLine.setAttribute('aria-hidden', 'true');
+    image.append(growLine);
+    stage.append(image);
 
-    // content: eyebrow + heading + body + optional "Did you know?" callout
+    // content card
     if (contentCell) {
-      contentCell.className = 'energy-journey-stage-content';
-      // eyebrow = a leading short paragraph before the heading
-      const heading = contentCell.querySelector('h1, h2, h3, h4, h5, h6');
-      if (heading) {
-        const prev = heading.previousElementSibling;
-        if (prev && prev.tagName === 'P' && prev.textContent.trim().length < 60) {
-          prev.classList.add('energy-journey-eyebrow');
-        }
-      }
-      // callout: an <h4> whose text starts with the "Did you know" marker (or a
-      // sole <h4> late in the cell) + its following paragraph, wrapped in a box.
-      const h4 = [...contentCell.querySelectorAll('h4')].pop();
-      if (h4) {
-        const callout = document.createElement('div');
-        callout.className = 'energy-journey-callout';
-        const after = h4.nextElementSibling;
-        h4.classList.add('energy-journey-callout-title');
-        callout.append(h4);
-        if (after && after.tagName === 'P') callout.append(after);
-        contentCell.append(callout);
-      }
-      stage.append(contentCell);
+      const scroll = document.createElement('div');
+      scroll.className = 'energy-journey-content-scroll';
+      // the card body can scroll on desktop; make it keyboard-operable (a11y:
+      // scrollable-region-focusable) and label it from its heading.
+      scroll.tabIndex = 0;
+      scroll.setAttribute('role', 'group');
+      const decorated = decorateContent(contentCell, isNewEnergy);
+      const h = decorated.querySelector('h1, h2, h3');
+      if (h) scroll.setAttribute('aria-label', h.textContent.trim());
+      // move the decorated children into the scroll wrapper
+      [...decorated.childNodes].forEach((n) => scroll.append(n));
+      decorated.append(scroll);
+      stage.append(decorated);
     }
 
     stagesWrap.append(stage);
     return stage;
   });
 
-  block.textContent = '';
-  block.append(bg, line, stagesWrap);
+  // ---- left dot-rail (progress) ----
+  const rail = document.createElement('div');
+  rail.className = 'energy-journey-rail';
+  rail.setAttribute('aria-hidden', 'true');
+  const railDots = stages.map(() => {
+    const d = document.createElement('span');
+    d.className = 'energy-journey-rail-dot';
+    rail.append(d);
+    return d;
+  });
 
-  // ---- reveal stages on scroll + drive the progress line ----
-  const total = stages.length || 1;
-  let activeCount = 0;
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const wasActive = entry.target.classList.contains('is-active');
-      if (entry.isIntersecting) {
+  // ---- assemble: track > pin > (intro, rail, stages) ----
+  const pin = document.createElement('div');
+  pin.className = 'energy-journey-pin';
+  pin.append(intro, rail, stagesWrap);
+  const track = document.createElement('div');
+  track.className = 'energy-journey-track';
+  track.append(pin);
+
+  block.textContent = '';
+  block.append(track);
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(min-width: 992px)');
+
+  // activate the inherit-line (draw up + turn right) when the section is pinned,
+  // and play the intro Lottie (the .new-energy turbine) once on first activation
+  let introPlayed = false;
+  const activateLine = () => {
+    inheritLine.classList.add('is-active');
+    if (!introPlayed && !reduceMotion.matches) {
+      introPlayed = true;
+      introHandles.forEach((h) => h && h.play());
+    }
+  };
+
+  // set the current step: reveal that stage, play its Lottie, update the rail
+  let currentStep = -1;
+  const setStep = (i) => {
+    if (i === currentStep) return;
+    currentStep = i;
+    stages.forEach((s, idx) => s.classList.toggle('is-current', idx === i));
+    railDots.forEach((d, idx) => d.classList.toggle('is-current', idx === i));
+    const handle = lottieHandles[i];
+    if (handle && !reduceMotion.matches) handle.play();
+  };
+
+  // ---- MOBILE (and reduced motion): simple reveal-on-scroll, no pin ----
+  const setupReveal = () => {
+    activateLine();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
         entry.target.classList.add('is-active');
-        if (!wasActive) activeCount += 1;
+        const idx = stages.indexOf(entry.target);
+        const handle = lottieHandles[idx];
+        if (handle && !reduceMotion.matches) handle.play();
+      });
+    }, { threshold: 0.35 });
+    stages.forEach((s) => io.observe(s));
+  };
+
+  // ---- DESKTOP: pinned stepper driven by scroll position within the track ----
+  let scrollHandler = null;
+  const setupPinned = () => {
+    // give the track enough height to scrub through all steps while pinned
+    const stepsCount = stages.length;
+    track.style.height = `${(stepsCount + 1) * 100}svh`;
+    let lineActivated = false;
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const rect = track.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const total = track.offsetHeight - vh; // scrollable distance while pinned
+      // progress 0..1 through the pinned region
+      const scrolled = Math.min(Math.max(-rect.top, 0), total);
+      const p = total > 0 ? scrolled / total : 0;
+      // the pin is engaged while the track spans the viewport top
+      const pinned = rect.top <= 0 && rect.bottom >= vh;
+      if ((pinned || p > 0) && !lineActivated) { activateLine(); lineActivated = true; }
+      // first slice (0..1/(steps+1)) is the intro; remaining maps to steps
+      const seg = 1 / (stepsCount + 1);
+      if (p < seg) {
+        // intro visible, no stage current yet
+        stages.forEach((s) => s.classList.remove('is-current'));
+        railDots.forEach((d) => d.classList.remove('is-current'));
+        intro.style.opacity = '';
+        currentStep = -1;
+      } else {
+        const step = Math.min(stepsCount - 1, Math.floor((p - seg) / seg));
+        intro.style.opacity = '0';
+        setStep(step);
       }
-    });
-    // fill the line proportional to how many stages have been revealed
-    const pct = Math.min(100, Math.round((activeCount / total) * 100));
-    lineFill.style.height = `${pct}%`;
-  }, { threshold: 0.35 });
-  stages.forEach((s) => io.observe(s));
+    };
+    scrollHandler = () => {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    update();
+  };
+
+  const teardownPinned = () => {
+    if (scrollHandler) { window.removeEventListener('scroll', scrollHandler); scrollHandler = null; }
+    track.style.height = '';
+    stages.forEach((s) => s.classList.remove('is-current'));
+    intro.style.opacity = '';
+  };
+
+  const applyMode = () => {
+    teardownPinned();
+    if (desktop.matches && !reduceMotion.matches) setupPinned();
+    else setupReveal();
+  };
+
+  applyMode();
+  // re-evaluate on breakpoint changes (desktop pin ⇄ mobile reveal)
+  if (desktop.addEventListener) desktop.addEventListener('change', applyMode);
 }

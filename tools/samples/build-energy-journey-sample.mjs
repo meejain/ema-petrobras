@@ -1,19 +1,23 @@
 /*
  * Build the energy-journey block-sample page.
  *
- * The energy-journey block is the pinned scrollytelling centerpiece of
- * petrobras.com.br/en/jornada-da-energia. The FIRST authored row is the pinned
- * background (a looping muted video, host-allowlisted); the remaining rows are
- * the 7 journey STAGES, each with an eyebrow, an <h3> heading, body copy, and a
- * "Did you know?" callout (authored as an <h4> + a following <p>).
+ * The energy-journey block is the pinned line-drawing scrollytelling centerpiece
+ * of petrobras.com.br/en/jornada-da-energia (source ".section-slider-green").
  *
- * A stage's media cell may link to a local Lottie JSON (rendered via the block's
- * vendored player) or hold a <picture>; this sample leaves the media cells empty
- * for now (text-reveal only) until the source Lottie JSON files are supplied.
+ * Authored structure:
+ *   row 0 (intro): an <h2> opening statement + a <p>.
+ *   row 1..n (stages): [ media cell: a link to a local Lottie JSON ]
+ *                      [ content cell: an eyebrow <p>, an <h3> heading, body
+ *                        <p>s (and lists/tables), and a "Did you know?" callout
+ *                        authored as an <h4> + a following <p> ].
+ *
+ * The block renders a pinned stepper on desktop (each step reveals a stage,
+ * plays its Lottie, travels a grow-line, advances the left dot-rail) and a
+ * simple reveal-on-scroll flow on mobile. The Lottie JSONs are the source's own
+ * animations, hosted LOCALLY under the sample media folder.
  *
  * The block MUST be wrapped in a section <div> (a bare top-level <div> becomes a
- * SECTION in EDS .plain.html). The journey is the FIRST section (full-bleed,
- * under the overlay header).
+ * SECTION in EDS .plain.html).
  *
  * Idempotent: re-running overwrites the sample.
  *
@@ -22,14 +26,28 @@
 import { writeFile } from 'node:fs/promises';
 
 const OUT = 'content/drafts/block-samples/energy-journey.plain.html';
+const MEDIA = '/media-da/drafts/block-samples/energy-journey';
 
-const VIDEO = 'https://petrobras.com.br/documents/d/f3a44542-113e-11ee-be56-0242ac120002/hero';
+// A short spacer clears the fixed header so its (transparent) utility strip
+// sits over white rather than the green journey band — matching the real page,
+// where a dark hero-movie is the first section and the header text is white.
+const spacer = (desktop, tablet, mobile) => {
+  const rows = [
+    ['Desktop', desktop],
+    ...(tablet ? [['Tablet', tablet]] : []),
+    ['Mobile', mobile],
+  ];
+  const cells = rows.map(([k, v]) => `    <div><div>${k}</div><div>${v}</div></div>`).join('\n');
+  return `  <div class="spacer">\n${cells}\n  </div>`;
+};
 
-// one stage: [ media cell (empty for now) ][ eyebrow + h3 + body[] + callout ]
-const stage = (eyebrow, heading, bodyParas, calloutTitle, calloutBody) => {
+const TOP = spacer('120px', '110px', '84px');
+
+// one stage: [ media cell: Lottie JSON link ][ eyebrow + h3 + body[] + callout ]
+const stage = (json, eyebrow, heading, bodyParas, calloutTitle, calloutBody) => {
   const body = bodyParas.map((p) => `        <p>${p}</p>`).join('\n');
   return `    <div>
-      <div></div>
+      <div><a href="${MEDIA}/${json}">${heading}</a></div>
       <div>
         <p>${eyebrow}</p>
         <h3>${heading}</h3>
@@ -42,6 +60,7 @@ ${body}
 
 const stages = [
   stage(
+    'anim-pessoas.json',
     'Innovation and Technology',
     'It all starts with a lot of research',
     [
@@ -52,6 +71,7 @@ const stages = [
     'Our oil extraction from the pre-salt layer emits 70% less CO2 equivalent per barrel than the world average!',
   ),
   stage(
+    'anim-exploracao.json',
     'Exploration and production',
     'We innovate to overcome technological barriers and expand our frontiers of exploration',
     [
@@ -62,16 +82,19 @@ const stages = [
     'This investment allows us to find new reserves combining efficiency and carbon footprint reduction.',
   ),
   stage(
+    'anim-plataforma.json',
     'Exploration and production',
     'You must be wondering: How is the oil extracted?',
     [
       'Much of our production is done with modern Floating Production, Storage, and Offloading (FPSO) units.',
       'Oil is extracted from producing wells along with water and gas, separated by our FPSO platforms still in high seas. Our new-generation FPSOs also have HISEP technology, which reinjects CO2 on the sea floor.',
+      'The FPSOs transfer the oil to tankers, which transport it to our waterway terminals. From there, the oil is sent to one of our refineries.',
     ],
     'Did you know? Our Santos Basin, in the Pre-Salt Polygon, is the largest oil extraction basin in Brazil.',
     'It is home to the Búzios Field, recipient of the OTC Award. In October 2025, Búzios set a record of 1 million barrels per day.',
   ),
   stage(
+    'anim-refino.json',
     'Refining',
     'In refineries, we use technology to transform crude oil into many different products',
     [
@@ -82,6 +105,7 @@ const stages = [
     'R Diesel has greater thermal and oxidation stability, so it does not damage engines and improves their performance.',
   ),
   stage(
+    'anim-gas.json',
     'Low Carbon Gas and Power',
     'How natural gas is produced to generate electrical energy and fuel?',
     [
@@ -92,6 +116,7 @@ const stages = [
     'Besides household kitchens, LPG can be utilized in the manufacturing of glass, ceramics, and food.',
   ),
   stage(
+    'anim-logistica.json',
     'Logistics',
     'And how does the logistics work to take this energy to people and industries?',
     [
@@ -101,30 +126,23 @@ const stages = [
     'Did you know? Our network of gas and oil pipelines is more than 7,000 km long',
     'This corresponds to the straight-line distance from the extreme north of Brazil to the extreme south of the Americas!',
   ),
-  stage(
-    'Energy transition',
-    'And it is with this energy that we are going to lead a new journey: the energy transition',
-    [
-      'Our gaze is on tomorrow. We are developing a new generation of fuels and products, focusing on new energy sources and cleaner processes.',
-      'It is the beginning of a new journey for our energy.',
-    ],
-    'Did you know? The journey does not end here.',
-    'From oil and gas to bioproducts, offshore wind and green hydrogen, our energy keeps transforming.',
-  ),
 ];
 
 const block = `<div>
+${TOP}
+</div>
+<div>
   <div class="energy-journey">
     <div>
-      <div><a href="${VIDEO}">Vídeo de fundo da Jornada da Energia</a></div>
-      <div></div>
+      <h2>We want to be the best diversified and integrated company in energy in value creation</h2>
+      <p>Building a more sustainable world, reconciling the focus on oil and gas with diversification into low-carbon businesses.</p>
     </div>
 ${stages.join('\n')}
   </div>
 </div>
 <div>
   <h1>Energy Journey</h1>
-  <p>A pinned scrollytelling block: a looping muted background video stays fixed while the journey stages scroll over it, each revealing (fade + rise) as it enters the viewport, with a yellow progress line filling as you advance. Each stage carries an eyebrow, a heading, body copy, and a "Did you know?" callout. A stage's media cell can hold a local Lottie JSON (rendered via the block's vendored SVG player) or a picture. Author the block as <strong>Energy Journey</strong>: the first row is the background video, each following row is a stage.</p>
+  <p>A pinned line-drawing scrollytelling block. An opening statement drops a white dot; a line draws up and turns right, then the section pins and each scroll step reveals a stage: a white line-drawn Lottie illustration on the left, a grow-line travelling toward it, and a white content card on the right (eyebrow, heading, body, and a gold "Did you know?" callout), with a left dot-rail tracking progress. On mobile the section flows vertically and each stage reveals on scroll. Author the block as <strong>Energy Journey</strong>: the first row is the opening title, each following row is a stage (a Lottie JSON link + a content cell).</p>
   <p>Source: <a href="https://petrobras.com.br/en/jornada-da-energia">https://petrobras.com.br/en/jornada-da-energia</a></p>
 </div>
 `;

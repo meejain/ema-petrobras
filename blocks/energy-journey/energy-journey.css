@@ -1,26 +1,37 @@
-/* Energy Journey — pinned scrollytelling centerpiece
-   Source: petrobras.com.br/en/jornada-da-energia ("The Journey of Energy")
+/* Energy Journey — pinned line-drawing scrollytelling centerpiece
+   Source: petrobras.com.br/en/jornada-da-energia (".section-slider-green").
 
-   A tall block with a STICKY full-viewport video background; stages scroll over
-   it and reveal (fade + rise) as they enter view. A decorative yellow progress
-   line fills down the left as you advance. Design tokens measured from source:
-     eyebrow   white #fff, 400, 16px
-     heading   #373737, 700, 32px/1.2
-     body      #fff (over video) / #373737, 16px/1.6
-     callout   gold bg #fdc82f, dark title #373737 700 22px + body
-     line      gold #fdc82f
-   Mobile-first; min-width media queries only. */
+   A green full-viewport section that PINS while you scroll: an initial white
+   dot drops a vertical line that draws UP the viewport, then corners and turns
+   RIGHT (the "inherit-line"). Then step-by-step, each stage reveals a white
+   line-drawn Lottie illustration on the left, a horizontal "grow-line" travels
+   right to meet it, and a white content card on the right shows the copy + a
+   gold "Did you know?" callout. A left dot-rail tracks progress (active dot
+   gold, scaled up). On the last step the pin releases and the page scrolls on.
+
+   Design tokens measured from source:
+     green band  #008542         line/marks  #fff, 2px
+     dot-rail    white ring bullets; active = gold #fdc82f, scale 2
+     card        #fff, radius 16, #373737 copy, 40px pad; h3 32/1.2
+     eyebrow     uppercase #373737 20px (mobile 12)
+     callout     gold #fdc82f panel, dark title
+   Mobile-first; min-width media queries only (breakpoints 576/768/992/1280).
+   Below 992px the section does NOT pin — stages flow vertically and reveal. */
 
 .energy-journey {
-  --ej-gold: rgb(253 200 47);
+  --ej-green: #008542;
+  --ej-gold: #fdc82f;
   --ej-dark: #373737;
 
   position: relative;
   width: 100%;
+  background: var(--ej-green);
+  color: #fff;
 }
 
 /* full-bleed: the journey spans the viewport width */
 .energy-journey-wrapper {
+  width: 100% !important;
   max-width: none !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -32,71 +43,109 @@ main > .section.energy-journey-container {
   padding: 0;
 }
 
-/* ---------- sticky video background ---------- */
-.energy-journey-bg {
-  position: sticky;
-  top: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100svh;
+/* ---------- the pinned viewport ----------
+   On mobile this is just a normal-flow container; on desktop the .pin element
+   inside becomes sticky and the outer .track provides the scroll distance. */
+.energy-journey-track {
+  position: relative;
+}
+
+.energy-journey-pin {
+  position: relative;
   overflow: hidden;
-
-  /* pull the following stages up over the sticky background */
-  margin-bottom: -100svh;
 }
 
-.energy-journey-bg-video,
-.energy-journey-bg picture,
-.energy-journey-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
+/* ---------- opening title (step 0) ---------- */
+.energy-journey-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: 64px var(--layout-gutter);
+  text-align: center;
 }
 
-.energy-journey-bg-overlay {
+.energy-journey-intro h2 {
+  margin: 0;
+  max-width: 900px;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.energy-journey-intro p {
+  margin: 24px 0 0;
+  max-width: 720px;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* the white starting dot + the vertical line that draws up and turns right */
+.energy-journey-dot {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin: 48px auto;
+  border-radius: 100px;
+  background: #fff;
+  box-shadow: 0 0 0 16px rgb(0 0 0 / 16%);
+}
+
+.energy-journey-inherit-line {
   position: absolute;
-  inset: 0;
-  background: rgb(0 0 0 / 45%);
+  right: 50%;
+  bottom: 50%;
+  box-sizing: border-box;
+  width: calc(50vw - 128px);
+  height: 100vh;
+  margin-bottom: -1px;
   pointer-events: none;
 }
 
-/* ---------- animated progress line ---------- */
-.energy-journey-line {
+.energy-journey-inherit-line::before {
+  content: "";
   position: absolute;
   top: 0;
-  left: var(--layout-gutter);
-  z-index: 2;
-  width: 3px;
-  height: 100%;
-  background: rgb(255 255 255 / 20%);
-  pointer-events: none;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  border-radius: 0;
+  transition:
+    height 0.5s ease-in-out 0.5s,
+    border-radius 1s linear,
+    width 0.5s ease-in-out;
 }
 
-.energy-journey-line-fill {
-  display: block;
+.energy-journey-inherit-line.is-active::before {
   width: 100%;
-  height: 0;
-  background: var(--ej-gold);
-  transition: height 0.4s ease;
+  height: 100%;
+  border-radius: 0 0 0 60px;
+  transition:
+    height 0.5s ease-in-out,
+    border-radius 1s linear,
+    width 0.5s ease-in-out 0.5s;
 }
 
 /* ---------- stages ---------- */
 .energy-journey-stages {
   position: relative;
-  z-index: 1;
 }
 
 .energy-journey-stage {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  justify-content: center;
+  gap: 16px;
   min-height: 100svh;
-  padding: 64px var(--layout-gutter);
+  padding: 48px var(--layout-gutter);
 
-  /* reveal-on-scroll: start faded + lowered, animate in when .is-active */
+  /* reveal-on-scroll (mobile) */
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 0.6s ease, transform 0.6s ease;
@@ -107,59 +156,79 @@ main > .section.energy-journey-container {
   transform: none;
 }
 
-.energy-journey-stage-media {
+/* the line-drawn illustration */
+.energy-journey-image {
+  position: relative;
   width: 100%;
-  max-width: 420px;
 }
 
-.energy-journey-stage-media picture,
-.energy-journey-stage-media img,
-.energy-journey-stage-media svg {
+.energy-journey-anim {
+  width: 100%;
+  height: 140px;
+  pointer-events: none;
+}
+
+.energy-journey-anim svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
-.energy-journey-stage-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 620px;
-  color: #fff;
+/* horizontal connector line that grows toward the illustration */
+.energy-journey-grow-line {
+  height: 2px;
+  width: 0;
+  background: #fff;
+  transition: width 1s ease-in-out;
 }
 
-/* eyebrow */
+.energy-journey-stage.is-active .energy-journey-grow-line {
+  width: 0;
+}
+
+/* white content card */
+.energy-journey-content {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ej-dark);
+}
+
 .energy-journey-eyebrow {
-  margin: 0;
-  color: #fff;
-  font-size: 16px;
+  margin: 0 0 8px;
+  color: var(--ej-dark);
+  font-size: 12px;
   font-weight: 400;
+  line-height: 1.6;
+  text-transform: uppercase;
 }
 
-/* stage heading */
-.energy-journey-stage-content :is(h1, h2, h3) {
-  margin: 0;
-  color: #fff;
+.energy-journey-content :is(h1, h2, h3) {
+  margin: 0 0 16px;
+  color: var(--ej-dark);
   font-family: var(--heading-font-family);
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.energy-journey-stage-content p {
-  margin: 0;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 400;
+.energy-journey-content p {
+  margin: 0 0 16px;
+  color: var(--ej-dark);
+  font-size: 15px;
   line-height: 1.6;
 }
 
-.energy-journey-stage-content a:any-link {
-  color: #fff;
+.energy-journey-content a:any-link {
+  color: rgb(0 133 66);
+  font-weight: 700;
   text-decoration: underline;
 }
 
-/* "Did you know?" callout — gold panel with dark text (source) */
+/* "Did you know?" callout — gold panel with dark text */
 .energy-journey-callout {
   margin-top: 8px;
   padding: 24px;
@@ -184,6 +253,48 @@ main > .section.energy-journey-container {
   line-height: 1.6;
 }
 
+/* trailing paragraph reset (placed after the more-specific callout rules to
+   keep selector specificity non-descending for stylelint) */
+.energy-journey-content > p:last-child,
+.energy-journey-content-scroll > p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- left dot-rail (progress) ---------- */
+.energy-journey-rail {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.energy-journey-rail-dot {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  background: transparent;
+  opacity: 1;
+  transition: transform 0.5s ease, background 0.5s ease, border-color 0.5s ease;
+}
+
+.energy-journey-rail-dot.is-current {
+  background: var(--ej-gold);
+  border-color: var(--ej-gold);
+  transform: scale(2);
+}
+
+/* the rail is a progress indicator, decorative — hide from AT */
+.energy-journey-rail[aria-hidden="true"] {
+  /* no-op: documents intent */
+  visibility: visible;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .energy-journey-stage {
     opacity: 1;
@@ -191,46 +302,184 @@ main > .section.energy-journey-container {
     transition: none;
   }
 
-  .energy-journey-line-fill {
+  .energy-journey-inherit-line::before,
+  .energy-journey-grow-line {
     transition: none;
   }
 }
 
-/* ---------- tablet / desktop: two-column stages ---------- */
+/* ---------- tablet ---------- */
 @media (width >= 768px) {
-  .energy-journey-line {
-    left: var(--space-big);
+  .energy-journey-intro h2 {
+    font-size: 40px;
   }
 
   .energy-journey-stage {
-    flex-direction: row;
-    align-items: center;
-    gap: 64px;
     padding: 64px var(--space-big);
-  }
-
-  .energy-journey-stage-media {
-    flex: 0 0 40%;
-    max-width: none;
-  }
-
-  .energy-journey-stage-content {
-    flex: 1;
-  }
-
-  .energy-journey-stage-content :is(h1, h2, h3) {
-    font-size: 32px;
-  }
-
-  .energy-journey-callout-title {
-    font-size: 22px;
   }
 }
 
-/* centre the stage content within the band on wide screens */
-@media (width >= 1280px) {
-  .energy-journey-stage {
-    max-width: var(--content-max-width);
-    margin: 0 auto;
+/* ---------- desktop: PINNED stepper, two-column stages ---------- */
+@media (width >= 992px) {
+  /* the track provides scroll distance; the pin sticks for its duration */
+  .energy-journey-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
   }
+
+  .energy-journey-stages {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* stages are stacked layers; only the current one is visible/active */
+  .energy-journey-stage {
+    position: absolute;
+    inset: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 64px;
+    min-height: 0;
+    padding: 0 8% 0 12%;
+    opacity: 0;
+    transform: none;
+    transition: opacity 0.6s ease-in-out;
+    pointer-events: none;
+  }
+
+  .energy-journey-stage.is-current {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .energy-journey-image {
+    flex: 0 0 540px;
+    max-width: 540px;
+    height: 600px;
+    display: flex;
+    align-items: center;
+  }
+
+  .energy-journey-anim {
+    height: 600px;
+  }
+
+  .energy-journey-content {
+    flex: 1;
+    max-width: 620px;
+    padding: 40px;
+  }
+
+  .energy-journey-eyebrow {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .energy-journey-content :is(h1, h2, h3) {
+    font-size: 32px;
+    margin-bottom: 32px;
+  }
+
+  .energy-journey-content p {
+    font-size: 16px;
+  }
+
+  .energy-journey-content-scroll {
+    max-height: calc(100vh - 320px);
+    overflow: auto;
+    padding-right: 24px;
+  }
+
+  .energy-journey-rail {
+    left: 40px;
+  }
+}
+
+/* =====================================================================
+   Variant: .new-energy — the white "new energy sources" slider section
+   (source ".section-slider-white"). Same pinned stepper, but a light grey
+   theme: dark #343a40 dot, #767676 draw-lines, dark copy on the grey band,
+   gold active rail dots. The intro shows the wind-turbine Lottie; each stage
+   is a statement pair ("We have… / To have…") rather than an illustration.
+   ===================================================================== */
+.energy-journey.new-energy {
+  --ej-green: #f8f8f8;
+  --ej-dark: #343a40;
+
+  background: #f8f8f8;
+  color: var(--ej-dark);
+}
+
+.energy-journey.new-energy .energy-journey-intro h2,
+.energy-journey.new-energy .energy-journey-intro p {
+  color: var(--ej-dark);
+}
+
+/* the turbine sits in the intro on this variant */
+.energy-journey.new-energy .energy-journey-intro-anim {
+  width: 180px;
+  height: 360px;
+  margin: 0 auto 24px;
+  pointer-events: none;
+}
+
+.energy-journey.new-energy .energy-journey-intro-anim svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* dark dot + grey draw-line */
+.energy-journey.new-energy .energy-journey-dot {
+  background: var(--ej-dark);
+  box-shadow: 0 0 0 16px rgb(0 0 0 / 8%);
+}
+
+.energy-journey.new-energy .energy-journey-inherit-line::before {
+  border-left-color: #767676;
+  border-bottom-color: #767676;
+}
+
+.energy-journey.new-energy .energy-journey-grow-line {
+  background: #767676;
+}
+
+/* on this variant the "content card" is transparent (dark text on grey), not a
+   white panel — the statements read directly on the band (source). */
+.energy-journey.new-energy .energy-journey-content {
+  background: transparent;
+  color: var(--ej-dark);
+  padding: 0;
+}
+
+.energy-journey.new-energy .energy-journey-content :is(h1, h2, h3) {
+  color: var(--ej-dark);
+}
+
+.energy-journey.new-energy .energy-journey-content p {
+  color: var(--ej-dark);
+}
+
+/* "What makes it possible for us…" connector chip between the two statements */
+.energy-journey.new-energy .energy-journey-connector {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgb(52 58 64 / 6%);
+  color: var(--ej-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.energy-journey.new-energy .energy-journey-rail-dot {
+  border-color: #343a40;
+}
+
+.energy-journey.new-energy .energy-journey-rail-dot.is-current {
+  background: var(--ej-gold);
+  border-color: var(--ej-gold);
 }

@@ -1,0 +1,35 @@
+/*
+ * Template: jornada-da-energia
+ * Page-scoped styling for petrobras.com.br/en/jornada-da-energia — a complex,
+ * heavily animated scrollytelling page. Everything here is scoped under the
+ * body.jornada-da-energia class (set from the page's `template` metadata by
+ * decorateTemplateAndTheme in aem.js), so it never leaks into other pages or
+ * the shared blocks. Loaded lazily by loadTemplate() in scripts.js.
+ *
+ * This file holds ONLY page-level concerns: the stacked full-height section
+ * rhythm, the page background, and the shared scroll-progress rail. Individual
+ * animated blocks (energy-journey, energy-map, …) keep their own block CSS.
+ *
+ * Mobile-first; min-width media queries only (breakpoints 576/768/992/1280).
+ */
+
+body.jornada-da-energia {
+  /* the source page runs edge-to-edge with its own sectioned backgrounds */
+  --jde-green: #008542;
+  --jde-dark: #373737;
+  --jde-grey: #f8f8f8;
+  --jde-yellow: #fdc82f;
+}
+
+/* full-bleed page: sections manage their own inner width */
+body.jornada-da-energia main .section.jde-full {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+body.jornada-da-energia main .section.jde-full > div {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}

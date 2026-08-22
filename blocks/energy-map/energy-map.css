@@ -14,8 +14,11 @@
                     slides in with translateX + scale + opacity (0.5s).
    Mobile-first; min-width media queries only (breakpoints 576/768/992/1280). */
 
-/* full-bleed: the green map band spans the full viewport width */
+/* full-bleed: the green map band spans the full viewport width. The wrapper is
+   the `main > .section > div` that otherwise gets a centered `min(…, max-width)`
+   width — force it to the full width so the band doesn't hug the left. */
 .energy-map-wrapper {
+  width: 100% !important;
   max-width: none !important;
   padding: 0 !important;
   margin: 0 !important;

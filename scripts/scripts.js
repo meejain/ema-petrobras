@@ -10,6 +10,8 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  getMetadata,
+  toClassName,
 } from './aem.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
@@ -46,6 +48,49 @@ async function loadFonts() {
     if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
   } catch (e) {
     // do nothing
+  }
+}
+
+/**
+ * The template name for this page (from the `template` metadata), normalized
+ * to a class name — or '' when the page has no template. Matches the class
+ * decorateTemplateAndTheme() adds to <body>.
+ * @returns {string} the template class name, or ''
+ */
+function getTemplateName() {
+  const template = getMetadata('template');
+  return template ? toClassName(template) : '';
+}
+
+/**
+ * Eagerly load a page template's scoped CSS (if any) so its styles are ready
+ * before first paint. Templates live in `templates/<name>/<name>.css`.
+ * @returns {Promise<void>}
+ */
+async function loadTemplateCSS() {
+  const name = getTemplateName();
+  if (!name) return;
+  try {
+    await loadCSS(`${window.hlx.codeBasePath}/templates/${name}/${name}.css`);
+  } catch (e) {
+    // template CSS is optional — ignore if absent
+  }
+}
+
+/**
+ * Lazily run a page template's scoped JS (if any). Templates may export a
+ * default `decorateTemplate(main)` for page-level orchestration.
+ * @param {Element} main The main element
+ * @returns {Promise<void>}
+ */
+async function loadTemplateJS(main) {
+  const name = getTemplateName();
+  if (!name) return;
+  try {
+    const mod = await import(`${window.hlx.codeBasePath}/templates/${name}/${name}.js`);
+    if (mod.default) await mod.default(main);
+  } catch (e) {
+    // template JS is optional — ignore if absent
   }
 }
 
@@ -193,6 +238,7 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  await loadTemplateCSS();
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -219,6 +265,8 @@ async function loadLazy(doc) {
 
   const main = doc.querySelector('main');
   await loadSections(main);
+
+  await loadTemplateJS(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
