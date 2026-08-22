@@ -224,14 +224,27 @@ export default function decorate(block) {
   const inheritLine = document.createElement('div');
   inheritLine.className = 'energy-journey-inherit-line';
   dot.append(inheritLine);
+  // the intro dot's own grow-line (source .green-starting-dot .grow-line.to-pessoas)
+  const introGrowLine = document.createElement('div');
+  introGrowLine.className = 'energy-journey-grow-line to-pessoas';
+  introGrowLine.setAttribute('aria-hidden', 'true');
+  dot.append(introGrowLine);
   intro.append(dot);
 
   // ---- stages ----
   const stagesWrap = document.createElement('div');
   stagesWrap.className = 'energy-journey-stages';
 
+  // Per-stage grow-line targets, VERBATIM from the source (.section-slider-green
+  // .grow-line.to-*). Each stage's line has a fixed left/top + a default width
+  // reaching toward its illustration; when the stage's slide becomes active the
+  // line collapses to 0 (source `.swiper-slide-active .grow-line{width:0}`), so
+  // it reads as a line travelling in from the left toward the vector. The intro
+  // dot carries `to-pessoas`; stages carry to-map/boat/factory/storage/truck.
+  const GROW_TARGETS = ['to-map', 'to-boat', 'to-factory', 'to-storage', 'to-truck'];
+
   const lottieHandles = [];
-  const stages = stageRows.map((row) => {
+  const stages = stageRows.map((row, stageIndex) => {
     const cells = [...row.children];
     const mediaCell = cells.find((c) => c.querySelector('a[href], picture, img')) || cells[0];
     const contentCell = cells.find((c) => c !== mediaCell) || cells[1] || cells[0];
@@ -248,6 +261,10 @@ export default function decorate(block) {
       if (jsonLink) {
         const anim = document.createElement('div');
         anim.className = 'energy-journey-anim';
+        // tag the anim with its source name (anim-plataforma → anim-plataforma)
+        // so the per-anim SVG transforms (from the source) can position it.
+        const nameMatch = (jsonLink.getAttribute('href') || '').match(/anim-([a-z0-9]+)/i);
+        if (nameMatch) anim.classList.add(`anim-${nameMatch[1].toLowerCase()}`);
         anim.setAttribute('aria-hidden', 'true');
         image.append(anim);
         lottieHandles.push(createLottieHandle(anim, resolveAnimationUrl(jsonLink.getAttribute('href'))));
@@ -263,10 +280,14 @@ export default function decorate(block) {
     } else {
       lottieHandles.push(null);
     }
-    const growLine = document.createElement('div');
-    growLine.className = 'energy-journey-grow-line';
-    growLine.setAttribute('aria-hidden', 'true');
-    image.append(growLine);
+    // grow-line with the source's per-target class (the last stage has none)
+    const target = GROW_TARGETS[stageIndex];
+    if (target) {
+      const growLine = document.createElement('div');
+      growLine.className = `energy-journey-grow-line ${target}`;
+      growLine.setAttribute('aria-hidden', 'true');
+      image.append(growLine);
+    }
     stage.append(image);
 
     // content card
@@ -310,11 +331,6 @@ export default function decorate(block) {
   const swiperEl = document.createElement('div');
   swiperEl.className = 'swiper energy-journey-swiper';
   swiperEl.append(wrapper);
-  // the continuous baseline the vectors travel along (desktop overlay)
-  const baseline = document.createElement('div');
-  baseline.className = 'energy-journey-baseline';
-  baseline.setAttribute('aria-hidden', 'true');
-  swiperEl.append(baseline);
 
   const pin = document.createElement('div');
   pin.className = 'energy-journey-pin';

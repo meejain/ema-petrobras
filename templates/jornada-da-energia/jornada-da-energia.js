@@ -118,13 +118,8 @@ function orderSections(main) {
  * .section-map__curve + .section-map__line). An elbow at the SECTION top runs
  * from the page centre — where the fixed hero's centre line ends — leftwards and
  * curves down; a vertical line then grows DOWNWARD along the left edge as the
- * section is scrolled. It lives on the section (not the map block) so it stays
- * anchored to the section top even though the block sits below the intro heading.
- *
- * The line height uses the SOURCE formula: max(0, viewportHeight/2 − sectionTop)
- * — so it stays 0 until the section top rises past the viewport MIDDLE (by which
- * point the rising green has covered the hero's centre line from the bottom),
- * then extends down. Desktop only (the CSS guards visibility).
+ * section is scrolled. Drawn as ONE continuous SVG path so there is never a gap
+ * between the elbow and the vertical line. Desktop only (CSS guards visibility).
  * @param {Element} main The main element
  */
 const JDE_NS = 'http://www.w3.org/2000/svg';
@@ -132,9 +127,6 @@ const JDE_NS = 'http://www.w3.org/2000/svg';
 function buildMapConnector(main) {
   const section = main.querySelector(':scope > .section.energy-map-container');
   if (!section) return;
-  // A SINGLE SVG path draws the whole connector — centre-top → down → rounded
-  // corner left → rounded corner down → vertical line. One continuous stroke, so
-  // there is never a junction gap between the elbow and the vertical line.
   const svg = document.createElementNS(JDE_NS, 'svg');
   svg.setAttribute('class', 'jde-map-connector');
   svg.setAttribute('aria-hidden', 'true');
@@ -168,10 +160,10 @@ function buildMapConnector(main) {
     const lineLen = Math.min(Math.max(vh / 2 - rect.top, 0), maxLine);
     const endY = 70 + lineLen;
     // centre-top down, rounded corner turning left (r=30), horizontal to x158,
-    // rounded corner turning down (r=30) at x128, then the vertical line.
+    // rounded corner turning down (r=30) at x128, then the vertical line — ONE
+    // continuous stroke so the elbow and vertical line never separate.
     const d = `M ${cx} 0 V 10 Q ${cx} 40 ${cx - 30} 40 L 158 40 Q 128 40 128 70 V ${endY}`;
     path.setAttribute('d', d);
-    // present while the section top edge is within the viewport
     svg.style.opacity = (rect.top < vh && rect.top > -h) ? '1' : '0';
   };
   const onScroll = () => {

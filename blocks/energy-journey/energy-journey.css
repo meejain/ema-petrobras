@@ -84,6 +84,16 @@ main > .section.energy-journey-container {
   line-height: 1.6;
 }
 
+/* yellow accent bar under the intro heading (source: 40x4 gold, centred) */
+.energy-journey-intro h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 24px auto 0;
+  background: var(--ej-gold);
+}
+
 /* the white starting dot + the vertical line that draws up and turns right */
 .energy-journey-dot {
   position: relative;
@@ -210,25 +220,15 @@ main > .section.energy-journey-container {
   height: 100%;
 }
 
-/* horizontal connector line that grows rightward toward the illustration as a
-   stage is revealed (source `.grow-line`: 2px white, width 0 → target, 1s
-   ease-in-out). Absolutely placed at the vertical centre of the illustration so
-   it reads as a line travelling right and "hitting" the artwork, after which the
-   Lottie plays (the JS delays play() until the line has arrived). */
+/* horizontal connector line — VERBATIM from the source (.section-slider-green
+   .grow-line): a 2px white line, 1s ease-in-out, width 0 by default on mobile
+   (drawn only on the desktop pinned strip, per the desktop rules below). */
 .energy-journey-grow-line {
-  position: absolute;
-  left: 0;
-  top: 50%;
+  background: #fff;
   height: 2px;
   width: 0;
-  background: #fff;
-  transition: width 1s ease-in-out;
+  transition: 1s ease-in-out;
   pointer-events: none;
-}
-
-/* mobile reveal: the line draws across the illustration when the stage enters */
-.energy-journey-stage.is-active .energy-journey-grow-line {
-  width: 100%;
 }
 
 /* white content card */
@@ -391,52 +391,91 @@ main > .section.energy-journey-container {
     transition: none;
   }
 
-  /* intro panel (source slide 0): the statement is LEFT-aligned in the left
-     column; the pin/dot sits on the baseline at centre. (Also beats
-     swiper-bundle's `.swiper-slide{display:block}`.) */
+  /* intro panel (source slide 0, #slider-verde-1): a single CENTERED column —
+     centered heading + yellow accent bar, then the starting dot (marker +
+     inherit-line + grow-line), then centered body. Matches source `.center`. */
   .energy-journey-swiper .energy-journey-intro {
     display: flex;
     position: relative;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 14svh 8% 14svh 12%;
-    text-align: left;
+    align-items: center;
+    justify-content: center;
+    padding: 14svh 12%;
+    text-align: center;
   }
 
   .energy-journey-intro h2,
   .energy-journey-intro p {
-    max-width: 620px;
-    text-align: left;
+    max-width: 720px;
+    text-align: center;
   }
 
-  /* the pin/dot rides on the baseline at the horizontal centre */
+  .energy-journey-intro h2 {
+    font-size: 40px;
+  }
+
+  /* the intro's starting dot sits centred, matching source .green-starting-dot
+     (margin 148px auto 48px). The inherit-line draws UP the viewport and corners
+     RIGHT; the dot's own grow-line (.to-pessoas) then travels toward slide 2. */
   .energy-journey-swiper .energy-journey-intro .energy-journey-dot {
+    position: relative;
+    margin: 148px auto 48px;
+  }
+
+  /* ---- source grow-line mechanic (VERBATIM geometry) ----
+     Each grow-line has a fixed left/top and a DEFAULT width reaching toward its
+     illustration (calc(100vw − Npx)); the transition is 1s ease-in-out. When a
+     slide becomes active (or is upcoming) its line collapses to width 0, so it
+     reads as a line drawing in from the left toward the vector as you advance. */
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line {
     position: absolute;
-    top: 50%;
+    width: calc(100vw - 501px);
+  }
+
+  .energy-journey-swiper .energy-journey-dot .energy-journey-grow-line {
+    bottom: 50%;
     left: 50%;
-    margin: 0;
-    transform: translate(-50%, -50%);
+    margin-bottom: -1px;
   }
 
-  /* the baseline IS the single continuous line on desktop; the intro's
-     inherit-line (vertical + corner) would be a redundant second line, so hide
-     it. The pin/dot already sits on the baseline. */
-  .energy-journey-swiper .energy-journey-inherit-line {
-    display: none;
-  }
-
-  /* the continuous baseline runs across the WHOLE strip at the illustration's
-     vertical centre, connecting every vector — the line you travel along. */
-  .energy-journey-baseline {
-    display: block;
+  .energy-journey-swiper .energy-journey-image .energy-journey-grow-line {
     position: absolute;
-    left: 0;
-    top: 50%;
-    width: 100%;
-    height: 2px;
-    background: #fff;
-    pointer-events: none;
+  }
+
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line.to-map {
+    left: 480px;
+    top: 474px;
+    width: calc(100vw - 248px);
+  }
+
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line.to-boat {
+    left: 430px;
+    top: 299px;
+    width: calc(100vw - 419px);
+  }
+
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line.to-factory {
+    left: 483px;
+    top: 426px;
+    width: calc(100vw - 279px);
+  }
+
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line.to-storage {
+    left: 435px;
+    top: 476px;
+    width: calc(100vw - 398px);
+  }
+
+  .energy-journey-swiper .swiper-slide .energy-journey-grow-line.to-truck {
+    left: 509px;
+    top: 455px;
+    width: calc(100vw - 330px);
+  }
+
+  /* the active slide's line (and every upcoming slide's line) collapses to 0 */
+  .energy-journey-swiper .swiper-slide-active .energy-journey-grow-line,
+  .energy-journey-swiper .swiper-slide-active ~ .swiper-slide .energy-journey-grow-line {
+    width: 0 !important;
   }
 
   .energy-journey-image {
@@ -453,9 +492,27 @@ main > .section.energy-journey-container {
     height: 600px;
   }
 
-  /* the per-stage grow-line is not used on desktop — the baseline is the line */
-  .energy-journey-stage .energy-journey-grow-line {
-    display: none;
+  /* per-anim SVG transforms — VERBATIM from the source
+     (.section-slider-green .green-image .animation-frame.animX svg) so each
+     Lottie sits exactly where the grow-line points. */
+  .energy-journey-anim.anim-pessoas svg {
+    transform: scale(1) translateY(11px) translateX(5px) !important;
+  }
+
+  .energy-journey-anim.anim-exploracao svg {
+    transform: scale(1) translate(-4px, -5px) !important;
+  }
+
+  .energy-journey-anim.anim-plataforma svg {
+    transform: scale(1) translate(-8px, 20px) !important;
+  }
+
+  .energy-journey-anim.anim-gas svg {
+    transform: scale(1) translateY(-1px) !important;
+  }
+
+  .energy-journey-anim.anim-logistica svg {
+    transform: scale(1) translateX(-2px) translateY(8px) !important;
   }
 
   .energy-journey-content {

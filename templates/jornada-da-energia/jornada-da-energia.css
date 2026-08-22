@@ -62,8 +62,15 @@ body.jornada-da-energia main > .section.hero-container:first-child + .section {
    white default. Each carries the same `:not(.hero-container:first-child)` base
    plus its own class, so it wins on both specificity and order. */
 body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-map-container,
-body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container {
+body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container,
+body.jornada-da-energia main > .section:not(.hero-container:first-child).green {
   background-color: var(--jde-green);
+}
+
+/* a default-content green window (e.g. the map intro "explore this journey")
+   also whitens its text and keeps the section flush with the map below it. */
+body.jornada-da-energia main > .section:not(.hero-container:first-child).green :is(h1, h2, h3, h4, h5, h6, p) {
+  color: #fff;
 }
 
 body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container:has(.energy-journey.new-energy) {
@@ -197,14 +204,16 @@ body.jornada-da-energia main > .section.energy-map-container .default-content-wr
 }
 
 /* ---------- continuous connector line on the MAP section (desktop) ----------
-   Source .section-map__curve (centre→left elbow at the section top) +
-   .section-map__line (2px vertical growing down the left edge on scroll). */
+   One continuous SVG path (.jde-map-connector) drawn by the template JS:
+   centre→left rounded elbow at the section top, then a vertical line growing
+   down the left edge on scroll. A single stroke, so the elbow and vertical line
+   never separate. */
 @media (width >= 992px) {
   body.jornada-da-energia .jde-nav {
     display: flex;
   }
 
-  body.jornada-da-energia main > .section.energy-map-container .jde-map-connector {
+  body.jornada-da-energia main > .section.energy-map-container > .jde-map-connector {
     position: absolute;
     top: 0;
     left: 0;
