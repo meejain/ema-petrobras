@@ -160,8 +160,57 @@ body.jornada-da-energia .jde-nav-dot:focus-visible {
   outline-offset: 4px;
 }
 
+/* ---------- map section intro heading (source .section-map heading) ----------
+   The heading + paragraph sit in a centered 680px block, white on the green
+   band, with a gold accent bar under the heading. Authored as default content
+   above the energy-map block. */
+body.jornada-da-energia main > .section.energy-map-container .default-content-wrapper {
+  max-width: 680px;
+  margin-inline: auto;
+  padding: 48px var(--layout-gutter) 24px;
+  text-align: left;
+}
+
+body.jornada-da-energia main > .section.energy-map-container .default-content-wrapper h2 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+body.jornada-da-energia main > .section.energy-map-container .default-content-wrapper h2::after {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 3px;
+  margin: 24px 0 32px;
+  background: var(--jde-yellow);
+}
+
+body.jornada-da-energia main > .section.energy-map-container .default-content-wrapper p {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* ---------- continuous connector line on the MAP section (desktop) ----------
+   Source .section-map__curve (centre→left elbow at the section top) +
+   .section-map__line (2px vertical growing down the left edge on scroll). */
 @media (width >= 992px) {
   body.jornada-da-energia .jde-nav {
     display: flex;
+  }
+
+  body.jornada-da-energia main > .section.energy-map-container .jde-map-connector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    overflow: visible;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
   }
 }

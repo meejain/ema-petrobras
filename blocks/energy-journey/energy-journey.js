@@ -151,6 +151,29 @@ function decorateContent(contentCell, newEnergy) {
   return contentCell;
 }
 
+/* ---- Swiper: load the locally vendored bundle (JS + CSS) once, lazily ----
+   The source builds these horizontal sliders with Swiper; we vendor it (like
+   the Lottie player) and reuse it so the slide layout/transitions match exactly
+   without a build step or CDN dependency. */
+let swiperLoader = null;
+function loadSwiper() {
+  if (window.Swiper) return Promise.resolve(window.Swiper);
+  if (swiperLoader) return swiperLoader;
+  swiperLoader = new Promise((resolve, reject) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = `${window.hlx.codeBasePath}/blocks/energy-journey/swiper-bundle.min.css`;
+    document.head.append(css);
+    const s = document.createElement('script');
+    s.src = `${window.hlx.codeBasePath}/blocks/energy-journey/swiper-bundle.min.js`;
+    s.async = true;
+    s.onload = () => resolve(window.Swiper);
+    s.onerror = reject;
+    document.head.append(s);
+  }).catch(() => null);
+  return swiperLoader;
+}
+
 export default function decorate(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
   if (!rows.length) return;
@@ -187,6 +210,17 @@ export default function decorate(block) {
   const dot = document.createElement('div');
   dot.className = 'energy-journey-dot';
   dot.setAttribute('aria-hidden', 'true');
+  // location marker: a white teardrop pin with a green target glyph, sitting
+  // ABOVE the dot (source .green-starting-dot img, alt "Target icon").
+  const marker = document.createElement('div');
+  marker.className = 'energy-journey-marker';
+  marker.setAttribute('aria-hidden', 'true');
+  marker.innerHTML = '<svg viewBox="0 0 40 52" width="40" height="52" focusable="false" aria-hidden="true">'
+    + '<path d="M20 0C9 0 0 9 0 20c0 13 20 32 20 32s20-19 20-32C40 9 31 0 20 0Z" fill="#fff"/>'
+    + '<circle cx="20" cy="20" r="10" fill="none" stroke="#008542" stroke-width="2"/>'
+    + '<circle cx="20" cy="20" r="5" fill="none" stroke="#008542" stroke-width="2"/>'
+    + '<circle cx="20" cy="20" r="1.6" fill="#008542"/></svg>';
+  dot.append(marker);
   const inheritLine = document.createElement('div');
   inheritLine.className = 'energy-journey-inherit-line';
   dot.append(inheritLine);
@@ -260,10 +294,31 @@ export default function decorate(block) {
   // jornada-da-energia template), not a per-block rail — matching the source
   // where a single fixed rail tracks all sections.
 
-  // ---- assemble: track > pin > (intro, stages) ----
+  // ---- assemble into a Swiper: track > pin > swiper[ intro, stages… ] ----
+  // The section PINS while you scroll; scroll position drives Swiper.slideTo, so
+  // the horizontal strip advances one full-viewport panel at a time (intro, then
+  // each vector) — travelling RIGHT along the baseline, vectors appearing one
+  // after another. At the last panel the pin releases and the page scrolls on.
+  // Below 992px Swiper is not used: panels flow vertically and reveal on scroll.
+  intro.classList.add('swiper-slide');
+  stages.forEach((s) => s.classList.add('swiper-slide'));
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'swiper-wrapper';
+  wrapper.append(intro, ...stages);
+
+  const swiperEl = document.createElement('div');
+  swiperEl.className = 'swiper energy-journey-swiper';
+  swiperEl.append(wrapper);
+  // the continuous baseline the vectors travel along (desktop overlay)
+  const baseline = document.createElement('div');
+  baseline.className = 'energy-journey-baseline';
+  baseline.setAttribute('aria-hidden', 'true');
+  swiperEl.append(baseline);
+
   const pin = document.createElement('div');
   pin.className = 'energy-journey-pin';
-  pin.append(intro, stagesWrap);
+  pin.append(swiperEl);
   const track = document.createElement('div');
   track.className = 'energy-journey-track';
   track.append(pin);
@@ -285,24 +340,16 @@ export default function decorate(block) {
     }
   };
 
-  // set the current step: reveal that stage (the grow-line draws toward the
-  // illustration via CSS), then play its Lottie once the line has arrived — the
-  // source plays the animation ~2s after the slide becomes active, so the line
-  // "hits the location" before the illustration builds.
-  let currentStep = -1;
-  const setStep = (i) => {
-    if (i === currentStep) return;
-    currentStep = i;
+  // mark the current stage and play its Lottie ONCE the first time it is reached
+  const played = new Set();
+  const playStage = (i) => {
     stages.forEach((s, idx) => s.classList.toggle('is-current', idx === i));
+    if (i < 0 || played.has(i) || reduceMotion.matches) return;
     const handle = lottieHandles[i];
-    if (!handle) return;
-    if (reduceMotion.matches) return; // reduced motion: no autoplay
-    // wait for the grow-line (1s CSS transition) to reach the illustration,
-    // guarding against a rapid step change before the timer fires.
-    window.setTimeout(() => { if (currentStep === i) handle.play(); }, 900);
+    if (handle) { played.add(i); window.setTimeout(() => handle.play(), 250); }
   };
 
-  // ---- MOBILE (and reduced motion): simple reveal-on-scroll, no pin ----
+  // ---- MOBILE (and reduced motion): reveal-on-scroll, no Swiper ----
   let revealObserver = null;
   const setupReveal = () => {
     activateLine();
@@ -317,13 +364,28 @@ export default function decorate(block) {
     }, { threshold: 0.35 });
     stages.forEach((s) => revealObserver.observe(s));
   };
+  const teardownReveal = () => {
+    if (revealObserver) { revealObserver.disconnect(); revealObserver = null; }
+    stages.forEach((s) => s.classList.remove('is-active'));
+  };
 
-  // ---- DESKTOP: pinned stepper driven by scroll position within the track ----
+  // ---- DESKTOP: Swiper horizontal slider, advanced by scroll within the track
+  let swiper = null;
   let scrollHandler = null;
-  const setupPinned = () => {
-    // give the track enough height to scrub through all steps while pinned
-    const stepsCount = stages.length;
-    track.style.height = `${(stepsCount + 1) * 100}svh`;
+  const setupPinned = async () => {
+    const panels = stages.length + 1; // intro + stages
+    track.style.height = `${panels * 100}svh`;
+    const Swiper = await loadSwiper();
+    if (!Swiper) { track.style.height = ''; setupReveal(); return; }
+    swiper = new Swiper(swiperEl, {
+      direction: 'horizontal',
+      slidesPerView: 1,
+      speed: reduceMotion.matches ? 0 : 600,
+      allowTouchMove: false, // scroll position drives the slides on desktop
+      keyboard: { enabled: true },
+      a11y: { enabled: true },
+    });
+    swiper.on('slideChange', () => playStage(swiper.activeIndex - 1));
     let lineActivated = false;
     let ticking = false;
     const update = () => {
@@ -331,24 +393,12 @@ export default function decorate(block) {
       const rect = track.getBoundingClientRect();
       const vh = window.innerHeight;
       const total = track.offsetHeight - vh; // scrollable distance while pinned
-      // progress 0..1 through the pinned region
       const scrolled = Math.min(Math.max(-rect.top, 0), total);
       const p = total > 0 ? scrolled / total : 0;
-      // the pin is engaged while the track spans the viewport top
       const pinned = rect.top <= 0 && rect.bottom >= vh;
       if ((pinned || p > 0) && !lineActivated) { activateLine(); lineActivated = true; }
-      // first slice (0..1/(steps+1)) is the intro; remaining maps to steps
-      const seg = 1 / (stepsCount + 1);
-      if (p < seg) {
-        // intro visible, no stage current yet
-        stages.forEach((s) => s.classList.remove('is-current'));
-        intro.style.opacity = '';
-        currentStep = -1;
-      } else {
-        const step = Math.min(stepsCount - 1, Math.floor((p - seg) / seg));
-        intro.style.opacity = '0';
-        setStep(step);
-      }
+      const panel = Math.min(panels - 1, Math.max(0, Math.round(p * (panels - 1))));
+      if (swiper && panel !== swiper.activeIndex) swiper.slideTo(panel);
     };
     scrollHandler = () => {
       if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
@@ -359,28 +409,19 @@ export default function decorate(block) {
 
   const teardownPinned = () => {
     if (scrollHandler) { window.removeEventListener('scroll', scrollHandler); scrollHandler = null; }
+    if (swiper) { swiper.destroy(true, true); swiper = null; }
     track.style.height = '';
     stages.forEach((s) => s.classList.remove('is-current'));
-    intro.style.opacity = '';
-  };
-
-  const teardownReveal = () => {
-    if (revealObserver) { revealObserver.disconnect(); revealObserver = null; }
-    stages.forEach((s) => s.classList.remove('is-active'));
   };
 
   const applyMode = () => {
     teardownPinned();
     teardownReveal();
-    // Desktop ALWAYS uses the pinned stepper so exactly one stage is current at
-    // a time (reduced motion only skips the Lottie autoplay + line transitions,
-    // handled in setStep/activateLine). Below 992px, the section flows normally
-    // and each stage reveals on scroll.
     if (desktop.matches) setupPinned();
     else setupReveal();
   };
 
   applyMode();
-  // re-evaluate on breakpoint changes (desktop pin ⇄ mobile reveal)
+  // re-evaluate on breakpoint changes (desktop Swiper ⇄ mobile reveal)
   if (desktop.addEventListener) desktop.addEventListener('change', applyMode);
 }

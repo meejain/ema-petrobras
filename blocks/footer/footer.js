@@ -93,11 +93,21 @@ function buildColumns(section) {
     heading.type = 'button';
     heading.className = 'footer-column-title';
     heading.setAttribute('aria-expanded', 'false');
-    heading.textContent = [...li.childNodes]
+    // Title text: prefer the LI's direct text nodes, but fall back to the first
+    // non-list child element (the title may be wrapped in <strong>/<p>/<a>) and
+    // finally to the LI's first text line — so the button is never empty (a11y:
+    // buttons must have a discernible name).
+    let titleText = [...li.childNodes]
       .filter((n) => n.nodeType === Node.TEXT_NODE)
       .map((n) => n.textContent.trim())
       .filter(Boolean)
       .join(' ');
+    if (!titleText) {
+      const firstEl = [...li.children].find((c) => c.tagName !== 'UL');
+      if (firstEl) titleText = firstEl.textContent.trim();
+    }
+    if (!titleText) titleText = (li.textContent || '').trim().split('\n')[0].trim();
+    heading.textContent = titleText;
     col.append(heading);
     const sub = li.querySelector(':scope > ul');
     if (sub) {

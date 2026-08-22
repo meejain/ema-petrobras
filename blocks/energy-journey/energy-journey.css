@@ -95,6 +95,25 @@ main > .section.energy-journey-container {
   box-shadow: 0 0 0 16px rgb(0 0 0 / 16%);
 }
 
+/* location marker (white teardrop + green target) sitting above the dot */
+.energy-journey-marker {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 40px;
+  height: 52px;
+  margin-bottom: 14px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.energy-journey-marker svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 25%));
+}
+
 .energy-journey-inherit-line {
   position: absolute;
   right: 50%;
@@ -135,6 +154,23 @@ main > .section.energy-journey-container {
 /* ---------- stages ---------- */
 .energy-journey-stages {
   position: relative;
+}
+
+/* MOBILE: Swiper is not initialised — the wrapper is a normal vertical flow so
+   panels stack (overrides swiper-bundle.css `.swiper-wrapper{display:flex}`).
+   The swiper container must not clip on mobile (Swiper adds overflow:hidden). */
+.energy-journey-swiper {
+  overflow: visible;
+}
+
+.energy-journey-swiper .swiper-wrapper {
+  display: block;
+}
+
+/* the continuous baseline is a desktop-only device (hidden on mobile, where
+   stages simply reveal on scroll) */
+.energy-journey-baseline {
+  display: none;
 }
 
 .energy-journey-stage {
@@ -285,7 +321,8 @@ main > .section.energy-journey-container {
   }
 
   .energy-journey-inherit-line::before,
-  .energy-journey-grow-line {
+  .energy-journey-grow-line,
+  .energy-journey-strip {
     transition: none;
   }
 }
@@ -301,50 +338,110 @@ main > .section.energy-journey-container {
   }
 }
 
-/* ---------- desktop: PINNED stepper, two-column stages ---------- */
+/* ---------- desktop: PINNED horizontal strip ---------- */
 @media (width >= 992px) {
   /* the track provides scroll distance; the pin sticks for its duration */
   .energy-journey-pin {
     position: sticky;
     top: 0;
     height: 100svh;
+    overflow: hidden;
   }
 
-  .energy-journey-stages {
-    position: absolute;
-    inset: 0;
+  /* Swiper fills the pin; its wrapper is the flex row of full-viewport slides
+     (Swiper sizes each slide in JS, so no flex min-content surprises). Scroll
+     position drives Swiper.slideTo (see JS). */
+  .energy-journey-swiper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
-  /* stages are stacked layers; only the current one is visible. Non-current
-     stages are pushed fully off-screen (source behaviour) AND made
-     visibility:hidden + opacity:0, so it is structurally impossible for two
-     stages to paint at once regardless of JS/opacity/reduced-motion state. The
-     `.is-active` mobile-reveal class is intentionally NOT honoured here. */
-  .energy-journey-stage,
-  .energy-journey-stage.is-active {
-    position: absolute;
-    inset: 0;
+  .energy-journey-swiper .swiper-wrapper {
+    display: flex;
+    height: 100%;
+  }
+
+  .energy-journey-intro,
+  .energy-journey-stage {
+    box-sizing: border-box;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .energy-journey-content,
+  .energy-journey-content-scroll {
+    min-width: 0;
+  }
+
+  /* stages: illustration left, white content card right, vertically centred.
+     Scoped under .energy-journey-swiper so `display:flex` beats swiper-bundle's
+     `.swiper-slide{display:block}` (loaded later). No reveal transition here —
+     Swiper's slide translate is what brings each panel into view. */
+  .energy-journey-swiper .energy-journey-stage,
+  .energy-journey-swiper .energy-journey-stage.is-active {
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 64px;
-    min-height: 0;
     padding: 0 8% 0 12%;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(100%);
-    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out, visibility 0s linear 0.6s;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* intro panel (source slide 0): the statement is LEFT-aligned in the left
+     column; the pin/dot sits on the baseline at centre. (Also beats
+     swiper-bundle's `.swiper-slide{display:block}`.) */
+  .energy-journey-swiper .energy-journey-intro {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 14svh 8% 14svh 12%;
+    text-align: left;
+  }
+
+  .energy-journey-intro h2,
+  .energy-journey-intro p {
+    max-width: 620px;
+    text-align: left;
+  }
+
+  /* the pin/dot rides on the baseline at the horizontal centre */
+  .energy-journey-swiper .energy-journey-intro .energy-journey-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  /* the baseline IS the single continuous line on desktop; the intro's
+     inherit-line (vertical + corner) would be a redundant second line, so hide
+     it. The pin/dot already sits on the baseline. */
+  .energy-journey-swiper .energy-journey-inherit-line {
+    display: none;
+  }
+
+  /* the continuous baseline runs across the WHOLE strip at the illustration's
+     vertical centre, connecting every vector — the line you travel along. */
+  .energy-journey-baseline {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #fff;
     pointer-events: none;
   }
 
-  .energy-journey-stage.is-current {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
-    pointer-events: auto;
-  }
-
   .energy-journey-image {
+    position: relative;
+    z-index: 1;
     flex: 0 0 540px;
     max-width: 540px;
     height: 600px;
@@ -356,18 +453,14 @@ main > .section.energy-journey-container {
     height: 600px;
   }
 
-  /* desktop pinned stepper reveals stages with `.is-current` (not the mobile
-     `.is-active`), so the grow-line must draw off that class. It travels right
-     across the illustration column when the stage becomes current. */
+  /* the per-stage grow-line is not used on desktop — the baseline is the line */
   .energy-journey-stage .energy-journey-grow-line {
-    width: 0;
-  }
-
-  .energy-journey-stage.is-current .energy-journey-grow-line {
-    width: 100%;
+    display: none;
   }
 
   .energy-journey-content {
+    position: relative;
+    z-index: 2;
     flex: 1;
     max-width: 620px;
     padding: 40px;

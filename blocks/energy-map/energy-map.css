@@ -46,14 +46,6 @@ main > .section.energy-map-container {
   padding: 24px 0;
 }
 
-/* ---- continuous connector line (source .section-map__curve + .line) ----
-   Hidden on mobile (the rail/line experience is desktop-only, matching the
-   page's fixed-hero handoff). Shown from 992px up in the media query below. */
-.energy-map-curve,
-.energy-map-line {
-  display: none;
-}
-
 /* the positioning context the detail card anchors to; centers the map */
 .energy-map-relative {
   position: relative;
@@ -354,56 +346,5 @@ main > .section.energy-map-container {
 
   .energy-map-card.is-open {
     transform: translateX(0) scale(1);
-  }
-}
-
-/* connector line — desktop only (source geometry: curve center→left elbow at
-   the top, then a 2px vertical line growing down the left edge on scroll). */
-@media (width >= 992px) {
-  .energy-map-line {
-    display: block;
-    position: absolute;
-    top: 70px;
-    left: 128px;
-    z-index: 1;
-    width: 2px;
-    height: 0;
-    max-height: 150vh;
-    background: #fff;
-    transition: height 0.5s ease-out;
-    pointer-events: none;
-  }
-
-  .energy-map-curve {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 50%;
-    z-index: 1;
-    width: calc(50vw - 167px);
-    height: 40px;
-    margin-right: -1px;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    border-radius: 0 0 30px;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-  }
-
-  .energy-map-curve.is-active {
-    opacity: 1;
-  }
-
-  .energy-map-curve::before {
-    content: "";
-    position: absolute;
-    top: 100%;
-    right: 100%;
-    width: 40px;
-    height: 40px;
-    border-top: 2px solid #fff;
-    border-left: 2px solid #fff;
-    border-radius: 30px 0 0;
   }
 }
