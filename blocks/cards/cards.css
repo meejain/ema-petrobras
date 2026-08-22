@@ -443,6 +443,10 @@
   box-sizing: border-box;
   position: relative;
   width: 100%;
+
+  /* Card aspect ~1:1 (source 300x302). Full-width mobile keeps this so the
+     photo shows at the top and the fixed 204px green graphism covers the
+     lower ~2/3, exactly like the source. */
   aspect-ratio: 300 / 302;
   border: none;
   border-radius: 16px;
@@ -469,24 +473,50 @@
   object-fit: cover;
 }
 
-/* brand-tint scrim over the image (source: green .2 over yellow .3), plus a
-   dark bottom gradient so the white heading stays legible on any photo */
+/* brand-tint + dark overlay over the photo (source: a green colour-filter and
+   a dark overlay-filter darken the image so the graphism + white heading read
+   clearly). Measured on source: green .2 tint + black .48 overlay. */
 .cards.overlay .cards-card-image::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(0deg, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 0%) 55%),
-    linear-gradient(0deg, rgb(0 133 66 / 20%), rgb(0 133 66 / 20%)),
-    linear-gradient(0deg, rgb(253 200 47 / 30%), rgb(253 200 47 / 30%));
+    linear-gradient(0deg, rgb(0 0 0 / 48%), rgb(0 0 0 / 48%)),
+    linear-gradient(0deg, rgb(0 133 66 / 20%), rgb(0 133 66 / 20%));
 }
 
-/* heading (and any body copy) overlaid bottom-left */
+/* decorative graphism: a green diagonal panel filling the lower part of the
+   card with a thin gold line tracing just above it (source shapes). Rendered at
+   its NATURAL 410x204 (source), anchored bottom-left; the card's overflow:hidden
+   clips the right excess (410 > 300 card width). NOT stretched, so the diagonal
+   angle matches the source exactly. */
+.cards.overlay .cards-overlay-graphism {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 410px;
+  height: 204px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cards.overlay .cards-overlay-graphism-fill {
+  fill: rgb(0 133 66);
+}
+
+.cards.overlay .cards-overlay-graphism-line {
+  fill: none;
+  stroke: rgb(253 200 47);
+  stroke-width: 1px;
+}
+
+/* heading (and any body copy) overlaid bottom-left, above the green panel */
 .cards.overlay .cards-card-body {
   position: absolute;
   inset: auto 24px 24px;
   margin: 0;
-  z-index: 1;
+  z-index: 2;
 }
 
 .cards.overlay .cards-card-body :is(h1, h2, h3, h4, h5, h6) {
@@ -504,11 +534,11 @@
   color: #fff;
 }
 
-/* whole-tile stretched link (empty, sits above the scrim) */
+/* whole-tile stretched link (empty, sits above the graphism + heading) */
 .cards.overlay .cards-overlay-link {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   font-size: 0;
 }
 

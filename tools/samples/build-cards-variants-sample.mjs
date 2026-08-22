@@ -54,9 +54,9 @@ const tile = (src, alt, title, href) => `    <div>
 
 const overlayBlock = `  <div class="cards overlay">
 ${tile('https://petrobras.com.br/documents/2677942/35679554/petrobras-tej.jpeg/eff7ed28-7f1f-9038-9dea-2184d7a280f7?version=1.0&t=1751658905000', 'Campo de cana-de-açúcar ao pôr do sol com uma refinaria ao fundo, simbolizando a produção de biocombustíveis.', 'Transição Energética Justa', '/transicao-energetica')}
-${tile('https://petrobras.com.br/documents/2677942/8353462/image+%281%29.webp/8d206f76-d4a0-78d0-a3bf-0b5291b021eb?version=1.0&t=1696278319000', 'Plataforma de petróleo da Petrobras em alto-mar.', 'Quem somos', '/quem-somos')}
+${tile('https://petrobras.com.br/documents/2677942/41758384/operacoes-bolivia.jpg/9ff552b8-9bdf-cd1f-7207-d873571428fc?version=1.0&t=1760710441000', 'Plataforma de petróleo da Petrobras em alto-mar.', 'Quem somos', '/quem-somos')}
 ${tile('https://petrobras.com.br/documents/2677942/5913300/PreSal.webp/a1c46b87-7714-70d3-3300-884f51c55cc7?version=3.0&t=1696279670000', 'Operação de exploração do pré-sal em alto-mar.', 'Pré-sal', '/pre-sal')}
-${tile('https://petrobras.com.br/documents/2677942/8353462/image+%283%29.webp/15f8fa71-5ae9-657c-b36f-d6768733b2d7?version=1.0&t=1696278376000', 'Pesquisadores em um laboratório de inovação e tecnologia da Petrobras.', 'Inovação e Tecnologia', '/inovacao-e-tecnologia')}
+${tile('https://petrobras.com.br/documents/2677942/35679554/bioqav-petrobras-transicao-energetica.png/d12feeef-4394-9044-c452-33ac09ba8140?version=1.0&t=1749823665000', 'Pesquisadores em um laboratório de inovação e tecnologia da Petrobras.', 'Inovação e Tecnologia', '/inovacao-e-tecnologia')}
   </div>`;
 
 // --- audio: one species card (megaphone cell + name/desc/mp3 body) ----------
