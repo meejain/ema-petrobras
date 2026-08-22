@@ -444,10 +444,12 @@
   position: relative;
   width: 100%;
 
-  /* Card aspect ~1:1 (source 300x302). Full-width mobile keeps this so the
-     photo shows at the top and the fixed 204px green graphism covers the
-     lower ~2/3, exactly like the source. */
-  aspect-ratio: 300 / 302;
+  /* MOBILE: source cards are LANDSCAPE (measured 300x175, ~1.71:1). The fixed
+     204px green graphism is bottom-anchored, so on the shorter card it rides up
+     and the diagonal is steeper — green fills the lower-left, the photo peeks at
+     the top-right (source parity). Near-square 300/302 is re-asserted from the
+     2-col tablet layout up (below). */
+  aspect-ratio: 300 / 175;
   border: none;
   border-radius: 16px;
   overflow: hidden;
@@ -549,7 +551,9 @@
 
 @media (width >= 576px) {
   .cards.overlay > ul > li {
+    /* tablet/desktop: near-square tiles like the source multi-column grid */
     width: calc((100% - 32px) / 2);
+    aspect-ratio: 300 / 302;
   }
 }
 
