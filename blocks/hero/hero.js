@@ -439,16 +439,31 @@ function decorateMovie(block) {
     media.append(poster.closest('picture') || poster);
   }
 
-  // bottom-darkening gradient so the white title stays legible on any frame
+  // full-screen dark overlay so the white title stays legible on any frame
   const overlay = document.createElement('div');
   overlay.className = 'hero-movie-overlay';
 
-  // --- content: heading + subtitle ---
+  // vertical white line between the two columns that "draws" down on load
+  // (source .section-banner__line: grows from height 0 to 70%, 2s ease-in-out).
+  const line = document.createElement('div');
+  line.className = 'hero-movie-line';
+  line.setAttribute('aria-hidden', 'true');
+
+  // --- content: heading + subtitle (centered two-column row) ---
   if (contentCell) contentCell.className = 'hero-movie-content';
 
   block.textContent = '';
-  block.append(media, overlay);
+  block.append(media, overlay, line);
   if (contentCell) block.append(contentCell);
+
+  // trigger the line-draw once the block is in the DOM (next frame), unless the
+  // visitor prefers reduced motion (then it is shown at full height immediately)
+  const reduceMotionLine = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (reduceMotionLine.matches) {
+    line.classList.add('is-active');
+  } else {
+    requestAnimationFrame(() => requestAnimationFrame(() => line.classList.add('is-active')));
+  }
 }
 
 export default async function decorate(block) {

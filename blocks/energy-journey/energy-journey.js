@@ -30,6 +30,19 @@
  * or a JSON is missing, the stage still works (text only).
  */
 
+/* Resolve an authored Lottie JSON link to a URL that is guaranteed to be served.
+ * The animation JSONs are committed under the block folder (code, always served
+ * on preview/publish). Author links may point at a content media path (e.g.
+ * /media-da/.../anim-plataforma.json) which is NOT reliably served on
+ * *.aem.live; so we remap any recognised `anim-*.json` basename to the
+ * code-served copy under blocks/energy-journey/animations/. Unknown URLs pass
+ * through unchanged. */
+function resolveAnimationUrl(href) {
+  const m = (href || '').match(/(anim-[a-z0-9-]+\.json)(?:[?#].*)?$/i);
+  if (m) return `${window.hlx.codeBasePath}/blocks/energy-journey/animations/${m[1]}`;
+  return href;
+}
+
 /* ---- Lottie: load the locally vendored player once, lazily ---- */
 let lottieLoader = null;
 function loadLottie() {
@@ -149,7 +162,7 @@ export default function decorate(block) {
       const anim = document.createElement('div');
       anim.className = 'energy-journey-intro-anim';
       anim.setAttribute('aria-hidden', 'true');
-      introHandles.push(createLottieHandle(anim, introJson.getAttribute('href')));
+      introHandles.push(createLottieHandle(anim, resolveAnimationUrl(introJson.getAttribute('href'))));
       introJson.closest('p')?.remove();
       introJson.remove();
       intro.append(anim);
@@ -189,7 +202,7 @@ export default function decorate(block) {
         anim.className = 'energy-journey-anim';
         anim.setAttribute('aria-hidden', 'true');
         image.append(anim);
-        lottieHandles.push(createLottieHandle(anim, jsonLink.getAttribute('href')));
+        lottieHandles.push(createLottieHandle(anim, resolveAnimationUrl(jsonLink.getAttribute('href'))));
       } else if (pic) {
         const wrap = document.createElement('div');
         wrap.className = 'energy-journey-anim';
@@ -229,21 +242,14 @@ export default function decorate(block) {
     return stage;
   });
 
-  // ---- left dot-rail (progress) ----
-  const rail = document.createElement('div');
-  rail.className = 'energy-journey-rail';
-  rail.setAttribute('aria-hidden', 'true');
-  const railDots = stages.map(() => {
-    const d = document.createElement('span');
-    d.className = 'energy-journey-rail-dot';
-    rail.append(d);
-    return d;
-  });
+  // Progress is shown by the PAGE-LEVEL fixed dot-rail (.jde-nav, built by the
+  // jornada-da-energia template), not a per-block rail — matching the source
+  // where a single fixed rail tracks all sections.
 
-  // ---- assemble: track > pin > (intro, rail, stages) ----
+  // ---- assemble: track > pin > (intro, stages) ----
   const pin = document.createElement('div');
   pin.className = 'energy-journey-pin';
-  pin.append(intro, rail, stagesWrap);
+  pin.append(intro, stagesWrap);
   const track = document.createElement('div');
   track.className = 'energy-journey-track';
   track.append(pin);
@@ -271,15 +277,15 @@ export default function decorate(block) {
     if (i === currentStep) return;
     currentStep = i;
     stages.forEach((s, idx) => s.classList.toggle('is-current', idx === i));
-    railDots.forEach((d, idx) => d.classList.toggle('is-current', idx === i));
     const handle = lottieHandles[i];
     if (handle && !reduceMotion.matches) handle.play();
   };
 
   // ---- MOBILE (and reduced motion): simple reveal-on-scroll, no pin ----
+  let revealObserver = null;
   const setupReveal = () => {
     activateLine();
-    const io = new IntersectionObserver((entries) => {
+    revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-active');
@@ -288,7 +294,7 @@ export default function decorate(block) {
         if (handle && !reduceMotion.matches) handle.play();
       });
     }, { threshold: 0.35 });
-    stages.forEach((s) => io.observe(s));
+    stages.forEach((s) => revealObserver.observe(s));
   };
 
   // ---- DESKTOP: pinned stepper driven by scroll position within the track ----
@@ -315,7 +321,6 @@ export default function decorate(block) {
       if (p < seg) {
         // intro visible, no stage current yet
         stages.forEach((s) => s.classList.remove('is-current'));
-        railDots.forEach((d) => d.classList.remove('is-current'));
         intro.style.opacity = '';
         currentStep = -1;
       } else {
@@ -338,9 +343,19 @@ export default function decorate(block) {
     intro.style.opacity = '';
   };
 
+  const teardownReveal = () => {
+    if (revealObserver) { revealObserver.disconnect(); revealObserver = null; }
+    stages.forEach((s) => s.classList.remove('is-active'));
+  };
+
   const applyMode = () => {
     teardownPinned();
-    if (desktop.matches && !reduceMotion.matches) setupPinned();
+    teardownReveal();
+    // Desktop ALWAYS uses the pinned stepper so exactly one stage is current at
+    // a time (reduced motion only skips the Lottie autoplay + line transitions,
+    // handled in setStep/activateLine). Below 992px, the section flows normally
+    // and each stage reveals on scroll.
+    if (desktop.matches) setupPinned();
     else setupReveal();
   };
 

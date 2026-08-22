@@ -33,3 +33,86 @@ body.jornada-da-energia main .section.jde-full > div {
   max-width: none;
   margin-inline: 0;
 }
+
+/* ---------- page-level fixed dot-rail (source .energy-page__nav) ----------
+   A single vertical rail pinned to the left of the viewport that tracks scroll
+   progress across ALL sections. Each dot is an anchor with a hidden label that
+   expands on hover; the active dot is gold and scaled up. Hidden on small
+   screens (the source hides it below the desktop breakpoint). */
+body.jornada-da-energia .jde-nav {
+  position: fixed;
+  top: 50%;
+  left: 32px;
+  z-index: 20;
+  display: none; /* shown from 992px up */
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px;
+  border-radius: 8px;
+  transform: translateY(-50%);
+}
+
+body.jornada-da-energia .jde-nav-dot {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 28px;
+  color: rgb(255 255 255 / 80%);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 200%;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+body.jornada-da-energia .jde-nav-dot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease-in-out, background 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+body.jornada-da-energia .jde-nav-dot span {
+  display: inline-block;
+  margin-left: 24px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+body.jornada-da-energia .jde-nav-dot:hover span,
+body.jornada-da-energia .jde-nav-dot:focus-visible span {
+  opacity: 1;
+}
+
+body.jornada-da-energia .jde-nav-dot:hover::before {
+  border-color: var(--jde-yellow);
+}
+
+body.jornada-da-energia .jde-nav-dot.active {
+  color: var(--jde-yellow);
+  font-weight: 700;
+}
+
+body.jornada-da-energia .jde-nav-dot.active::before {
+  background: var(--jde-yellow);
+  border-color: var(--jde-yellow);
+  transform: translateY(-50%) scale(2);
+}
+
+body.jornada-da-energia .jde-nav-dot:focus-visible {
+  outline: 2px solid var(--jde-yellow);
+  outline-offset: 4px;
+}
+
+@media (width >= 992px) {
+  body.jornada-da-energia .jde-nav {
+    display: flex;
+  }
+}

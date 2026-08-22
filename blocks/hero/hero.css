@@ -840,19 +840,39 @@ main > .section.hero-container {
   object-position: 50% 50%;
 }
 
-/* bottom-darkening gradient overlay so the white title stays legible */
+/* flat dark overlay so the white title/description stay legible (source:
+   rgba(0,0,0,0.5) over the whole banner, not a bottom gradient) */
 .hero.movie .hero-movie-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-image: linear-gradient(rgb(0 0 0 / 0%) 30%, rgb(0 0 0 / 70%) 100%);
+  background: rgb(0 0 0 / 50%);
   pointer-events: none;
 }
 
-/* content: title + subtitle overlaid bottom-left at the layout band */
+/* vertical white line between the two columns that draws down on load
+   (source .section-banner__line: right-aligned, grows 0 → 70% over 2s) */
+.hero.movie .hero-movie-line {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  z-index: 2;
+  width: 2px;
+  height: 0;
+  background: #fff;
+  transition: height 2s ease-in-out;
+  pointer-events: none;
+}
+
+.hero.movie .hero-movie-line.is-active {
+  height: 70%;
+}
+
+/* content: MOBILE — title + description stacked, bottom-left; DESKTOP below
+   becomes the centered two-column row that straddles the line. */
 .hero.movie .hero-movie-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -885,9 +905,48 @@ main > .section.hero-container {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* no autoplay handled in JS; nothing to animate here */
   .hero.movie .hero-movie-video {
     animation: none;
+  }
+
+  .hero.movie .hero-movie-line {
+    transition: none;
+  }
+}
+
+/* DESKTOP: centered two-column row — title on the left of the line, the
+   description on the right, both vertically centered (source .section-banner
+   .row { top:50%; translateY(-50%) } with the line between the columns). */
+@media (width >= 992px) {
+  .hero.movie .hero-movie-line {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  /* centered content container (source .container, ~1140px) split by the line:
+     title left column, description right column, both vertically centered. */
+  .hero.movie .hero-movie-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: min(100% - (2 * var(--space-big)), var(--content-max-width));
+    padding: 0;
+  }
+
+  .hero.movie .hero-movie-content h1,
+  .hero.movie .hero-movie-content h2 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 10%;
+    font-size: 48px;
+  }
+
+  .hero.movie .hero-movie-content p {
+    flex: 0 0 50%;
+    max-width: 320px;
+    padding-left: 10%;
   }
 }
 

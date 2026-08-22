@@ -260,41 +260,14 @@ main > .section.energy-journey-container {
   margin-bottom: 0;
 }
 
-/* ---------- left dot-rail (progress) ---------- */
-.energy-journey-rail {
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
+/* Progress is shown by the page-level fixed dot-rail (.jde-nav, in the
+   jornada-da-energia template), not a per-block rail. */
 
-.energy-journey-rail-dot {
-  width: 8px;
-  height: 8px;
-  border: 2px solid #fff;
-  border-radius: 100%;
-  background: transparent;
-  opacity: 1;
-  transition: transform 0.5s ease, background 0.5s ease, border-color 0.5s ease;
-}
-
-.energy-journey-rail-dot.is-current {
-  background: var(--ej-gold);
-  border-color: var(--ej-gold);
-  transform: scale(2);
-}
-
-/* the rail is a progress indicator, decorative — hide from AT */
-.energy-journey-rail[aria-hidden="true"] {
-  /* no-op: documents intent */
-  visibility: visible;
-}
-
+/* reduced motion: drop the drawing transitions. On the MOBILE flow the base
+   `.energy-journey-stage` reveal (opacity/transform) is turned off so stages
+   simply appear. The desktop pinned layout below re-asserts the stacked/hidden
+   isolation with its own opacity/visibility, so a stage still never paints
+   until it is current (no overlapping "vectors"). */
 @media (prefers-reduced-motion: reduce) {
   .energy-journey-stage {
     opacity: 1;
@@ -333,8 +306,13 @@ main > .section.energy-journey-container {
     inset: 0;
   }
 
-  /* stages are stacked layers; only the current one is visible/active */
-  .energy-journey-stage {
+  /* stages are stacked layers; only the current one is visible. Non-current
+     stages are pushed fully off-screen (source behaviour) AND made
+     visibility:hidden + opacity:0, so it is structurally impossible for two
+     stages to paint at once regardless of JS/opacity/reduced-motion state. The
+     `.is-active` mobile-reveal class is intentionally NOT honoured here. */
+  .energy-journey-stage,
+  .energy-journey-stage.is-active {
     position: absolute;
     inset: 0;
     flex-direction: row;
@@ -343,13 +321,17 @@ main > .section.energy-journey-container {
     min-height: 0;
     padding: 0 8% 0 12%;
     opacity: 0;
-    transform: none;
-    transition: opacity 0.6s ease-in-out;
+    visibility: hidden;
+    transform: translateX(100%);
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out, visibility 0s linear 0.6s;
     pointer-events: none;
   }
 
   .energy-journey-stage.is-current {
     opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
     pointer-events: auto;
   }
 
@@ -389,10 +371,6 @@ main > .section.energy-journey-container {
     max-height: calc(100vh - 320px);
     overflow: auto;
     padding-right: 24px;
-  }
-
-  .energy-journey-rail {
-    left: 40px;
   }
 }
 
@@ -473,13 +451,4 @@ main > .section.energy-journey-container {
   color: var(--ej-dark);
   font-size: 14px;
   font-weight: 700;
-}
-
-.energy-journey.new-energy .energy-journey-rail-dot {
-  border-color: #343a40;
-}
-
-.energy-journey.new-energy .energy-journey-rail-dot.is-current {
-  background: var(--ej-gold);
-  border-color: var(--ej-gold);
 }
