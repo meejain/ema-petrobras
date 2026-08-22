@@ -174,16 +174,25 @@ main > .section.energy-journey-container {
   height: 100%;
 }
 
-/* horizontal connector line that grows toward the illustration */
+/* horizontal connector line that grows rightward toward the illustration as a
+   stage is revealed (source `.grow-line`: 2px white, width 0 → target, 1s
+   ease-in-out). Absolutely placed at the vertical centre of the illustration so
+   it reads as a line travelling right and "hitting" the artwork, after which the
+   Lottie plays (the JS delays play() until the line has arrived). */
 .energy-journey-grow-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
   height: 2px;
   width: 0;
   background: #fff;
   transition: width 1s ease-in-out;
+  pointer-events: none;
 }
 
+/* mobile reveal: the line draws across the illustration when the stage enters */
 .energy-journey-stage.is-active .energy-journey-grow-line {
-  width: 0;
+  width: 100%;
 }
 
 /* white content card */
@@ -345,6 +354,17 @@ main > .section.energy-journey-container {
 
   .energy-journey-anim {
     height: 600px;
+  }
+
+  /* desktop pinned stepper reveals stages with `.is-current` (not the mobile
+     `.is-active`), so the grow-line must draw off that class. It travels right
+     across the illustration column when the stage becomes current. */
+  .energy-journey-stage .energy-journey-grow-line {
+    width: 0;
+  }
+
+  .energy-journey-stage.is-current .energy-journey-grow-line {
+    width: 100%;
   }
 
   .energy-journey-content {

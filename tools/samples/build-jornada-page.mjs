@@ -97,6 +97,8 @@ ${linkText ? `        <p><a href="${href}">${linkText}</a></p>` : ''}
     </div>`;
 
 const map = `<div>
+  <h2 id="from-energy-production-to-energy-distribution-explore-this-journey">From energy production to energy distribution: explore this journey</h2>
+  <p>We pave the way to supply the energy that Brazil needs. On this journey, we use oil and natural gas as fuels to create new opportunities and businesses, while moving forward to enable a safe, inclusive, and fair energy transition for all Brazilians. Learn about our main operations.</p>
   <div class="energy-map">
     <div>
       <div><picture><img src="${MAP_MEDIA}/map.webp" alt="Mapa isométrico ilustrado das operações da Petrobras: caminhão, refinarias, unidades de processamento, terminais, navios e parque eólico offshore." loading="lazy"></picture></div>

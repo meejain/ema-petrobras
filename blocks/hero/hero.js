@@ -458,11 +458,17 @@ function decorateMovie(block) {
 
   // trigger the line-draw once the block is in the DOM (next frame), unless the
   // visitor prefers reduced motion (then it is shown at full height immediately)
+  // load choreography: the line draws up first, then the title rises in, then
+  // the subtitle (staggered via CSS transition-delays on the `is-entered` class).
   const reduceMotionLine = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (reduceMotionLine.matches) {
     line.classList.add('is-active');
+    block.classList.add('is-entered');
   } else {
-    requestAnimationFrame(() => requestAnimationFrame(() => line.classList.add('is-active')));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      line.classList.add('is-active');
+      block.classList.add('is-entered');
+    }));
   }
 }
 

@@ -38,9 +38,23 @@
  * code-served copy under blocks/energy-journey/animations/. Unknown URLs pass
  * through unchanged. */
 function resolveAnimationUrl(href) {
-  const m = (href || '').match(/(anim-[a-z0-9-]+\.json)(?:[?#].*)?$/i);
-  if (m) return `${window.hlx.codeBasePath}/blocks/energy-journey/animations/${m[1]}`;
+  // Accept the animation basename in any of the forms the content pipeline may
+  // emit: `anim-name.json`, `anim-name-json` (the `.` mangled to `-` in a
+  // media-da link), or a bare `.../anim-name` path segment. Always remap to the
+  // code-served copy under blocks/energy-journey/animations/ (content media-da
+  // paths 404 on *.aem.live).
+  const m = (href || '').match(/anim-([a-z0-9]+)(?:[-.]json)?(?:[?#].*)?$/i);
+  if (m) return `${window.hlx.codeBasePath}/blocks/energy-journey/animations/anim-${m[1].toLowerCase()}.json`;
   return href;
+}
+
+// A media link is an animation link if its href resolves to an `anim-*` asset
+// in any of the accepted forms above.
+const ANIM_LINK_RE = /anim-[a-z0-9]+(?:[-.]json)?(?:[?#].*)?$/i;
+function findAnimLink(cell) {
+  if (!cell) return null;
+  return [...cell.querySelectorAll('a[href]')]
+    .find((a) => ANIM_LINK_RE.test(a.getAttribute('href') || '')) || null;
 }
 
 /* ---- Lottie: load the locally vendored player once, lazily ---- */
@@ -157,7 +171,7 @@ export default function decorate(block) {
   if (introCell) {
     // the .new-energy variant shows a Lottie (the wind turbine) atop the intro,
     // authored as a leading JSON link in the intro cell.
-    const introJson = introCell.querySelector('a[href$=".json"], a[href*=".json?"]');
+    const introJson = findAnimLink(introCell);
     if (introJson) {
       const anim = document.createElement('div');
       anim.className = 'energy-journey-intro-anim';
@@ -195,7 +209,7 @@ export default function decorate(block) {
     const image = document.createElement('div');
     image.className = 'energy-journey-image';
     if (mediaCell) {
-      const jsonLink = mediaCell.querySelector('a[href$=".json"], a[href*=".json?"]');
+      const jsonLink = findAnimLink(mediaCell);
       const pic = mediaCell.querySelector('picture, img');
       if (jsonLink) {
         const anim = document.createElement('div');
@@ -271,14 +285,21 @@ export default function decorate(block) {
     }
   };
 
-  // set the current step: reveal that stage, play its Lottie, update the rail
+  // set the current step: reveal that stage (the grow-line draws toward the
+  // illustration via CSS), then play its Lottie once the line has arrived — the
+  // source plays the animation ~2s after the slide becomes active, so the line
+  // "hits the location" before the illustration builds.
   let currentStep = -1;
   const setStep = (i) => {
     if (i === currentStep) return;
     currentStep = i;
     stages.forEach((s, idx) => s.classList.toggle('is-current', idx === i));
     const handle = lottieHandles[i];
-    if (handle && !reduceMotion.matches) handle.play();
+    if (!handle) return;
+    if (reduceMotion.matches) return; // reduced motion: no autoplay
+    // wait for the grow-line (1s CSS transition) to reach the illustration,
+    // guarding against a rapid step change before the timer fires.
+    window.setTimeout(() => { if (currentStep === i) handle.play(); }, 900);
   };
 
   // ---- MOBILE (and reduced motion): simple reveal-on-scroll, no pin ----

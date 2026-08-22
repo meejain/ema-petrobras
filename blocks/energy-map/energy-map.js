@@ -230,6 +230,45 @@ export default function decorate(block) {
     if (e.key === 'Escape' && !card.hidden) { closeCard(); e.preventDefault(); }
   });
 
+  // ---- continuous connector line (source .section-map__curve + .line) ----
+  // An elbow at the top runs from the page centre (where the hero's centre line
+  // ends) leftwards and curves down; a vertical line then grows DOWNWARD along
+  // the left edge as the section is scrolled — the "middle → left → move down"
+  // line. Desktop only (CSS guards it), matching where the rail is shown.
+  const curve = document.createElement('div');
+  curve.className = 'energy-map-curve';
+  curve.setAttribute('aria-hidden', 'true');
+  const connectorLine = document.createElement('div');
+  connectorLine.className = 'energy-map-line';
+  connectorLine.setAttribute('aria-hidden', 'true');
+
   block.textContent = '';
-  block.append(relative);
+  block.append(curve, connectorLine, relative);
+
+  // grow the vertical line with scroll, using the SOURCE formula: the line
+  // height = max(0, viewportHeight/2 − sectionTop). So it stays 0 until the
+  // section's top rises past the viewport MIDDLE — by which point the rising
+  // green has already covered the hero's centre line from the bottom — and only
+  // THEN does the left line extend downward. The curve rides at the section top
+  // (visible whenever the top edge is on screen) so the hero line hands off to
+  // it seamlessly. Guarded to the desktop breakpoint.
+  const desktop = window.matchMedia('(min-width: 992px)');
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    if (!desktop.matches) { connectorLine.style.height = ''; curve.classList.remove('is-active'); return; }
+    const rect = block.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const maxH = Math.max(0, block.offsetHeight - 70);
+    const h = Math.min(Math.max(vh / 2 - rect.top, 0), maxH);
+    connectorLine.style.height = `${Math.round(h)}px`;
+    // the curve is present while the section top edge is within the viewport
+    curve.classList.toggle('is-active', rect.top < vh && rect.top > -rect.height);
+  };
+  const onScroll = () => {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
 }

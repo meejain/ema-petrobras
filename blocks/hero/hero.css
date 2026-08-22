@@ -850,11 +850,12 @@ main > .section.hero-container {
   pointer-events: none;
 }
 
-/* vertical white line between the two columns that draws down on load
-   (source .section-banner__line: right-aligned, grows 0 → 70% over 2s) */
+/* vertical white line between the two columns that draws UP on load, anchored
+   at the bottom (source .section-banner__line: bottom:0, grows height 0 → 70%
+   over 2s, so it grows bottom→top). */
 .hero.movie .hero-movie-line {
   position: absolute;
-  top: 15%;
+  bottom: 0;
   left: 50%;
   z-index: 2;
   width: 2px;
@@ -904,12 +905,39 @@ main > .section.hero-container {
   line-height: 1.6;
 }
 
+/* load entrance (matches source): title + subtitle simply FADE in (no movement)
+   as the line draws up — the title fades first, then the right paragraph. */
+.hero.movie .hero-movie-content h1,
+.hero.movie .hero-movie-content h2,
+.hero.movie .hero-movie-content p {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.hero.movie.is-entered .hero-movie-content h1,
+.hero.movie.is-entered .hero-movie-content h2 {
+  opacity: 1;
+  transition-delay: 1s;
+}
+
+.hero.movie.is-entered .hero-movie-content p {
+  opacity: 1;
+  transition-delay: 1.8s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero.movie .hero-movie-video {
     animation: none;
   }
 
   .hero.movie .hero-movie-line {
+    transition: none;
+  }
+
+  /* show the title/subtitle immediately (no rise-in) */
+  .hero.movie.is-entered .hero-movie-content h1,
+  .hero.movie.is-entered .hero-movie-content h2,
+  .hero.movie.is-entered .hero-movie-content p {
     transition: none;
   }
 }
@@ -924,29 +952,35 @@ main > .section.hero-container {
     transform: translateX(-50%);
   }
 
-  /* centered content container (source .container, ~1140px) split by the line:
-     title left column, description right column, both vertically centered. */
+  /* centered container (~1140px) split by the centre line. Source columns are
+     NOT 50/50: the title column is 41.67% (Bootstrap col-5) and the description
+     column 33.33% (col-4), pushed to the container edges so the centre line sits
+     in the gap between them. The narrower title column makes the heading wrap to
+     two lines, exactly like the source. */
   .hero.movie .hero-movie-content {
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 0;
     width: min(100% - (2 * var(--space-big)), var(--content-max-width));
     padding: 0;
   }
 
+  /* source title: 40px / line-height 48px / weight 700 */
   .hero.movie .hero-movie-content h1,
   .hero.movie .hero-movie-content h2 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding-right: 10%;
-    font-size: 48px;
+    flex: 0 0 41.6667%;
+    max-width: 41.6667%;
+    font-size: 40px;
+    line-height: 1.2;
   }
 
+  /* source description: 18px / line-height 1.6 */
   .hero.movie .hero-movie-content p {
-    flex: 0 0 50%;
-    max-width: 320px;
-    padding-left: 10%;
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+    font-size: 18px;
+    line-height: 1.6;
   }
 }
 

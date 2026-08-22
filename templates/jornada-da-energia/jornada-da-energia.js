@@ -95,11 +95,31 @@ function buildNav(main) {
 }
 
 /**
+ * Reorder sections to the source narrative: the isometric operations map is the
+ * FIRST green window after the hero ("explore this journey"), followed by the
+ * step-by-step journey scrollytelling. Authored content may place the journey
+ * first; we move the map ahead of it here so the page reads like the source
+ * without changing the authored content. Scoped to this template only.
+ * @param {Element} main The main element
+ */
+function orderSections(main) {
+  const sections = [...main.querySelectorAll(':scope > .section')];
+  const map = sections.find((s) => s.classList.contains('energy-map-container'));
+  const firstJourney = sections.find((s) => s.classList.contains('energy-journey-container'));
+  // only move if the map currently comes AFTER the first journey section
+  if (map && firstJourney && map !== firstJourney
+    && sections.indexOf(map) > sections.indexOf(firstJourney)) {
+    firstJourney.before(map);
+  }
+}
+
+/**
  * Decorate the Jornada da Energia page. Runs once, lazily, on that page only.
  * @param {Element} main The main element
  */
 export default async function decorateTemplate(main) {
   if (!main) return;
   main.dataset.jdeReady = 'true';
+  orderSections(main);
   buildNav(main);
 }

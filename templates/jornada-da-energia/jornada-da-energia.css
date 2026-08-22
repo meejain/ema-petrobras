@@ -21,6 +21,55 @@ body.jornada-da-energia {
   --jde-yellow: #fdc82f;
 }
 
+/* ---------- fixed hero, content scrolls over it (source mechanism) ----------
+   The source hero (.section-banner) is position:fixed and never moves; the
+   sections below have a higher stacking context with opaque backgrounds and
+   scroll UP OVER it. So the hero's white line is not animated away — it is
+   progressively COVERED from the bottom as the next section rises ("reduces").
+
+   We reproduce that exactly, scoped to this page only:
+     • the first section (the hero) is pinned fixed to the viewport;
+     • the next section is pushed down a full viewport (margin-top:100vh) so the
+       hero is what you see first, then it slides up and covers the hero;
+     • every non-hero section sits above the hero (z-index) with an opaque
+       fallback background so the fixed hero can never peek through a gap. */
+body.jornada-da-energia main > .section.hero-container:first-child {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* Every non-hero section sits above the fixed hero, stacks flush (no margin
+   gaps that would reveal it), and gets an opaque default background so the hero
+   never shows through its own uncovered areas (intro/track edges). */
+body.jornada-da-energia main > .section:not(.hero-container:first-child) {
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  margin-bottom: 0;
+  background-color: #fff;
+}
+
+/* the first content section starts one viewport down (over the fixed hero);
+   the rest stack flush so no margin gap ever reveals the fixed hero behind. */
+body.jornada-da-energia main > .section.hero-container:first-child + .section {
+  margin-top: 100svh;
+}
+
+/* Green windows (map + journey) and the grey "new energy" window override the
+   white default. Each carries the same `:not(.hero-container:first-child)` base
+   plus its own class, so it wins on both specificity and order. */
+body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-map-container,
+body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container {
+  background-color: var(--jde-green);
+}
+
+body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container:has(.energy-journey.new-energy) {
+  background-color: var(--jde-grey);
+}
+
 /* full-bleed page: sections manage their own inner width */
 body.jornada-da-energia main .section.jde-full {
   max-width: none;
@@ -46,7 +95,7 @@ body.jornada-da-energia .jde-nav {
   z-index: 20;
   display: none; /* shown from 992px up */
   flex-direction: column;
-  gap: 20px;
+  gap: 16px; /* source: dot line-box 28px + 16px = 44px pitch */
   padding: 8px;
   border-radius: 8px;
   transform: translateY(-50%);
