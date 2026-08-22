@@ -369,7 +369,93 @@ function decorateSlider(block) {
   else start();
 }
 
+/**
+ * Hero "movie" variant — a full-bleed autoplaying background VIDEO with a title
+ * and subtitle overlaid bottom-left (source: petrobras.com.br/en/jornada-da-energia
+ * hero). Authored as "Hero (movie)" with one row, two cells:
+ *   cell 1 (media):   a link to the .mp4 (the video source); an optional poster
+ *                     image can accompany it.
+ *   cell 2 (content): an <h1>/<h2> heading + a body <p> subtitle.
+ *
+ * The video is injected only when its host is on the allowlist (Security Rule:
+ * validate external input before use); it autoplays muted+looped+inline (a
+ * decorative background movie) and is paused when reduced motion is preferred.
+ */
+const HERO_MOVIE_HOSTS = ['petrobras.com.br', 'www.petrobras.com.br'];
+
+function isAllowedMovieHost(url) {
+  try {
+    return HERO_MOVIE_HOSTS.includes(new URL(url, window.location.href).hostname);
+  } catch (e) {
+    return false;
+  }
+}
+
+function decorateMovie(block) {
+  const rows = [...block.querySelectorAll(':scope > div')];
+  if (!rows.length) return;
+
+  block.setAttribute('role', 'region');
+  block.setAttribute('aria-roledescription', 'Banner');
+
+  const row = rows[0];
+  const cells = [...row.children];
+  // media cell = whichever holds a link to a video or a picture; other = content
+  const mediaCell = cells.find((c) => c.querySelector('a[href], picture, img')) || cells[0];
+  const contentCell = cells.find((c) => c !== mediaCell) || cells[1] || cells[0];
+
+  // --- media: full-bleed looping background video ---
+  const media = document.createElement('div');
+  media.className = 'hero-movie-media';
+  const videoLink = mediaCell && mediaCell.querySelector('a[href]');
+  const poster = mediaCell && mediaCell.querySelector('img');
+  const src = videoLink ? videoLink.getAttribute('href') : null;
+  if (src && isAllowedMovieHost(src)) {
+    const video = document.createElement('video');
+    video.className = 'hero-movie-video';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('aria-hidden', 'true');
+    video.preload = 'metadata';
+    if (poster) video.poster = poster.src;
+    const source = document.createElement('source');
+    source.src = src;
+    source.type = 'video/mp4';
+    video.append(source);
+    media.append(video);
+
+    // autoplay muted, unless the visitor prefers reduced motion (leave paused
+    // on its poster frame). Playing programmatically avoids autoplay-attr races.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!reduceMotion.matches) {
+      const play = () => { const p = video.play(); if (p && p.catch) p.catch(() => {}); };
+      if (video.readyState >= 2) play();
+      else video.addEventListener('loadeddata', play, { once: true });
+    }
+  } else if (poster) {
+    // no valid video: fall back to the poster image as a static background
+    media.append(poster.closest('picture') || poster);
+  }
+
+  // bottom-darkening gradient so the white title stays legible on any frame
+  const overlay = document.createElement('div');
+  overlay.className = 'hero-movie-overlay';
+
+  // --- content: heading + subtitle ---
+  if (contentCell) contentCell.className = 'hero-movie-content';
+
+  block.textContent = '';
+  block.append(media, overlay);
+  if (contentCell) block.append(contentCell);
+}
+
 export default async function decorate(block) {
+  if (block.classList.contains('movie')) {
+    decorateMovie(block);
+    return;
+  }
   if (block.classList.contains('slider')) {
     decorateSlider(block);
     return;

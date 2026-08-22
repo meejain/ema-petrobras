@@ -1,0 +1,344 @@
+/* Energy Map — interactive isometric map with hotspots + detail card
+   Source: petrobras.com.br/en/jornada-da-energia ("Learn about our main
+   operations"). A LARGE illustration (1376×640) sits in a horizontally
+   scrollable holder: on every viewport the map keeps its full size and the
+   user pans left↔right to reach the "+" markers (it is NOT shrunk to fit).
+
+   Design tokens measured from source:
+     dot            40px, background-image "map-dot" SVG (orange disc, dark
+                    rings, white plus). Tooltip pill = dark translucent
+                    (rgb(0 0 0 / 32%)), radius 48, expands on hover.
+     blink          expanding box-shadow ripple (1s ease-out); JS hops it
+                    from marker to marker at random (the "travelling" pulse).
+     card           white, radius 8, image 200px cover, body #495057 on #fff,
+                    slides in with translateX + scale + opacity (0.5s).
+   Mobile-first; min-width media queries only (breakpoints 576/768/992/1280). */
+
+/* full-bleed: the green map band spans the full viewport width */
+.energy-map-wrapper {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+main > .section.energy-map-container {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.energy-map {
+  --em-orange: #ed8b00;
+  --em-green: #00552a;
+  --em-dark: #373737;
+  --em-body: #495057;
+  --em-link: rgb(0 133 66);
+
+  position: relative;
+  width: 100%;
+  background: var(--em-green);
+  padding: 24px 0;
+}
+
+/* the positioning context the detail card anchors to; centers the map */
+.energy-map-relative {
+  position: relative;
+  max-width: 1376px;
+  margin: 0 auto;
+}
+
+/* horizontally scrollable viewport onto the full-size map */
+.energy-map-holder {
+  overflow: auto hidden;
+  text-align: center;
+  -webkit-overflow-scrolling: touch;
+}
+
+.energy-map-holder::-webkit-scrollbar {
+  height: 4px;
+}
+
+.energy-map-holder::-webkit-scrollbar-track {
+  background: rgb(255 255 255 / 15%);
+  border-radius: 4px;
+}
+
+.energy-map-holder::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 45%);
+  border-radius: 2px;
+}
+
+/* the map itself: full-size, never shrunk — height-capped, width follows the
+   1376:640 aspect ratio, so it overflows the holder and scrolls sideways. */
+.energy-map-stage {
+  position: relative;
+  display: inline-block;
+  height: min(80vh, 460px);
+  aspect-ratio: 1376 / 640;
+  border-radius: 10px;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.energy-map-illustration {
+  width: 100%;
+  height: 100%;
+  line-height: 0;
+}
+
+.energy-map-illustration picture,
+.energy-map-illustration img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- hotspots ---------- */
+.energy-map-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  box-shadow: 0 0 0 0 rgb(0 0 0 / 50%);
+  transition: box-shadow 0.2s ease-in-out;
+  z-index: 1;
+}
+
+/* the "+" glyph is the source "map-dot" SVG (orange disc + white plus) */
+.energy-map-hotspot-icon {
+  position: absolute;
+  inset: 0;
+  background-image: url("map-dot.svg");
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 50%;
+}
+
+.energy-map-hotspot:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* travelling ripple: JS toggles .is-blinking on a random marker */
+.energy-map-hotspot.is-blinking {
+  animation: energy-map-blink 1s ease-out;
+}
+
+@keyframes energy-map-blink {
+  0% {
+    box-shadow: 0 0 0 0 rgb(0 0 0 / 45%);
+  }
+
+  100% {
+    box-shadow: 0 0 0 20px rgb(0 0 0 / 0%);
+  }
+}
+
+/* hover/focus tooltip pill (source: dark translucent pill that expands from
+   behind the marker, showing the marker's title via content:attr(data-text)) */
+.energy-map-hotspot::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  max-width: 40px;
+  padding: 0 56px 0 16px;
+  border-radius: 48px;
+  background: rgb(0 0 0 / 32%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  pointer-events: none;
+}
+
+/* left-side markers expand the pill to their RIGHT instead */
+.energy-map-hotspot.is-left::before {
+  right: auto;
+  left: 0;
+  padding: 0 16px 0 56px;
+}
+
+.energy-map-hotspot:hover::before,
+.energy-map-hotspot:focus-visible::before {
+  max-width: 500px;
+  opacity: 1;
+}
+
+/* ---------- detail card ----------
+   Absolute over the map area, anchored to .energy-map-relative. Slides/scales/
+   fades in from the left. MOBILE (base): full width, left:0. It stays put while
+   the map scrolls behind it. DESKTOP (>=768px): 520px card inset 20px. */
+.energy-map-card {
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
+  color: var(--em-dark);
+  text-align: left;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-10%) scale(0.95);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  pointer-events: none;
+}
+
+.energy-map-card.is-open {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+.energy-map-card[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .energy-map-card {
+    transition: none;
+  }
+}
+
+/* close button — two rotated white bars with a drop-shadow (source) */
+.energy-map-card-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 50%));
+}
+
+.energy-map-card-close::before,
+.energy-map-card-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.energy-map-card-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.energy-map-card-close:focus-visible {
+  outline: 2px solid var(--em-link);
+  outline-offset: 2px;
+}
+
+/* image on top of the card (source: 200px tall, full width, cover) */
+.energy-map-card-media {
+  flex: 0 0 auto;
+  height: 200px;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.energy-map-card-media[hidden] {
+  display: none;
+}
+
+.energy-map-card-media picture,
+.energy-map-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.energy-map-card-body {
+  height: calc(100% - 200px);
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.energy-map-card-body[data-no-media] {
+  height: 100%;
+}
+
+.energy-map-card-title {
+  margin: 0 0 24px;
+  color: var(--em-dark);
+  font-family: var(--heading-font-family);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+.energy-map-card-body p {
+  margin: 0 0 24px;
+  color: var(--em-body);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.energy-map-card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.energy-map-card-body a:any-link {
+  color: var(--em-link);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .energy-map-hotspot.is-blinking {
+    animation: none;
+  }
+}
+
+/* ---------- tablet / desktop ---------- */
+@media (width >= 768px) {
+  .energy-map {
+    padding: 48px 0;
+  }
+
+  .energy-map-holder {
+    margin: 0 15px;
+  }
+
+  .energy-map-stage {
+    height: min(72vh, 640px);
+  }
+
+  .energy-map-card {
+    left: -20px;
+    width: 520px;
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  .energy-map-card.is-open {
+    transform: translateX(0) scale(1);
+  }
+}

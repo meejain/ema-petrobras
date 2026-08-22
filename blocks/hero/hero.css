@@ -799,3 +799,111 @@ main > .section.hero-container {
     height: var(--hero-slider-height-desktop);
   }
 }
+
+/* ============================================================
+   Hero variant: movie  (source: petrobras.com.br/en/jornada-da-energia hero)
+   Full-bleed autoplaying background VIDEO (object-fit:cover) filling the
+   viewport, a bottom-darkening gradient for legibility, and a white title +
+   subtitle overlaid bottom-left at the layout band inset.
+
+   Extracted source values (1440):
+     hero height   100vh (full viewport)
+     title         white #fff, 700, 40px/48 (desktop) → 32px/38.4 (mobile)
+     subtitle      white, 400, 18px/1.6
+     content inset layout band (~165px @1440), bottom-anchored group
+   ============================================================ */
+.hero.movie {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+/* full-bleed under the transparent/overlay header (like the other full-bleed
+   heroes); the section wrapper clips any overflow. */
+.section.hero-container:has(.hero.movie) {
+  overflow: hidden;
+}
+
+.hero.movie .hero-movie-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero.movie .hero-movie-video,
+.hero.movie .hero-movie-media picture,
+.hero.movie .hero-movie-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/* bottom-darkening gradient overlay so the white title stays legible */
+.hero.movie .hero-movie-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: linear-gradient(rgb(0 0 0 / 0%) 30%, rgb(0 0 0 / 70%) 100%);
+  pointer-events: none;
+}
+
+/* content: title + subtitle overlaid bottom-left at the layout band */
+.hero.movie .hero-movie-content {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100svh;
+  justify-content: flex-end;
+  width: min(100% - (2 * var(--layout-gutter)), var(--content-max-width));
+  margin: 0 auto;
+  padding: 0 0 15svh;
+  color: #fff;
+}
+
+.hero.movie .hero-movie-content h1,
+.hero.movie .hero-movie-content h2 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero.movie .hero-movie-content p {
+  margin: 0;
+  max-width: 40ch;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* no autoplay handled in JS; nothing to animate here */
+  .hero.movie .hero-movie-video {
+    animation: none;
+  }
+}
+
+@media (width >= 768px) {
+  .hero.movie .hero-movie-content {
+    padding-inline: 0;
+    width: min(100% - (2 * var(--space-big)), var(--content-max-width));
+  }
+
+  .hero.movie .hero-movie-content h1,
+  .hero.movie .hero-movie-content h2 {
+    font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .hero.movie .hero-movie-content p {
+    font-size: 18px;
+  }
+}
