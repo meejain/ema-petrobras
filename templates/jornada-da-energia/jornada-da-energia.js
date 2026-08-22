@@ -178,11 +178,15 @@ function buildMapConnector(main) {
     svg.setAttribute('height', svgH);
     svg.setAttribute('viewBox', `0 0 ${w} ${svgH}`);
     const cx = Math.round(w / 2);
-    // vertical line grows with scroll: it starts extending as soon as the heading
-    // section enters the viewport (top passes vh − 70) and keeps growing toward
-    // the map bottom as you scroll, so by the time the map is in view the line has
-    // travelled down through the whole section (source .section-map__line effect).
-    const lineLen = Math.min(Math.max(vh - 70 - rect.top, 0), maxReach);
+    // vertical line grows with scroll — VERBATIM source formula
+    // (.section-map__line height = scrollTop − sectionTop + vh/2). Since
+    // rect.top = sectionTop − scrollTop, that is (vh/2 − rect.top). It stays at 0
+    // until the section top rises to the VIEWPORT MIDDLE, then grows down. This is
+    // the key to the source's choreography: the green band first rises over the
+    // fixed hero and COVERS ("reduces") the centre line; only once the section has
+    // risen to mid-viewport does the LEFT rail line begin to travel down — so the
+    // left line never moves before the middle line has reduced.
+    const lineLen = Math.min(Math.max(vh / 2 - rect.top, 0), maxReach);
     const endY = 70 + lineLen;
     // centre-top down, rounded corner turning left (r=30), horizontal to x158,
     // rounded corner turning down (r=30) at x128, then the vertical line — ONE
