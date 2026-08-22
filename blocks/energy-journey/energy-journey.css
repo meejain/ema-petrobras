@@ -438,6 +438,14 @@ main > .section.energy-journey-container {
     margin-bottom: -1px;
   }
 
+  /* On desktop the descending vertical line to the pin is drawn by the page-level
+     map connector (.jde-map-connector), which flows continuously from the map
+     into this intro. The journey's own inherit-line would be a redundant second
+     line, so hide it here (mobile still uses it for the reveal flow). */
+  .energy-journey-swiper .energy-journey-inherit-line {
+    display: none;
+  }
+
   .energy-journey-swiper .energy-journey-image .energy-journey-grow-line {
     position: absolute;
   }

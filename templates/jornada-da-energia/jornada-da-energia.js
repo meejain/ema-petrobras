@@ -140,6 +140,12 @@ function buildMapConnector(main) {
   svg.append(path);
   section.append(svg);
 
+  // the journey section that follows the map — its intro dot is where the
+  // descending line must ARRIVE, so the line flows seamlessly from the map,
+  // past the section boundary, down to the location pin (then the journey's
+  // own grow-lines carry it right through the vectors).
+  const journey = section.nextElementSibling;
+
   const desktop = window.matchMedia('(min-width: 992px)');
   let ticking = false;
   const update = () => {
@@ -148,23 +154,36 @@ function buildMapConnector(main) {
     svg.style.display = '';
     const w = section.offsetWidth;
     const h = section.offsetHeight;
-    svg.setAttribute('width', w);
-    svg.setAttribute('height', h);
-    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    const cx = Math.round(w / 2);
     const rect = section.getBoundingClientRect();
     const vh = window.innerHeight;
+    // The line may extend BELOW the map section into the journey intro, so size
+    // the SVG canvas to cover the map PLUS the reach to the journey's intro dot.
+    // maxReach = distance from the map-section top to the journey intro dot (or
+    // the map bottom if the journey isn't found). overflow:visible lets the
+    // stroke paint past the section box.
+    let maxReach = h - 70;
+    const dot = journey ? journey.querySelector('.energy-journey-dot') : null;
+    if (dot) {
+      const dRect = dot.getBoundingClientRect();
+      // dot centre in the map-section's coordinate space
+      maxReach = Math.max(maxReach, (dRect.top + dRect.height / 2) - rect.top);
+    }
+    const svgH = Math.ceil(maxReach + 10);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', svgH);
+    svg.setAttribute('viewBox', `0 0 ${w} ${svgH}`);
+    const cx = Math.round(w / 2);
     // vertical line grows with scroll (source formula): 0 until the section top
-    // rises past the viewport middle, then extends down (capped to the section).
-    const maxLine = Math.max(0, h - 70);
-    const lineLen = Math.min(Math.max(vh / 2 - rect.top, 0), maxLine);
+    // rises past the viewport middle, then extends down — now allowed to reach
+    // all the way to the journey intro dot so the line is continuous.
+    const lineLen = Math.min(Math.max(vh / 2 - rect.top, 0), maxReach);
     const endY = 70 + lineLen;
     // centre-top down, rounded corner turning left (r=30), horizontal to x158,
     // rounded corner turning down (r=30) at x128, then the vertical line — ONE
     // continuous stroke so the elbow and vertical line never separate.
     const d = `M ${cx} 0 V 10 Q ${cx} 40 ${cx - 30} 40 L 158 40 Q 128 40 128 70 V ${endY}`;
     path.setAttribute('d', d);
-    svg.style.opacity = (rect.top < vh && rect.top > -h) ? '1' : '0';
+    svg.style.opacity = (rect.top < vh && rect.bottom > -svgH) ? '1' : '0';
   };
   const onScroll = () => {
     if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
