@@ -13,6 +13,73 @@ reach 100% parity.
 
 ---
 
+## 0. CURRENT STATUS (latest) — read this first
+
+Strategy pivot in effect: **reuse the source's own Swiper/CSS code as much as
+possible; no repo rules gate this page — the only goal is to match the source.**
+Swiper is vendored locally (`blocks/energy-journey/swiper-bundle.min.{js,css}`)
+and the block drives it.
+
+### What WORKS now
+- **Hero** — fixed full-screen banner, video, centered two-column title/desc,
+  vertical white line draws down. Matches source.
+- **Fixed dot-rail** (`.jde-nav`, template) — left, tracks sections, gold active.
+- **Map intro** ("From energy production…") — green band, white text, correct.
+- **Interactive map** — all 8 hotspots, full card content.
+- **Green journey (energy-journey) content** — 7 stages, full verbatim copy,
+  refining table, logistics list, closing statement.
+- **Vector illustrations** — the 7 Lottie line-drawings render and PLAY as each
+  slide activates (per-slide `.play()` on `slideChange`). ✅
+- **Per-anim SVG transforms** — the source's exact
+  `.animPessoas/Exploracao/Plataforma/Gas/Logistica svg { transform … }` nudges
+  are applied so each vector sits where its grow-line points. ✅
+- **grow-line mechanic** — ported VERBATIM from source
+  (`.grow-line.to-map/to-boat/to-factory/to-storage/to-truck`, widths
+  `calc(100vw − Npx)`, `.swiper-slide-active ~ .swiper-slide .grow-line{width:0}`).
+  Verified byte-for-byte vs source: at rest all 0; advancing one slide grows the
+  PREVIOUS slide's line to 939px. So vector→vector line motion is correct. ✅
+- **new-energy** white slider, **tech/explore cards**, **CTA**, **FAQ** — present.
+
+### The ONE unresolved issue — the map→pin line JOIN (task #11, in progress)
+The line has THREE ported pieces that must read as one continuous line as you
+scroll (source confirmed it is NOT a single element — it's a handoff):
+1. **map → down** = `.jde-map-connector` (SVG path in template JS). Uses the
+   source formula `height = scrollTop − sectionTop + vh/2`. ✅ works, one stroke.
+2. **→ location pin** = the journey intro's `.energy-journey-inherit-line`
+   (draws up, corners right). 
+3. **pin → right through vectors** = the `.grow-line`s. ✅
+
+**Problem:** geometry mismatch at the join. The descending map line arrives at
+the **LEFT rail (x≈128)**, but our intro **location-pin sits at CENTER (x≈712)**.
+The source reconciles this with its `.inherit-line` (`right:50%; width:calc(50vw
+−128px)` — a center→left horizontal+corner). In our build the map line stops at
+x128 and doesn't reach the centered pin, so the line looks like it "ends at half
+the map." An attempt to extend the map connector down into the journey was made
+(`buildMapConnector` now sizes its SVG to reach the journey `.energy-journey-dot`
+and the journey inherit-line is `display:none` on desktop) — but the x128 vs
+x712 mismatch means it still doesn't visually connect to the pin.
+
+**Recommended fix (pending user choice):** rebuild the journey intro to the
+source's exact `.green-starting-dot` + `.inherit-line` markup/CSS **verbatim**
+(dot centered; inherit-line `right:50%; width:calc(50vw−128px)` connecting
+center→left→down) so the source's own geometry makes the join correct — instead
+of reconciling our centered-intro layout by hand. Options considered:
+(a) rebuild intro 1:1 from source [recommended]; (b) un-hide + hand-tune the
+inherit-line to meet the x128 map line; (c) pause line work, move on.
+
+### Source line code we have (nothing missing)
+All CSS/JS for the line motion is extracted and in the repo — there is no
+special animation library. Map line = 1-line jQuery scroll handler (ported).
+grow-lines = pure CSS width transitions toggled by Swiper's `swiper-slide-active`
+(ported). inherit-line = CSS border + `border-radius` corner transition (present
+but `display:none` on desktop right now). See §1.3 for exact values.
+
+### Known cosmetic follow-ups (non-blocking)
+- Dot-rail labels: after reordering, `.jde-nav` shows 8 dots for 9 sections;
+  labels are slightly off (e.g. "Explore the journey"). Reconcile to intended set.
+
+---
+
 ## 1. How the SOURCE page works (ground truth)
 
 The source is a Liferay page using **React + Swiper + jQuery + Lottie (bodymovin)**.
