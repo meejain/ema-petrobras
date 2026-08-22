@@ -385,11 +385,21 @@ export default function decorate(block) {
     stages.forEach((s) => s.classList.remove('is-active'));
   };
 
-  // ---- DESKTOP: Swiper horizontal slider, advanced by scroll within the track
+  // ---- DESKTOP: Swiper horizontal slider, driven by a TALL PINNED TRACK ----
+  // The source locks the page and drives slides by mouse-wheel notches. Snapping
+  // window.scrollTo every frame fights the browser's native scroll (janky, and it
+  // can't actually PIN a section that is only one viewport tall). Instead we give
+  // the track REAL scroll distance — (panels)×100svh — so the inner .pin sticks
+  // for the whole strip, and we map how far the track has scrolled to the active
+  // slide. Result is the same experience the source gives: as you scroll the
+  // section holds, the vertical inherit-line draws to the pin, then each vector's
+  // grow-line collapses in turn as the strip advances, and at the end the pin
+  // releases and the page scrolls on — but scroll-LINKED, so it never fights you.
   let swiper = null;
   let scrollHandler = null;
+  const panels = stages.length + 1; // intro + stages
   const setupPinned = async () => {
-    const panels = stages.length + 1; // intro + stages
+    // one viewport of scroll distance PER panel, so the pin sticks the whole way
     track.style.height = `${panels * 100}svh`;
     const Swiper = await loadSwiper();
     if (!Swiper) { track.style.height = ''; setupReveal(); return; }
@@ -397,22 +407,31 @@ export default function decorate(block) {
       direction: 'horizontal',
       slidesPerView: 1,
       speed: reduceMotion.matches ? 0 : 600,
-      allowTouchMove: false, // scroll position drives the slides on desktop
+      allowTouchMove: false, // scroll position (not drag/wheel) drives the slides
       keyboard: { enabled: true },
       a11y: { enabled: true },
     });
     swiper.on('slideChange', () => playStage(swiper.activeIndex - 1));
+
     let lineActivated = false;
     let ticking = false;
     const update = () => {
       ticking = false;
       const rect = track.getBoundingClientRect();
       const vh = window.innerHeight;
-      const total = track.offsetHeight - vh; // scrollable distance while pinned
+      const total = track.offsetHeight - vh; // scroll distance while pinned
       const scrolled = Math.min(Math.max(-rect.top, 0), total);
       const p = total > 0 ? scrolled / total : 0;
-      const pinned = rect.top <= 0 && rect.bottom >= vh;
+      const pinned = rect.top <= 1 && rect.bottom >= vh;
+      // draw the inherit-line (and play the intro anim) as soon as we pin
       if ((pinned || p > 0) && !lineActivated) { activateLine(); lineActivated = true; }
+      if (!pinned && p <= 0 && lineActivated) {
+        // scrolled back above the section → retract the line, reset to intro
+        inheritLine.classList.remove('is-active');
+        lineActivated = false;
+      }
+      block.classList.toggle('is-scrollable', pinned || p > 0);
+      // map scroll progress → active panel (0 = intro, then each stage)
       const panel = Math.min(panels - 1, Math.max(0, Math.round(p * (panels - 1))));
       if (swiper && panel !== swiper.activeIndex) swiper.slideTo(panel);
     };
@@ -420,13 +439,19 @@ export default function decorate(block) {
       if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
     };
     window.addEventListener('scroll', scrollHandler, { passive: true });
+    window.addEventListener('resize', scrollHandler, { passive: true });
     update();
   };
 
   const teardownPinned = () => {
-    if (scrollHandler) { window.removeEventListener('scroll', scrollHandler); scrollHandler = null; }
+    if (scrollHandler) {
+      window.removeEventListener('scroll', scrollHandler);
+      window.removeEventListener('resize', scrollHandler);
+      scrollHandler = null;
+    }
     if (swiper) { swiper.destroy(true, true); swiper = null; }
     track.style.height = '';
+    block.classList.remove('is-scrollable', 'is-past');
     stages.forEach((s) => s.classList.remove('is-current'));
   };
 

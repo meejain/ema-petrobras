@@ -125,8 +125,18 @@ function orderSections(main) {
 const JDE_NS = 'http://www.w3.org/2000/svg';
 
 function buildMapConnector(main) {
-  const section = main.querySelector(':scope > .section.energy-map-container');
-  if (!section) return;
+  const mapSection = main.querySelector(':scope > .section.energy-map-container');
+  if (!mapSection) return;
+  // In the source the heading ("From energy production…") and the map live in ONE
+  // `.section-map`, and the connector's elbow sits at the TOP of that section so
+  // the line runs continuously PAST THE HEADING and down into the map. Our page
+  // authors the heading as a separate `.green` section just before the map, so we
+  // anchor the connector to that heading section and let it span down through the
+  // map (overflow:visible). Fall back to the map section if there is no heading.
+  const headingSection = (mapSection.previousElementSibling
+    && mapSection.previousElementSibling.classList.contains('green'))
+    ? mapSection.previousElementSibling : mapSection;
+
   const svg = document.createElementNS(JDE_NS, 'svg');
   svg.setAttribute('class', 'jde-map-connector');
   svg.setAttribute('aria-hidden', 'true');
@@ -138,13 +148,14 @@ function buildMapConnector(main) {
   path.setAttribute('stroke-linecap', 'round');
   path.setAttribute('stroke-linejoin', 'round');
   svg.append(path);
-  section.append(svg);
+  headingSection.append(svg);
 
-  // the journey section that follows the map — its intro dot is where the
-  // descending line must ARRIVE, so the line flows seamlessly from the map,
-  // past the section boundary, down to the location pin (then the journey's
-  // own grow-lines carry it right through the vectors).
-  const journey = section.nextElementSibling;
+  // the journey section that follows the map. Once it LOCKS (adds .is-scrollable
+  // — see the energy-journey block JS), its own inherit-line draws the descending
+  // line to the location pin, so the map connector FADES OUT (source:
+  // `.section-map__line.fadeOut()`), handing the line off seamlessly.
+  const journey = mapSection.nextElementSibling;
+  const journeyBlock = journey ? journey.querySelector('.energy-journey') : null;
 
   const desktop = window.matchMedia('(min-width: 992px)');
   let ticking = false;
@@ -152,38 +163,37 @@ function buildMapConnector(main) {
     ticking = false;
     if (!desktop.matches) { svg.style.display = 'none'; return; }
     svg.style.display = '';
-    const w = section.offsetWidth;
-    const h = section.offsetHeight;
-    const rect = section.getBoundingClientRect();
+    const w = headingSection.offsetWidth;
+    const rect = headingSection.getBoundingClientRect();
+    const mapRect = mapSection.getBoundingClientRect();
     const vh = window.innerHeight;
-    // The line may extend BELOW the map section into the journey intro, so size
-    // the SVG canvas to cover the map PLUS the reach to the journey's intro dot.
-    // maxReach = distance from the map-section top to the journey intro dot (or
-    // the map bottom if the journey isn't found). overflow:visible lets the
-    // stroke paint past the section box.
-    let maxReach = h - 70;
-    const dot = journey ? journey.querySelector('.energy-journey-dot') : null;
-    if (dot) {
-      const dRect = dot.getBoundingClientRect();
-      // dot centre in the map-section's coordinate space
-      maxReach = Math.max(maxReach, (dRect.top + dRect.height / 2) - rect.top);
-    }
-    const svgH = Math.ceil(maxReach + 10);
+    // the connector spans from the heading section top down to the MAP bottom, so
+    // the SVG canvas height is the gap between the two rects' tops plus the map's
+    // full height. overflow:visible lets the stroke paint below the heading box.
+    const spanBottom = (mapRect.bottom - rect.top);
+    const svgH = Math.ceil(spanBottom + 10);
+    // the elbow's vertical line must reach at most the map bottom
+    const maxReach = spanBottom - 70;
     svg.setAttribute('width', w);
     svg.setAttribute('height', svgH);
     svg.setAttribute('viewBox', `0 0 ${w} ${svgH}`);
     const cx = Math.round(w / 2);
-    // vertical line grows with scroll (source formula): 0 until the section top
-    // rises past the viewport middle, then extends down — now allowed to reach
-    // all the way to the journey intro dot so the line is continuous.
-    const lineLen = Math.min(Math.max(vh / 2 - rect.top, 0), maxReach);
+    // vertical line grows with scroll: it starts extending as soon as the heading
+    // section enters the viewport (top passes vh − 70) and keeps growing toward
+    // the map bottom as you scroll, so by the time the map is in view the line has
+    // travelled down through the whole section (source .section-map__line effect).
+    const lineLen = Math.min(Math.max(vh - 70 - rect.top, 0), maxReach);
     const endY = 70 + lineLen;
     // centre-top down, rounded corner turning left (r=30), horizontal to x158,
     // rounded corner turning down (r=30) at x128, then the vertical line — ONE
-    // continuous stroke so the elbow and vertical line never separate.
+    // continuous stroke so the elbow and vertical line never separate. The elbow
+    // sits just below the heading-section top so the line is beside the heading.
     const d = `M ${cx} 0 V 10 Q ${cx} 40 ${cx - 30} 40 L 158 40 Q 128 40 128 70 V ${endY}`;
     path.setAttribute('d', d);
-    svg.style.opacity = (rect.top < vh && rect.bottom > -svgH) ? '1' : '0';
+    // fade out once the journey has locked (its inherit-line owns the line now)
+    const handedOff = journeyBlock && journeyBlock.classList.contains('is-scrollable');
+    const onScreen = rect.top < vh && mapRect.bottom > 0;
+    svg.style.opacity = (onScreen && !handedOff) ? '1' : '0';
   };
   const onScroll = () => {
     if (!ticking) { ticking = true; window.requestAnimationFrame(update); }

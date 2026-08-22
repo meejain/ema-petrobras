@@ -438,12 +438,15 @@ main > .section.energy-journey-container {
     margin-bottom: -1px;
   }
 
-  /* On desktop the descending vertical line to the pin is drawn by the page-level
-     map connector (.jde-map-connector), which flows continuously from the map
-     into this intro. The journey's own inherit-line would be a redundant second
-     line, so hide it here (mobile still uses it for the reveal flow). */
+  /* The join to the location pin is drawn by the intro's own inherit-line
+     (source .green-starting-dot .inherit-line): anchored right:50%/bottom:50% of
+     the centred dot with width calc(50vw − 128px), its ::before draws the x=128
+     vertical UP then corners RIGHT to the dot (border-radius 0 0 0 60px). The
+     x=128 rail matches the map connector's rail, so when the section locks and
+     the map connector fades out (see template), the inherit-line takes over the
+     descending line seamlessly and carries it to the pin. */
   .energy-journey-swiper .energy-journey-inherit-line {
-    display: none;
+    display: block;
   }
 
   .energy-journey-swiper .energy-journey-image .energy-journey-grow-line {

@@ -58,6 +58,19 @@ body.jornada-da-energia main > .section.hero-container:first-child + .section {
   margin-top: 100svh;
 }
 
+/* The connector line lives in the heading (.green) section and OVERFLOWS
+   downward into the map. Because the map section is a later sibling with the
+   same z-index and an opaque background, it would paint OVER that overflowing
+   line — cutting the line off at the heading's bottom edge. Raise the heading
+   section above the map so its overflowing connector stays visible over the map.
+   The heading's own box is short (~one heading tall), so only the line overflows;
+   the map's content is never covered. Uses the same selector shape as the other
+   green rules so it beats the base `.section:not(.hero-container:first-child)`
+   z-index on specificity. */
+body.jornada-da-energia main > .section:not(.hero-container:first-child).green {
+  z-index: 4;
+}
+
 /* Green windows (map + journey) and the grey "new energy" window override the
    white default. Each carries the same `:not(.hero-container:first-child)` base
    plus its own class, so it wins on both specificity and order. */
@@ -71,6 +84,13 @@ body.jornada-da-energia main > .section:not(.hero-container:first-child).green {
    also whitens its text and keeps the section flush with the map below it. */
 body.jornada-da-energia main > .section:not(.hero-container:first-child).green :is(h1, h2, h3, h4, h5, h6, p) {
   color: #fff;
+}
+
+/* breathing room above the "From energy production…" heading so the green band
+   opens with space before the title (matches the source's section top padding),
+   and the connector elbow has room to corner in beside the heading. */
+body.jornada-da-energia main > .section:not(.hero-container:first-child).green > div {
+  padding-top: 72px;
 }
 
 body.jornada-da-energia main > .section:not(.hero-container:first-child).energy-journey-container:has(.energy-journey.new-energy) {
@@ -213,6 +233,7 @@ body.jornada-da-energia main > .section.energy-map-container .default-content-wr
     display: flex;
   }
 
+  body.jornada-da-energia main > .section.green > .jde-map-connector,
   body.jornada-da-energia main > .section.energy-map-container > .jde-map-connector {
     position: absolute;
     top: 0;
